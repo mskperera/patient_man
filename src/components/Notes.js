@@ -635,6 +635,7 @@ function Notes() {
             ],
           }}
           className="bg-white rounded-lg"
+          style={{ padding: '10px 12px' }} // Adds vertical and horizontal padding
         />
       </div>
 

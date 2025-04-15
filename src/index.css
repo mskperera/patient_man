@@ -11,3 +11,8 @@ body {
 main {
   @apply min-h-[calc(100vh-128px)];
 }
+
+.ql-editor {
+  padding: 12px 15px; /* Adjusts padding inside the editable area */
+  min-height: 100px; /* Optional: Ensures enough vertical space */
+}
