@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-100 text-gray-800;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Ensure content doesn't overlap fixed elements */
+main {
+  @apply min-h-[calc(100vh-128px)];
+}
