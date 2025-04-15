@@ -666,11 +666,8 @@ function Notes() {
           </div>
         </div>
       )}
-
-      {/* Timeline of Saved Notes */}
-      {savedNotes.length > 0 && (
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-6">
+   <div className="mt-4">
+<div className="flex justify-between items-center mb-6">
             <div className="flex items-center mb-4">
               <input
                 type="checkbox"
@@ -692,6 +689,12 @@ function Notes() {
               Save Notes
             </button>
           </div>
+          </div>
+
+      {/* Timeline of Saved Notes */}
+      {savedNotes.length > 0 && (
+        <div className="mt-8">
+        
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Notes Timeline</h3>
           <div className="relative">
             <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-sky-600"></div>
