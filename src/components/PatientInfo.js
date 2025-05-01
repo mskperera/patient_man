@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap } from 'react-icons/fa';
+import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt } from 'react-icons/fa';
+import { FaHeartPulse } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function PatientInfo({ mode = 'view' }) {
@@ -294,7 +295,10 @@ function PatientInfo({ mode = 'view' }) {
     {
       id: '1',
       patientId: 'PT-0001',
-      name: 'John Doe',
+      firstName: 'John',
+      middleName: 'Peter',
+      lastName: 'Perera',
+      formDate: '1990-01-01',
       dob: '1990-01-01',
       age: '35',
       gender: 'Male',
@@ -500,20 +504,30 @@ function PatientInfo({ mode = 'view' }) {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="flex items-center text-3xl font-bold text-gray-800">
-          <FaUserMd className="mr-3" size={32} />
-          Patient Biographical Information
-        </h2>
-        <button
-          onClick={toggleEdit}
-          className="flex items-center bg-sky-600 text-white px-5 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
-          aria-label={isEditing ? 'Save changes' : 'Edit patient info'}
-        >
-          <FaEdit className="mr-2" />
-          {isEditing ? 'Save' : 'Edit'}
-        </button>
-      </div>
+  <div className="flex justify-between items-center mb-6">
+    <h2 className="flex items-center text-3xl font-bold text-gray-800">
+      <FaUserMd className="mr-3" size={32} />
+      Patient Biographical Information
+    </h2>
+    <div className="flex space-x-3">
+      <button
+        onClick={() => navigate(`/patients/report/${patientId}`)}
+        className="flex items-center bg-gray-600 text-white px-5 py-2 rounded-lg hover:bg-gray-700 transition-all duration-200 shadow-md"
+        aria-label="View patient report"
+      >
+        <FaFileAlt className="mr-2" />
+        Page View
+      </button>
+      <button
+        onClick={toggleEdit}
+        className="flex items-center bg-sky-600 text-white px-5 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
+        aria-label={isEditing ? 'Save changes' : 'Edit patient info'}
+      >
+        <FaEdit className="mr-2" />
+        {isEditing ? 'Save' : 'Edit'}
+      </button>
+    </div>
+  </div>
       <div className="flex space-x-3 mb-6 p-1 bg-gray-200 rounded-lg">
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -537,6 +551,18 @@ function PatientInfo({ mode = 'view' }) {
           <FaUser className="mr-2" size={16} />
           Family
         </button>
+   
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === 'medical'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'bg-transparent text-gray-700 hover:bg-gray-300'
+          }`}
+          onClick={() => setActiveTab('medical')}
+        >
+          <FaHeartPulse className="mr-2" size={16} />
+          Mental Health
+        </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
             activeTab === 'education'
@@ -548,18 +574,6 @@ function PatientInfo({ mode = 'view' }) {
           <FaGraduationCap className="mr-2" size={16} />
           Education
         </button>
-        <button
-          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
-            activeTab === 'medical'
-              ? 'bg-sky-600 text-white shadow-sm'
-              : 'bg-transparent text-gray-700 hover:bg-gray-300'
-          }`}
-          onClick={() => setActiveTab('medical')}
-        >
-          <FaNotesMedical className="mr-2" size={16} />
-          Medical
-        </button>
-   
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 p-6 ">
         {activeTab === 'personal' && (
@@ -594,16 +608,53 @@ function PatientInfo({ mode = 'view' }) {
                     </label>
                   )}
                 </div>
+                <div></div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700">Date</label>
                   <input
-                    name="name"
-                    value={patient.name}
+                    type="date"
+                    name="formDate"
+                    value={patient.formDate}
                     onChange={handleChange}
                     className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter full name"
                     disabled={!isEditing}
-                    aria-label="Full name"
+                    aria-label="Form Date"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                  <input
+                    name="lastName"
+                    value={patient.lastName}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Enter last name"
+                    disabled={!isEditing}
+                    aria-label="Last name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">First Name</label>
+                  <input
+                    name="firstName"
+                    value={patient.firstName}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Enter first name"
+                    disabled={!isEditing}
+                    aria-label="First name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Middle Name</label>
+                  <input
+                    name="middleName"
+                    value={patient.middleName}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Enter middle name"
+                    disabled={!isEditing}
+                    aria-label="Middle name"
                   />
                 </div>
                 <div>
@@ -717,7 +768,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Permanent Address (if different)</label>
+                  <label className="block text-sm font-medium text-gray-700">Permanent Address (if different from above)</label>
                   <textarea
                     name="permanentAddress"
                     value={patient.permanentAddress}
@@ -860,22 +911,25 @@ function PatientInfo({ mode = 'view' }) {
                     ))}
                   </div>
                 </div>
-                {(patient.maritalStatus.includes('married') || patient.maritalStatus.includes('widowed')) && (
-                  <div>
+                {/* {JSON.stringify(patient.maritalStatus)} */}
+           
+                 
+             
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
                     <label className="block text-sm font-medium text-gray-700">Number of Years Married to Present Spouse</label>
                     <input
                       type="number"
                       name="yearsMarried"
+                      
                       value={patient.yearsMarried}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       placeholder="Enter years"
-                      disabled={!isEditing}
+                      disabled={!isEditing || !patient.maritalStatus.includes('now for')}
                       aria-label="Years married"
                     />
                   </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Ages of Male Children</label>
                     <input
@@ -901,8 +955,10 @@ function PatientInfo({ mode = 'view' }) {
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Years of Formal Education Completed</label>
+                  <label className="block text-sm font-medium text-gray-700">Years of Formal Education Completed (circle number of years)</label>
                   <select
                     name="educationYears"
                     value={patient.educationYears}
@@ -919,26 +975,40 @@ function PatientInfo({ mode = 'view' }) {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    How religious are you? (1 = Not Religious, 9 = Very Religious)
-                  </label>
-                  <select
-                    name="religiosity"
-                    value={patient.religiosity}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    disabled={!isEditing}
-                    aria-label="Religiosity"
-                  >
-                    <option value="">Select level</option>
-                    {[...Array(9)].map((_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <div className='col-span-2 mx-20'>
+  <label className="block text-sm font-medium text-gray-700">
+    How religious are you? (1 = Very Religious, 5 = Average, 9 = Atheist)
+  </label>
+  <div className="mt-2 flex items-start justify-between">
+    {/* Labels above the scale */}
+    <div className="flex w-full justify-between">
+      <span className="text-xs text-gray-600 -ml-1">Very</span>
+      <span className="text-xs text-gray-600">Average</span>
+      <span className="text-xs text-gray-600 -mr-1">Atheist</span>
+    </div>
+  </div>
+  <div className="flex items-center justify-between mt-1 space-x-1">
+    {[...Array(9)].map((_, i) => {
+      const value = (i + 1).toString();
+      return (
+        <label key={value} className="flex flex-col items-center">
+          <input
+            type="radio"
+            name="religiosity"
+            value={value}
+            checked={patient.religiosity === value}
+            onChange={handleChange}
+            className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 disabled:opacity-75 custom-radio"
+            disabled={!isEditing}
+            aria-label={`Religiosity level ${value}`}
+          />
+          <span className="mt-1 text-sm text-gray-700">{value}</span>
+        </label>
+      );
+    })}
+  </div>
+</div>
+</div>
               </div>
             </section>
             {/* Personal Insights */}
@@ -947,7 +1017,7 @@ function PatientInfo({ mode = 'view' }) {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Things you like to do most, kinds of things and persons that give you pleasure
+                    List the things you like to do most, kinds of things and persons that give you pleasure
                   </label>
                   <textarea
                     name="thingsLiked"
@@ -961,7 +1031,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Main assets and good points</label>
+                  <label className="block text-sm font-medium text-gray-700">List your main assets and good points</label>
                   <textarea
                     name="assets"
                     value={patient.assets}
@@ -974,7 +1044,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Main bad points</label>
+                  <label className="block text-sm font-medium text-gray-700">List your main bad points</label>
                   <textarea
                     name="badPoints"
                     value={patient.badPoints}
@@ -987,7 +1057,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Main social difficulties</label>
+                  <label className="block text-sm font-medium text-gray-700">List your main social difficulties</label>
                   <textarea
                     name="socialDifficulties"
                     value={patient.socialDifficulties}
@@ -1000,7 +1070,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Main love and sex difficulties</label>
+                  <label className="block text-sm font-medium text-gray-700">List your main love and sex difficulties</label>
                   <textarea
                     name="loveSexDifficulties"
                     value={patient.loveSexDifficulties}
@@ -1013,7 +1083,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Main school or work difficulties</label>
+                  <label className="block text-sm font-medium text-gray-700">List your main school or work difficulties</label>
                   <textarea
                     name="schoolWorkDifficulties"
                     value={patient.schoolWorkDifficulties}
@@ -1026,7 +1096,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Main life goals</label>
+                  <label className="block text-sm font-medium text-gray-700">List your main life goals</label>
                   <textarea
                     name="lifeGoals"
                     value={patient.lifeGoals}
@@ -1039,7 +1109,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Things about yourself you would most like to change</label>
+                  <label className="block text-sm font-medium text-gray-700">List the things about yourself you would most like to change</label>
                   <textarea
                     name="thingsToChange"
                     value={patient.thingsToChange}
@@ -1057,7 +1127,7 @@ function PatientInfo({ mode = 'view' }) {
             <section>
               <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">Occupation Information</h3>
               <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">What occupation(s) have you mainly been trained for?</label>
                     <input
@@ -1070,9 +1140,25 @@ function PatientInfo({ mode = 'view' }) {
                       aria-label="Occupation"
                     />
                   </div>
+                
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Present Occupation</label>
-                    <div className="flex items-center space-x-4 mt-1">
+                    <input
+                      name="occupation"
+                      value={patient.occupation}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter occupation"
+                      disabled={!isEditing}
+                      aria-label="Occupation"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Occupation Status</label>
+                    <div className="flex items-center space-x-4  mt-5">
                       <label className="flex items-center">
                         <input
                           type="checkbox"
@@ -1100,8 +1186,22 @@ function PatientInfo({ mode = 'view' }) {
                     </div>
                   </div>
                 </div>
-                {(patient.maritalStatus.includes('married') || patient.maritalStatus.includes('widowed')) && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+          
+               
+              </div>
+            </section>
+          </div>
+        )}
+        {activeTab === 'family' && (
+          <div className="space-y-10">
+
+
+
+<section>
+              <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">Spouse's Information</h3>
+              <div className="space-y-6">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Spouse's Occupation</label>
                       <input
@@ -1110,13 +1210,13 @@ function PatientInfo({ mode = 'view' }) {
                         onChange={handleChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Enter spouse's occupation"
-                        disabled={!isEditing}
+                        disabled={!isEditing || !patient.maritalStatus.includes('now for')}
                         aria-label="Spouse's occupation"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Spouse's Occupation Status</label>
-                      <div className="flex items-center space-x-4 mt-1">
+                      <div className="flex items-center space-x-4 mt-5">
                         <label className="flex items-center">
                           <input
                             type="checkbox"
@@ -1124,7 +1224,7 @@ function PatientInfo({ mode = 'view' }) {
                             checked={patient.spouseOccupationFullTime}
                             onChange={(e) => setPatient({ ...patient, spouseOccupationFullTime: e.target.checked })}
                             className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                            disabled={!isEditing}
+                            disabled={!isEditing || !patient.maritalStatus.includes('now for')}
                             aria-label="Spouse full-time"
                           />
                           <span className="ml-2 text-sm text-gray-700">Full-time</span>
@@ -1133,10 +1233,10 @@ function PatientInfo({ mode = 'view' }) {
                           <input
                             type="checkbox"
                             name="spouseOccupationFullTime"
-                            checked={!patient.spouseOccupationFullTime}
+                            checked={!patient.maritalStatus.includes('now for') ? false : !patient.spouseOccupationFullTime}
                             onChange={(e) => setPatient({ ...patient, spouseOccupationFullTime: !e.target.checked })}
                             className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                            disabled={!isEditing}
+                            disabled={!isEditing || !patient.maritalStatus.includes('now for')}
                             aria-label="Spouse part-time"
                           />
                           <span className="ml-2 text-sm text-gray-700">Part-time</span>
@@ -1144,13 +1244,14 @@ function PatientInfo({ mode = 'view' }) {
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </section>
-          </div>
-        )}
-        {activeTab === 'family' && (
-          <div className="space-y-10">
+</div>
+</section>
+
+
+
+
+
+
             {/* Parental Information */}
             <section>
               <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">Parental Information</h3>
@@ -1271,7 +1372,8 @@ function PatientInfo({ mode = 'view' }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Describe the type of person your mother (or stepmother) was when you were a child and how you got along with her
+                  Briefly describe the type of person your mother (or stepmother or person who substituted for your mother) was when you were a child
+ and how you got along with her
                   </label>
                   <textarea
                     name="motherDescription"
@@ -1286,7 +1388,8 @@ function PatientInfo({ mode = 'view' }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Describe the type of person your father (or stepfather) was when you were a child and how you got along with him
+                  Briefly describe the type of person your father (or stepfather or father substitute) was when you were a child and how you got along
+                  with him
                   </label>
                   <textarea
                     name="fatherDescription"
@@ -1561,7 +1664,7 @@ function PatientInfo({ mode = 'view' }) {
               <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">Health Details</h3>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Chief physical ailments, diseases, complaints, or handicaps</label>
+                  <label className="block text-sm font-medium text-gray-700">List your chief physical ailments, diseases, complaints, or handicaps</label>
                   <textarea
                     name="physicalAilments"
                     value={patient.physicalAilments}
@@ -1574,7 +1677,7 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Briefly list your present main complaints, symptoms, and problems</label>
+                  <label className="block text-sm font-medium text-gray-700">Briefly list (PRINT) your present main complaints, symptoms, and problems</label>
                   <textarea
                     name="mainComplaints"
                     value={patient.mainComplaints}
@@ -1633,9 +1736,9 @@ function PatientInfo({ mode = 'view' }) {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">What kind of treatment have you previously had for emotional problems?</label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Hours of individual therapy, spread over years, ending years ago</label>
+                      <label className="block text-sm font-medium text-gray-600">Hours of individual therapy</label>
                       <div className="flex space-x-4 mt-1">
                         <input
                           type="number"
@@ -1647,18 +1750,44 @@ function PatientInfo({ mode = 'view' }) {
                           disabled={!isEditing}
                           aria-label="Individual therapy hours"
                         />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Spread over years</label>
+                      <div className="flex space-x-4 mt-1">
                         <input
                           type="number"
-                          name="individualTherapyYears"
-                          value={patient.individualTherapyYears}
+                          name="individualTherapyHours"
+                          value={patient.individualTherapyHours}
                           onChange={handleChange}
                           className="w-1/2 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                          placeholder="Years"
+                          placeholder="Hours"
                           disabled={!isEditing}
-                          aria-label="Individual therapy years"
+                          aria-label="Individual therapy hours"
                         />
                       </div>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Ending years ago</label>
+                      <div className="flex space-x-4 mt-1">
+                        <input
+                          type="number"
+                          name="individualTherapyHours"
+                          value={patient.individualTherapyHours}
+                          onChange={handleChange}
+                          className="w-1/2 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                          placeholder="Hours"
+                          disabled={!isEditing}
+                          aria-label="Individual therapy hours"
+                        />
+                      </div>
+                    </div>
+</div>
+
+
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Hours of group therapy</label>
                       <input
@@ -1732,7 +1861,8 @@ function PatientInfo({ mode = 'view' }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Type of psychotherapy you have mainly had (e.g., dream analysis, free association, drugs, hypnosis, etc.)</label>
+                  <label className="block text-sm font-medium text-gray-700">Type of psychotherapy you have mainly had (briefly describe method of treatment—ex., dream analysis, free association, drugs,
+                    hypnosis, etc.)</label>
                   <input
                     name="psychotherapyType"
                     value={patient.psychotherapyType}
@@ -1760,11 +1890,32 @@ function PatientInfo({ mode = 'view' }) {
             </section>
           </div>
         )}
-        {activeTab === 'education' && (
+{activeTab === 'education' && (
   <div className="space-y-10">
     {/* G.C.E Ordinary Level (O/L) Qualifications */}
     <section>
-      <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">G.C.E Ordinary Level (O/L) Qualifications</h3>
+      <div className="flex items-center space-x-3 mb-5 border-b pb-2">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={patient.education.ol.enabled !== false} // Default to true if not set
+            onChange={(e) => {
+              setPatient((prev) => ({
+                ...prev,
+                education: {
+                  ...prev.education,
+                  ol: { ...prev.education.ol, enabled: e.target.checked }
+                }
+              }));
+            }}
+            className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+            disabled={!isEditing}
+            aria-label="Has G.C.E O/L Qualifications"
+          />
+          <span className="ml-2 text-sm text-gray-700"></span>
+        </label>
+        <h3 className="text-xl font-semibold text-gray-800">G.C.E Ordinary Level (O/L) Qualifications</h3>
+      </div>
       <div className="space-y-4">
         {patient.education.ol.subjects.map((subject, index) => (
           <div key={index} className="flex items-center space-x-4">
@@ -1775,7 +1926,7 @@ function PatientInfo({ mode = 'view' }) {
                 checked={subject.followed}
                 onChange={handleCheckboxChange}
                 className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                disabled={!isEditing}
+                disabled={!isEditing || patient.education.ol.enabled === false}
                 aria-label={`Studied ${subject.name}`}
               />
               <span className="ml-2 text-sm text-gray-700">Studied</span>
@@ -1786,7 +1937,7 @@ function PatientInfo({ mode = 'view' }) {
               onChange={handleChange}
               className="w-1/3 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
               placeholder="Subject name"
-              disabled={!isEditing || index < defaultOLSubjects.length}
+              disabled={!isEditing || index < defaultOLSubjects.length || patient.education.ol.enabled === false}
               aria-label={`O/L Subject ${index + 1} name`}
             />
             <input
@@ -1795,9 +1946,45 @@ function PatientInfo({ mode = 'view' }) {
               onChange={handleChange}
               className="w-1/4 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
               placeholder="Grade (e.g., A, B, C, S, W)"
-              disabled={!isEditing || !subject.followed}
+              disabled={!isEditing || !subject.followed || patient.education.ol.enabled === false}
               aria-label={`O/L Subject ${index + 1} marks`}
             />
+            {isEditing && index >= defaultOLSubjects.length && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPatient((prev) => {
+                    const updatedSubjects = [...prev.education.ol.subjects];
+                    updatedSubjects.splice(index, 1);
+                    return {
+                      ...prev,
+                      education: {
+                        ...prev.education,
+                        ol: { ...prev.education.ol, subjects: updatedSubjects }
+                      }
+                    };
+                  });
+                }}
+                className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200"
+                disabled={patient.education.ol.enabled === false}
+                aria-label="Remove O/L Subject"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
         {isEditing && (
@@ -1805,6 +1992,7 @@ function PatientInfo({ mode = 'view' }) {
             type="button"
             onClick={() => addCustomSubject('ol')}
             className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
+            disabled={patient.education.ol.enabled === false}
           >
             Add Custom O/L Subject
           </button>
@@ -1813,7 +2001,28 @@ function PatientInfo({ mode = 'view' }) {
     </section>
     {/* G.C.E Advanced Level (A/L) Qualifications */}
     <section>
-      <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">G.C.E Advanced Level (A/L) Qualifications</h3>
+      <div className="flex items-center space-x-3 mb-5 border-b pb-2">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={patient.education.al.enabled !== false} // Default to true if not set
+            onChange={(e) => {
+              setPatient((prev) => ({
+                ...prev,
+                education: {
+                  ...prev.education,
+                  al: { ...prev.education.al, enabled: e.target.checked }
+                }
+              }));
+            }}
+            className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+            disabled={!isEditing}
+            aria-label="Has G.C.E A/L Qualifications"
+          />
+          <span className="ml-2 text-sm text-gray-700"></span>
+        </label>
+        <h3 className="text-xl font-semibold text-gray-800">G.C.E Advanced Level (A/L) Qualifications</h3>
+      </div>
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Stream</label>
@@ -1822,7 +2031,7 @@ function PatientInfo({ mode = 'view' }) {
             value={patient.education.al.stream}
             onChange={handleChange}
             className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-            disabled={!isEditing}
+            disabled={!isEditing || patient.education.al.enabled === false}
             aria-label="A/L Stream"
           >
             <option value="">Select stream</option>
@@ -1841,7 +2050,7 @@ function PatientInfo({ mode = 'view' }) {
                 checked={subject.followed}
                 onChange={handleCheckboxChange}
                 className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                disabled={!isEditing}
+                disabled={!isEditing || patient.education.al.enabled === false}
                 aria-label={`Studied ${subject.name}`}
               />
               <span className="ml-2 text-sm text-gray-700">Studied</span>
@@ -1852,7 +2061,7 @@ function PatientInfo({ mode = 'view' }) {
               onChange={handleChange}
               className="w-1/3 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
               placeholder="Subject name"
-              disabled={!isEditing || index < defaultALSubjects.length}
+              disabled={!isEditing || index < defaultALSubjects.length || patient.education.al.enabled === false}
               aria-label={`A/L Subject ${index + 1} name`}
             />
             <input
@@ -1861,9 +2070,45 @@ function PatientInfo({ mode = 'view' }) {
               onChange={handleChange}
               className="w-1/4 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
               placeholder="Grade (e.g., A, B, C, S, W)"
-              disabled={!isEditing || !subject.followed}
+              disabled={!isEditing || !subject.followed || patient.education.al.enabled === false}
               aria-label={`A/L Subject ${index + 1} marks`}
             />
+            {isEditing && index >= defaultALSubjects.length && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPatient((prev) => {
+                    const updatedSubjects = [...prev.education.al.subjects];
+                    updatedSubjects.splice(index, 1);
+                    return {
+                      ...prev,
+                      education: {
+                        ...prev.education,
+                        al: { ...prev.education.al, subjects: updatedSubjects }
+                      }
+                    };
+                  });
+                }}
+                className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200"
+                disabled={patient.education.al.enabled === false}
+                aria-label="Remove A/L Subject"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
         {isEditing && (
@@ -1871,6 +2116,7 @@ function PatientInfo({ mode = 'view' }) {
             type="button"
             onClick={() => addCustomSubject('al')}
             className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
+            disabled={patient.education.al.enabled === false}
           >
             Add Custom A/L Subject
           </button>
@@ -1884,7 +2130,7 @@ function PatientInfo({ mode = 'view' }) {
               onChange={handleChange}
               className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
               placeholder="Grade (e.g., A, B, C, S, W)"
-              disabled={!isEditing}
+              disabled={!isEditing || patient.education.al.enabled === false}
               aria-label="General English Marks"
             />
           </div>
@@ -1896,7 +2142,7 @@ function PatientInfo({ mode = 'view' }) {
               onChange={handleChange}
               className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
               placeholder="Marks (e.g., 75)"
-              disabled={!isEditing}
+              disabled={!isEditing || patient.education.al.enabled === false}
               aria-label="Common General Test Marks"
             />
           </div>
@@ -1905,46 +2151,102 @@ function PatientInfo({ mode = 'view' }) {
     </section>
     {/* University Qualifications */}
     <section>
-      <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">University Qualifications</h3>
+      <div className="flex items-center space-x-3 mb-5 border-b pb-2">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            checked={patient.education.universityEnabled !== false} // Default to true if not set
+            onChange={(e) => {
+              setPatient((prev) => ({
+                ...prev,
+                education: {
+                  ...prev.education,
+                  universityEnabled: e.target.checked
+                }
+              }));
+            }}
+            className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+            disabled={!isEditing}
+            aria-label="Has University Qualifications"
+          />
+          <span className="ml-2 text-lg text-gray-700 font-semibold"></span>
+        </label>
+        <h3 className="text-xl font-semibold text-gray-800">University Qualifications</h3>
+      </div>
       <div className="space-y-4">
         {patient.education.university.map((qualification, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Degree</label>
-              <input
-                name={`education.university.${index}.degree`}
-                value={qualification.degree}
-                onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                placeholder="e.g., BSc in Computer Science"
-                disabled={!isEditing}
-                aria-label={`Degree ${index + 1}`}
-              />
+          <div key={index} className="flex items-center space-x-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Degree</label>
+                <input
+                  name={`education.university.${index}.degree`}
+                  value={qualification.degree}
+                  onChange={handleChange}
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., BSc in Computer Science"
+                  disabled={!isEditing || patient.education.universityEnabled === false}
+                  aria-label={`Degree ${index + 1}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Institution</label>
+                <input
+                  name={`education.university.${index}.institution`}
+                  value={qualification.institution}
+                  onChange={handleChange}
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., University of Colombo"
+                  disabled={!isEditing || patient.education.universityEnabled === false}
+                  aria-label={`Institution ${index + 1}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Marks/Grade</label>
+                <input
+                  name={`education.university.${index}.marks`}
+                  value={qualification.marks}
+                  onChange={handleChange}
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., First Class"
+                  disabled={!isEditing || patient.education.universityEnabled === false}
+                  aria-label={`Marks ${index + 1}`}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Institution</label>
-              <input
-                name={`education.university.${index}.institution`}
-                value={qualification.institution}
-                onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                placeholder="e.g., University of Colombo"
-                disabled={!isEditing}
-                aria-label={`Institution ${index + 1}`}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Marks/Grade</label>
-              <input
-                name={`education.university.${index}.marks`}
-                value={qualification.marks}
-                onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                placeholder="e.g., First Class"
-                disabled={!isEditing}
-                aria-label={`Marks ${index + 1}`}
-              />
-            </div>
+            {isEditing && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPatient((prev) => {
+                    const updatedUniversity = [...prev.education.university];
+                    updatedUniversity.splice(index, 1);
+                    return {
+                      ...prev,
+                      education: { ...prev.education, university: updatedUniversity }
+                    };
+                  });
+                }}
+                className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
+                disabled={patient.education.universityEnabled === false}
+                aria-label="Remove University Qualification"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
         {isEditing && (
@@ -1952,6 +2254,7 @@ function PatientInfo({ mode = 'view' }) {
             type="button"
             onClick={addUniversityQualification}
             className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
+            disabled={patient.education.universityEnabled === false}
           >
             Add University Qualification
           </button>

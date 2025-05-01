@@ -8,6 +8,7 @@ import PatientList from './components/PatientList';
 import PatientInfo from './components/PatientInfo';
 import Notes from './components/Notes';
 import Home from './components/Home';
+import PatientReport from './components/PatientReport';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/add-note" element={<Notes />} />
                 <Route path="/edit-patient/:id" element={<PatientInfo />} />
                 <Route path="/notes" element={<Notes />} />
+                <Route path="/patients/report/:id" element={<PatientReport />} />
               </Routes>
             </div>
           </main>
