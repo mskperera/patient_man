@@ -858,7 +858,7 @@ function PatientInfoEdit({ mode = 'view' }) {
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 p-6 ">
         {activeTab === "personal" && (
-          <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className="p-8">
             {/* Basic Information */}
             <section className="mb-8">
               <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -1824,7 +1824,7 @@ function PatientInfoEdit({ mode = 'view' }) {
         )}
 
         {activeTab === "family" && (
-          <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className=" p-8">
             {/* Spouse's Information */}
             <section className="mb-8">
               <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -2577,7 +2577,7 @@ function PatientInfoEdit({ mode = 'view' }) {
           </div>
         )}
     {activeTab === 'medical' && (
-    <div className="bg-white p-8 rounded-lg shadow-md">
+    <div className=" p-8">
       {/* Health Details */}
       <section className="mb-8">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -2862,7 +2862,7 @@ function PatientInfoEdit({ mode = 'view' }) {
     </div>
   )}
  {activeTab === 'education' && (
-    <div className="bg-white p-8 rounded-lg shadow-md">
+    <div className="p-8">
       {/* G.C.E Ordinary Level (O/L) Qualifications */}
       <section className="mb-8">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
