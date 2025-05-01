@@ -791,14 +791,14 @@ function PatientInfoEdit({ mode = 'view' }) {
           Patient Biographical Information
         </h2>
         <div className="flex space-x-3">
-          <button
+          {/* <button
             onClick={() => navigate(`/patients/report/${patientId}`)}
             className="flex items-center bg-gray-600 text-white px-5 py-2 rounded-lg hover:bg-gray-700 transition-all duration-200 shadow-md"
             aria-label="View patient report"
           >
             <FaFileAlt className="mr-2" />
             Page View
-          </button>
+          </button> */}
           <button
             onClick={toggleEdit}
             className="flex items-center bg-sky-600 text-white px-5 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
