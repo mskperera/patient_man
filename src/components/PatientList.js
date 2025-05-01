@@ -4,39 +4,56 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function PatientList() {
   const navigate = useNavigate();
-  // Mock data (aligned with PatientInfo.js fields, added patientId)
   const patients = [
     {
-      id: 1,
+      id: '1',
       patientId: 'PT-0001',
-      name: 'John Doe',
+      name: 'John Peter Perera',
       dob: '1990-01-01',
       gender: 'Male',
+      phone: '0114547854',
+      email: 'john.perera@example.com',
       maritalStatus: 'Single',
-      phone: '123-456-7890',
-      email: 'john.doe@example.com',
-      emergencyContactName: 'Jane Doe',
-      emergencyContactPhone: '987-654-3210',
-      medicationAllergies: 'Penicillin - Rash',
-      currentMedications: 'Metformin 500mg, twice daily',
-      mentalHealth: 'Stable, no known issues',
-      lifestyle: 'Non-smoker, moderate exercise',
     },
     {
-      id: 2,
+      id: '2',
       patientId: 'PT-0002',
-      name: 'Jane Smith',
-      dob: '1985-05-10',
+      name: 'Ama Silva',
+      dob: '1985-05-15',
       gender: 'Female',
-      maritalStatus: 'Married',
-      phone: '098-765-4321',
-      email: 'jane.smith@example.com',
-      emergencyContactName: 'John Smith',
-      emergencyContactPhone: '123-123-1234',
-      medicationAllergies: 'None',
-      currentMedications: 'Lisinopril 10mg, daily',
-      mentalHealth: 'Anxiety, managed with therapy',
-      lifestyle: 'Smokes 5 cigarettes/day, light exercise',
+      phone: '0812233445',
+      email: 'ama.silva@example.com',
+      maritalStatus: 'Married now for',
+    },
+    {
+      id: '3',
+      patientId: 'PT-0003',
+      name: 'Nimal Kumar Fernando',
+      dob: '1998-10-20',
+      gender: 'Male',
+      phone: '0912233445',
+      email: 'nimal.fernando@example.com',
+      maritalStatus: 'Single',
+    },
+    {
+      id: '4',
+      patientId: 'PT-0004',
+      name: 'Sita Rani Wijesinghe',
+      dob: '1970-03-10',
+      gender: 'Female',
+      phone: '0312233445',
+      email: 'sita.wijesinghe@example.com',
+      maritalStatus: 'Divorced',
+    },
+    {
+      id: '5',
+      patientId: 'PT-0005',
+      name: 'Tharushi Jayasinghe',
+      dob: '2000-07-25',
+      gender: 'Female',
+      phone: '0452233445',
+      email: 'tharushi.jayasinghe@example.com',
+      maritalStatus: 'Single',
     },
   ];
 
@@ -101,13 +118,13 @@ function PatientList() {
         <table className="min-w-full bg-white border">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
+              <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700 w-32">
                 Patient ID
               </th>
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
+              <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700 w-32">
                 Date of Birth
               </th>
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
@@ -119,9 +136,7 @@ function PatientList() {
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Email
               </th>
-              <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
-                Marital Status
-              </th>
+        
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Actions
               </th>
@@ -143,7 +158,6 @@ function PatientList() {
                   <td className="py-3 px-4 border text-gray-800">{patient.gender}</td>
                   <td className="py-3 px-4 border text-gray-800">{patient.phone}</td>
                   <td className="py-3 px-4 border text-gray-800">{patient.email}</td>
-                  <td className="py-3 px-4 border text-gray-800">{patient.maritalStatus}</td>
                   <td className="py-3 px-4 border">
                     <div className="flex space-x-2">
                       <Link
