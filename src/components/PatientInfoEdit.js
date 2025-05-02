@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt } from 'react-icons/fa';
-import { FaHeartPulse } from 'react-icons/fa6';
+import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt, FaFirstAid, FaMale, FaFemale } from 'react-icons/fa';
+import { FaBookMedical, FaHeartPulse } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
+import Notes from './Notes';
 
 function PatientInfoEdit({ mode = 'view' }) {
   const navigate = useNavigate();
@@ -786,8 +787,8 @@ function PatientInfoEdit({ mode = 'view' }) {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="flex items-center text-3xl font-bold text-gray-800">
-          <FaUserMd className="mr-3" size={32} />
+        <h2 className="flex items-center text-3xl font-bold text-gray-800  pb-2">
+          <FaUser className="mr-3" size={32} />
           Patient Biographical Information
         </h2>
         <div className="flex space-x-3">
@@ -799,15 +800,64 @@ function PatientInfoEdit({ mode = 'view' }) {
             <FaFileAlt className="mr-2" />
             Page View
           </button> */}
-          <button
+          {/* <button
             onClick={toggleEdit}
             className="flex items-center bg-sky-600 text-white px-5 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
             aria-label={isEditing ? "Save changes" : "Edit patient info"}
           >
             <FaEdit className="mr-2" />
             {isEditing ? "Save" : "Edit"}
-          </button>
+          </button> */}
         </div>
+      </div>
+
+      <div>
+      <section className="mb-8">
+             
+              {editingSection === "basic" || mode === "add" ? (
+               <></>
+              ) : (
+                <>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-16 mb-4">
+                  <div className=''>
+                    <strong>Patient ID:</strong> {patient.patientId || "N/A"}
+                  </div>
+                  <div></div>        <div>
+                  
+                  <strong>Form Date:</strong> {patient.formDate || "N/A"}
+                </div>
+                  <div>
+                  
+                    <strong>Last Modified:</strong> {patient.formDate || "N/A"}
+                  </div>
+                  </div>
+                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-16">
+                 <div className="flex items-center justify-start gap-2">
+          <strong className="">Name:</strong>
+          <span className="">
+            {`${patient.firstName || ''} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName || ''}`.trim() || 'N/A'}
+          </span>
+        </div>
+            
+            <div></div>
+            <div></div>
+                  <div className='flex justify-start gap-2'>
+                   <strong>Gender:</strong> 
+                  
+                    <span className="flex items-center text-gray-800">
+            {patient.gender || 'N/A'}
+            {patient.gender === 'Male' && <FaMale className="ml-1 text-sky-600" />}
+            {patient.gender === 'Female' && <FaFemale className="ml-1 text-pink-600" />}
+          </span>
+                  </div>
+                  </div>
+
+   
+                  </>
+                  
+              
+              )}
+            </section>
       </div>
       <div className="flex space-x-3 mb-6 p-1 bg-gray-200 rounded-lg">
         <button
@@ -855,10 +905,21 @@ function PatientInfoEdit({ mode = 'view' }) {
           <FaGraduationCap className="mr-2" size={16} />
           Education
         </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === 'notes'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'bg-transparent text-gray-700 hover:bg-gray-300'
+          }`}
+          onClick={() => setActiveTab('notes')}
+        >
+          <FaBookMedical className="mr-2" size={16} />
+          Notes
+        </button>
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 p-6 ">
         {activeTab === "personal" && (
-          <div className="p-8">
+          <div className="px-8">
             {/* Basic Information */}
             <section className="mb-8">
               <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -882,50 +943,8 @@ function PatientInfoEdit({ mode = 'view' }) {
               </div>
               {editingSection === "basic" || mode === "add" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Patient ID
-                    </label>
-                    <input
-                      name="patientId"
-                      value={patient.patientId}
-                      onChange={handleChange}
-                      className={`mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 ${
-                        autoGenerateId ? "bg-gray-100 cursor-not-allowed" : ""
-                      }`}
-                      placeholder="e.g., PT-0001"
-                      disabled={autoGenerateId}
-                      aria-label="Patient ID"
-                    />
-                    {mode === "add" && (
-                      <label className="flex items-center mt-2">
-                        <input
-                          type="checkbox"
-                          checked={autoGenerateId}
-                          onChange={(e) => setAutoGenerateId(e.target.checked)}
-                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                          aria-label="Auto-generate Patient ID"
-                        />
-                        <span className="ml-2 text-sm text-gray-600">
-                          Auto-generate Patient ID
-                        </span>
-                      </label>
-                    )}
-                  </div>
-                  <div></div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Date
-                    </label>
-                    <input
-                      type="date"
-                      name="formDate"
-                      value={patient.formDate}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      aria-label="Form Date"
-                    />
-                  </div>
+  
+           
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Last Name
@@ -1028,12 +1047,7 @@ function PatientInfoEdit({ mode = 'view' }) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <strong>Patient ID:</strong> {patient.patientId || "N/A"}
-                  </div>
-                  <div>
-                    <strong>Form Date:</strong> {patient.formDate || "N/A"}
-                  </div>
+             
                   <div>
                     <strong>Last Name:</strong> {patient.lastName || "N/A"}
                   </div>
@@ -1824,7 +1838,7 @@ function PatientInfoEdit({ mode = 'view' }) {
         )}
 
         {activeTab === "family" && (
-          <div className=" p-8">
+          <div className=" px-8">
             {/* Spouse's Information */}
             <section className="mb-8">
               <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -2577,7 +2591,7 @@ function PatientInfoEdit({ mode = 'view' }) {
           </div>
         )}
     {activeTab === 'medical' && (
-    <div className=" p-8">
+    <div className=" px-8">
       {/* Health Details */}
       <section className="mb-8">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -2862,7 +2876,7 @@ function PatientInfoEdit({ mode = 'view' }) {
     </div>
   )}
  {activeTab === 'education' && (
-    <div className="p-8">
+    <div className="px-8">
       {/* G.C.E Ordinary Level (O/L) Qualifications */}
       <section className="mb-8">
         <div className="flex justify-between items-center mb-4 border-b pb-2">
@@ -3377,6 +3391,9 @@ function PatientInfoEdit({ mode = 'view' }) {
       </section>
     </div>
   )}
+  {activeTab === 'notes' && (
+<Notes />
+)}
       </form>
     </div>
   );

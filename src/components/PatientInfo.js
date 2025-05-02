@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt } from 'react-icons/fa';
+import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt, FaFirstAid } from 'react-icons/fa';
 import { FaHeartPulse } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
+import Notes from './Notes';
 
 function PatientInfo({ mode = 'view' }) {
   const navigate = useNavigate();
@@ -491,6 +492,7 @@ function PatientInfo({ mode = 'view' }) {
           <FaGraduationCap className="mr-2" size={16} />
           Education
         </button>
+  
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 p-6 ">
         {activeTab === 'personal' && (
@@ -2180,6 +2182,9 @@ function PatientInfo({ mode = 'view' }) {
     </section>
   </div>
 )}
+
+
+
       </form>
     </div>
   );

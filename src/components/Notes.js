@@ -331,7 +331,7 @@ function Notes() {
   };
 
   return (
-    <div className="mt-6 px-4 sm:px-6 lg:px-8">
+    <div className="px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="flex items-center text-2xl font-bold text-gray-800 mb-6">
           <FaNotesMedical className="mr-2" size={28} />

@@ -12,7 +12,7 @@ function PatientProfile() {
   return (
     <div className="grid gap-6">
       <PatientInfoEdit mode="view" />
-      <Notes />
+    
     </div>
   );
 }
