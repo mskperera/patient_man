@@ -167,13 +167,13 @@ function PatientList() {
                       >
                         <FaEye size={20} /> View Profile
                       </Link>
-                      <Link
+                      {/* <Link
                         to={`/edit-patient/${patient.id}`}
                         className="flex items-center gap-2 text-sky-600 hover:text-sky-700 transition-colors"
                         aria-label={`Edit patient ${patient.name}`}
                       >
                         <FaEdit size={20} /> Edit
-                      </Link>
+                      </Link> */}
                     </div>
                   </td>
                 </tr>
