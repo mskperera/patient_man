@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import PatientInfo from './PatientInfo';
 import Notes from './Notes';
 import PatientInfoEdit from './PatientInfoEdit';
+import MentalStatusExam from './MentalStatusExam';
 
 function PatientProfile() {
   const { id } = useParams();
@@ -12,7 +13,7 @@ function PatientProfile() {
   return (
     <div className="grid gap-6">
       <PatientInfoEdit mode="view" />
-    
+
     </div>
   );
 }

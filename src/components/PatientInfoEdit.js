@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt, FaFirstAid, FaMale, FaFemale } from 'react-icons/fa';
+import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt, FaFirstAid, FaMale, FaFemale, FaBrain, FaUsers } from 'react-icons/fa';
 import { FaBookMedical, FaHeartPulse } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
 import Notes from './Notes';
+import MentalStatusExam from './MentalStatusExam';
 
 function PatientInfoEdit({ mode = 'view' }) {
   const navigate = useNavigate();
@@ -822,10 +823,12 @@ function PatientInfoEdit({ mode = 'view' }) {
                   <div className=''>
                     <strong>Patient ID:</strong> {patient.patientId || "N/A"}
                   </div>
-                  <div></div>        <div>
+                  <div></div>       
                   
+                   <div>
                   <strong>Form Date:</strong> {patient.formDate || "N/A"}
                 </div>
+
                   <div>
                   
                     <strong>Last Modified:</strong> {patient.formDate || "N/A"}
@@ -879,7 +882,7 @@ function PatientInfoEdit({ mode = 'view' }) {
           }`}
           onClick={() => setActiveTab("family")}
         >
-          <FaUser className="mr-2" size={16} />
+          <FaUsers className="mr-2" size={16} />
           Family
         </button>
 
@@ -904,6 +907,18 @@ function PatientInfoEdit({ mode = 'view' }) {
         >
           <FaGraduationCap className="mr-2" size={16} />
           Education
+        </button>
+   
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === 'mentalExam'
+              ? 'bg-sky-600 text-white shadow-sm'
+              : 'bg-transparent text-gray-700 hover:bg-gray-300'
+          }`}
+          onClick={() => setActiveTab('mentalExam')}
+        >
+          <FaBrain className="mr-2" size={16} />
+          Mental Status Exam
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -3394,6 +3409,10 @@ function PatientInfoEdit({ mode = 'view' }) {
   {activeTab === 'notes' && (
 <Notes />
 )}
+  {activeTab === 'mentalExam' && (
+    <MentalStatusExam />
+)}
+
       </form>
     </div>
   );
