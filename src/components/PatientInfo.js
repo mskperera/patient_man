@@ -4,6 +4,7 @@ import { FaHeartPulse } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
 import Notes from './Notes';
 import {occupations,religions} from '../data/mockData';
+import DescriptionInput from './DescriptionInput';
 
 function PatientInfo({ mode = 'view' }) {
   const navigate = useNavigate();
@@ -319,6 +320,39 @@ function PatientInfo({ mode = 'view' }) {
       }
     }
   ];
+
+
+
+  
+  const descriptionOptions = [
+    'Supportive',
+    'Strict',
+    'Caring',
+    'Distant',
+    'Encouraging',
+    'Critical',
+    'Loving',
+    'Overprotective',
+    'Traditional',
+    'Warm',
+    'Disciplined',
+    'Anxious',
+    'Other'
+  ];
+
+  const raisedByOptions = [
+  'Parents',
+  'Grandparents',
+  'Aunt',
+  'Uncle',
+  'Older Sibling',
+  'Foster Parents',
+  'Adoptive Parents',
+  'Guardian',
+  'Single Mother',
+  'Single Father',
+  'Other'
+];
 
   useEffect(() => {
     if (mode === 'edit' || mode === 'view') {
@@ -1269,7 +1303,44 @@ function PatientInfo({ mode = 'view' }) {
 
                   </div>
                 </div>
-                <div>
+                                  <DescriptionInput
+                  patient={patient}
+                  setPatient={setPatient}
+                  isEditing={true}
+                  fieldName="raisedBy"
+                  label="If your mother and father did not raise you when you were young, who did?"
+                  placeholder="Enter raisedBy"
+                   descriptionOptions={raisedByOptions}
+                  isTypeable={false}
+                 
+                />
+                
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <DescriptionInput
+                  patient={patient}
+                  setPatient={setPatient}
+                  isEditing={true}
+                  fieldName="motherDescription"
+                  label="Briefly describe the type of person your mother (or stepmother or person who substituted for your mother) was when you were a child and how you got along with her"
+                  placeholder="Enter custom mother description"
+                   descriptionOptions={descriptionOptions}
+                  isTypeable={false}
+                 
+                />
+                
+                <DescriptionInput
+                  patient={patient}
+                  setPatient={setPatient}
+                  isEditing={true}
+                  fieldName="fatherDescription"
+                  label="Briefly describe the type of person your father (or stepfather or father substitute) was when you were a child and how you got along with him"
+                  placeholder="Enter custom father description"
+                   descriptionOptions={descriptionOptions}
+                  isTypeable={false}
+                />
+                    </div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">If your mother and father did not raise you when you were young, who did?</label>
                   <input
                     name="raisedBy"
@@ -1312,7 +1383,7 @@ function PatientInfo({ mode = 'view' }) {
                     disabled={!isEditing}
                     aria-label="Father description"
                   />
-                </div>
+                </div> */}
               </div>
             </section>
             {/* Sibling Information */}
