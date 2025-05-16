@@ -3,6 +3,7 @@ import { FaUser, FaNotesMedical, FaUserMd, FaEdit, FaGraduationCap, FaFileAlt, F
 import { FaHeartPulse } from 'react-icons/fa6';
 import { useNavigate, useParams } from 'react-router-dom';
 import Notes from './Notes';
+import {occupations,religions} from '../data/mockData';
 
 function PatientInfo({ mode = 'view' }) {
   const navigate = useNavigate();
@@ -192,6 +193,12 @@ function PatientInfo({ mode = 'view' }) {
       femaleRelativesHospitalized: '',
       additionalInfo: '',
       education: {
+        scholarship: {
+        enabled: true,
+        marks: '',
+        schoolAdmitted: '',
+        result:''
+      },
         ol: {
           subjects: defaultOLSubjects
         },
@@ -638,54 +645,7 @@ function PatientInfo({ mode = 'view' }) {
             <section>
               <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">Address Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Street</label>
-                  <input
-                    name="address.street"
-                    value={patient.address.street}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter street"
-                    disabled={!isEditing}
-                    aria-label="Street"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">City</label>
-                  <input
-                    name="address.city"
-                    value={patient.address.city}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter city"
-                    disabled={!isEditing}
-                    aria-label="City"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">State</label>
-                  <input
-                    name="address.state"
-                    value={patient.address.state}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter state"
-                    disabled={!isEditing}
-                    aria-label="State"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Zip Code</label>
-                  <input
-                    name="address.zip"
-                    value={patient.address.zip}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter zip code"
-                    disabled={!isEditing}
-                    aria-label="Zip code"
-                  />
-                </div>
+              
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700">Permanent Address (if different from above)</label>
                   <textarea
@@ -876,24 +836,7 @@ function PatientInfo({ mode = 'view' }) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Years of Formal Education Completed (circle number of years)</label>
-                  <select
-                    name="educationYears"
-                    value={patient.educationYears}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    disabled={!isEditing}
-                    aria-label="Education years"
-                  >
-                    <option value="">Select years</option>
-                    {[...Array(21)].map((_, i) => (
-                      <option key={i} value={i}>
-                        {i === 20 ? 'More than 20' : i}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              
                 <div className='col-span-2 mx-20'>
   <label className="block text-sm font-medium text-gray-700">
     How religious are you? (1 = Very Religious, 5 = Average, 9 = Atheist)
@@ -1043,41 +986,53 @@ function PatientInfo({ mode = 'view' }) {
               </div>
             </section>
             {/* Occupation Information */}
-            <section>
+              <section>
               <h3 className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2">Occupation Information</h3>
               <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">What occupation(s) have you mainly been trained for?</label>
-                    <input
-                      name="occupation"
-                      value={patient.occupation}
+                    <select
+                      id="occupationTrained"
+                      name="occupationTrained"
+                      value={patient.occupationTrained}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter occupation"
                       disabled={!isEditing}
-                      aria-label="Occupation"
-                    />
+                      aria-label="Occupation trained for"
+                    >
+                      <option value="">Select occupation</option>
+                      {occupations.map((occupation) => (
+                        <option key={occupation.id} value={occupation.id}>
+                          {occupation.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Present Occupation</label>
-                    <input
+                    <select
+                      id="occupation"
                       name="occupation"
                       value={patient.occupation}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter occupation"
                       disabled={!isEditing}
-                      aria-label="Occupation"
-                    />
+                      aria-label="Present occupation"
+                    >
+                      <option value="">Select occupation</option>
+                      {occupations.map((occupation) => (
+                        <option key={occupation.id} value={occupation.id}>
+                          {occupation.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Occupation Status</label>
-                    <div className="flex items-center space-x-4  mt-5">
+                    <div className="flex items-center space-x-4 mt-5">
                       <label className="flex items-center">
                         <input
                           type="checkbox"
@@ -1105,10 +1060,8 @@ function PatientInfo({ mode = 'view' }) {
                     </div>
                   </div>
                 </div>
-              
-          
-               
               </div>
+     
             </section>
           </div>
         )}
@@ -1123,15 +1076,22 @@ function PatientInfo({ mode = 'view' }) {
 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Spouse's Occupation</label>
-                      <input
-                        name="spouseOccupation"
-                        value={patient.spouseOccupation}
-                        onChange={handleChange}
-                        className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="Enter spouse's occupation"
-                        disabled={!isEditing || !patient.maritalStatus.includes('now for')}
-                        aria-label="Spouse's occupation"
-                      />
+                        <select
+                                         id="spouseOccupation"
+                                         name="spouseOccupation"
+                                         value={patient.occupation}
+                                         onChange={handleChange}
+                                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                         disabled={!isEditing}
+                                         aria-label="Present occupation"
+                                       >
+                                         <option value="">Select occupation</option>
+                                         {occupations.map((occupation) => (
+                                           <option key={occupation.id} value={occupation.id}>
+                                             {occupation.name}
+                                           </option>
+                                         ))}
+                                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Spouse's Occupation Status</label>
@@ -1230,51 +1190,83 @@ function PatientInfo({ mode = 'view' }) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Mother's Occupation</label>
-                    <input
-                      name="motherOccupation"
-                      value={patient.motherOccupation}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter mother's occupation"
-                      disabled={!isEditing}
-                      aria-label="Mother's occupation"
-                    />
+                        <select
+                                         id="motherOccupation"
+                                         name="motherOccupation"
+                                         value={patient.occupation}
+                                         onChange={handleChange}
+                                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                         disabled={!isEditing}
+                                         aria-label="Present occupation"
+                                       >
+                                         <option value="">Select occupation</option>
+                                         {occupations.map((occupation) => (
+                                           <option key={occupation.id} value={occupation.id}>
+                                             {occupation.name}
+                                           </option>
+                                         ))}
+                                       </select>
+
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Father's Occupation</label>
-                    <input
-                      name="fatherOccupation"
-                      value={patient.fatherOccupation}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter father's occupation"
-                      disabled={!isEditing}
-                      aria-label="Father's occupation"
-                    />
+                        <select
+                                         id="fatherOccupation"
+                                         name="fatherOccupation"
+                                         value={patient.occupation}
+                                         onChange={handleChange}
+                                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                         disabled={!isEditing}
+                                         aria-label="Present occupation"
+                                       >
+                                         <option value="">Select religion</option>
+                                         {occupations.map((occupation) => (
+                                           <option key={occupation.id} value={occupation.id}>
+                                             {occupation.name}
+                                           </option>
+                                         ))}
+                                       </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Mother's Religion</label>
-                    <input
-                      name="motherReligion"
-                      value={patient.motherReligion}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter mother's religion"
-                      disabled={!isEditing}
-                      aria-label="Mother's religion"
-                    />
+                    <label className="block text-sm font-medium text-gray-700">Mother's Religion</label>                
+                          <select
+                                         id="motherReligion"
+                                         name="motherReligion"
+                                         value={patient.motherReligion}
+                                         onChange={handleChange}
+                                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                        // disabled={!isEditing}
+                                         aria-label="motherReligion"
+                                       >
+                                         <option value="">Select religion</option>
+                                         {religions.map((motherReligion) => (
+                                           <option key={motherReligion.id} value={motherReligion.id}>
+                                             {motherReligion.name}
+                                           </option>
+                                         ))}
+                                       </select>
+                                       
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Father's Religion</label>
-                    <input
-                      name="fatherReligion"
-                      value={patient.fatherReligion}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter father's religion"
-                      disabled={!isEditing}
-                      aria-label="Father's religion"
-                    />
+
+                           <select
+                                         id="fatherReligion"
+                                         name="fatherReligion"
+                                         value={patient.fatherReligion}
+                                         onChange={handleChange}
+                                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                        // disabled={!isEditing}
+                                         aria-label="fatherReligion"
+                                       >
+                                         <option value="">Select religion</option>
+                                         {religions.map((fatherReligion) => (
+                                           <option key={fatherReligion.id} value={fatherReligion.id}>
+                                             {fatherReligion.name}
+                                           </option>
+                                         ))}
+                                       </select>
+
                   </div>
                 </div>
                 <div>
@@ -1811,6 +1803,111 @@ function PatientInfo({ mode = 'view' }) {
         )}
 {activeTab === 'education' && (
   <div className="space-y-10">
+
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+                  <label className="block text-sm font-medium text-gray-700">Years of Formal Education Completed (circle number of years)</label>
+                  <select
+                    name="educationYears"
+                    value={patient.educationYears}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    disabled={!isEditing}
+                    aria-label="Education years"
+                  >
+                    <option value="">Select years</option>
+                    {[...Array(21)].map((_, i) => (
+                      <option key={i} value={i}>
+                        {i === 20 ? 'More than 20' : i}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+        </div>
+        {/* Grade 5 Scholarship Qualifications */}
+  <section>
+    <div className="flex items-center space-x-3 mb-5 border-b pb-2">
+      <label className="flex items-center">
+        <input
+          type="checkbox"
+          checked={patient.education.scholarship.enabled !== false}
+          onChange={(e) => {
+            setPatient((prev) => ({
+              ...prev,
+              education: {
+                ...prev.education,
+                scholarship: { ...prev.education.scholarship, enabled: e.target.checked }
+              }
+            }));
+          }}
+          className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+          disabled={!isEditing}
+          aria-label="Has Grade 5 Scholarship Qualifications"
+        />
+        <span className="ml-2 text-sm text-gray-700"></span>
+      </label>
+      <h3 className="text-xl font-semibold text-gray-800">Grade 5 Scholarship Qualifications</h3>
+    </div>
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Marks</label>
+          <input
+            name="education.scholarship.marks"
+            value={patient.education.scholarship.marks}
+            onChange={handleChange}
+            className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+            placeholder="Enter marks (e.g., 180)"
+            disabled={!isEditing || patient.education.scholarship.enabled === false}
+            aria-label="Scholarship Marks"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">School Admitted</label>
+          <input
+            name="education.scholarship.schoolAdmitted"
+            value={patient.education.scholarship.schoolAdmitted}
+            onChange={handleChange}
+            className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+            placeholder="Enter school name"
+            disabled={!isEditing || patient.education.scholarship.enabled === false}
+            aria-label="School Admitted"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Result</label>
+          <div className="mt-1 flex space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="education.scholarship.result"
+                value="Pass"
+                checked={patient.education.scholarship.result === "Pass"}
+                onChange={handleChange}
+                className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                disabled={!isEditing || patient.education.scholarship.enabled === false}
+                aria-label="Scholarship Result Pass"
+              />
+              <span className="ml-2 text-sm text-gray-700">Pass</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="education.scholarship.result"
+                value="Fail"
+                checked={patient.education.scholarship.result === "Fail"}
+                onChange={handleChange}
+                className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                disabled={!isEditing || patient.education.scholarship.enabled === false}
+                aria-label="Scholarship Result Fail"
+              />
+              <span className="ml-2 text-sm text-gray-700">Fail</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
     {/* G.C.E Ordinary Level (O/L) Qualifications */}
     <section>
       <div className="flex items-center space-x-3 mb-5 border-b pb-2">
