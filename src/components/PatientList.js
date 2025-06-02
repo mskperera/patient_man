@@ -9,51 +9,41 @@ function PatientList() {
       id: '1',
       patientId: 'PT-0001',
       name: 'John Peter Perera',
-      dob: '1990-01-01',
       gender: 'Male',
       phone: '0114547854',
       email: 'john.perera@example.com',
-      maritalStatus: 'Single',
     },
     {
       id: '2',
       patientId: 'PT-0002',
       name: 'Ama Silva',
-      dob: '1985-05-15',
       gender: 'Female',
       phone: '0812233445',
       email: 'ama.silva@example.com',
-      maritalStatus: 'Married now for',
     },
     {
       id: '3',
       patientId: 'PT-0003',
       name: 'Nimal Kumar Fernando',
-      dob: '1998-10-20',
       gender: 'Male',
       phone: '0912233445',
       email: 'nimal.fernando@example.com',
-      maritalStatus: 'Single',
     },
     {
       id: '4',
       patientId: 'PT-0004',
       name: 'Sita Rani Wijesinghe',
-      dob: '1970-03-10',
       gender: 'Female',
       phone: '0312233445',
       email: 'sita.wijesinghe@example.com',
-      maritalStatus: 'Divorced',
     },
     {
       id: '5',
       patientId: 'PT-0005',
       name: 'Tharushi Jayasinghe',
-      dob: '2000-07-25',
       gender: 'Female',
       phone: '0452233445',
       email: 'tharushi.jayasinghe@example.com',
-      maritalStatus: 'Single',
     },
   ];
 
@@ -64,7 +54,7 @@ function PatientList() {
   // Filter patients based on search query and filter type
   const filteredPatients = patients.filter((patient) => {
     if (!searchQuery) return true; // Show all if query is empty
-    const value = patient[filterType]?.toLowerCase() || '';
+    const value = patient[filterType]?.toString().toLowerCase() || '';
     return value.includes(searchQuery.toLowerCase());
   });
 
@@ -100,7 +90,6 @@ function PatientList() {
             <option value="phone">Phone</option>
             <option value="email">Email</option>
             <option value="gender">Gender</option>
-            <option value="maritalStatus">Marital Status</option>
           </select>
           {/* Add Patient Button */}
           <button
@@ -124,9 +113,6 @@ function PatientList() {
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Name
               </th>
-              <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700 w-32">
-                Date of Birth
-              </th>
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Gender
               </th>
@@ -136,7 +122,6 @@ function PatientList() {
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Email
               </th>
-        
               <th className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Actions
               </th>
@@ -145,7 +130,7 @@ function PatientList() {
           <tbody>
             {filteredPatients.length === 0 ? (
               <tr>
-                <td colSpan="8" className="py-3 px-4 text-center text-gray-500">
+                <td colSpan="6" className="py-3 px-4 text-center text-gray-500">
                   No patients found
                 </td>
               </tr>
@@ -154,7 +139,6 @@ function PatientList() {
                 <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-3 px-4 border text-gray-800">{patient.patientId}</td>
                   <td className="py-3 px-4 border text-gray-800">{patient.name}</td>
-                  <td className="py-3 px-4 border text-gray-800">{patient.dob}</td>
                   <td className="py-3 px-4 border text-gray-800">{patient.gender}</td>
                   <td className="py-3 px-4 border text-gray-800">{patient.phone}</td>
                   <td className="py-3 px-4 border text-gray-800">{patient.email}</td>

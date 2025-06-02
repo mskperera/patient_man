@@ -129,3 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /build
+src/components/PatientInfoEdit.rar
+src/components/PatientInfoEdit2.rar
+src/components/EducationDetails4.rar
+src/components/EducationDetails3.rar

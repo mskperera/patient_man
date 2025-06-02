@@ -18,16 +18,17 @@ function App() {
         <TopNav />
         <div className="flex pt-16 pb-12">
           <Sidebar />
-          <main className="flex-1 ml-16 md:ml-64 p-4 overflow-auto">
+          <main className="flex-1 ml-16 md:ml-64 p-0 overflow-auto">
             <div className="container mx-auto">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/patients" element={<PatientList />} />
-                <Route path="/patients/:id" element={<PatientProfile />} />
-                <Route path="/add-patient" element={<PatientInfo mode="add" />} />
+                <Route path="/patients/:id" element={<PatientInfoEdit />} />
+                {/* <Route path="/add-patient" element={<PatientInfo mode="add" />} /> */}
                 <Route path="/add-note" element={<Notes />} />
-                <Route path="/edit-patient/:id" element={<PatientInfoEdit mode="add" />} />
+                {/* <Route path="/edit-patient/:id" element={<PatientInfoEdit />} /> */}
+                <Route path="/add-patient" element={<PatientInfoEdit mode="add" />} />
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/patients/report/:id" element={<PatientReport />} />
               </Routes>

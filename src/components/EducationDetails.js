@@ -1,0 +1,1381 @@
+import React, { useState, useEffect } from 'react';
+import { FaEdit, FaSlideshare } from 'react-icons/fa';
+import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
+import { educationData } from '../data/mockData';
+
+const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSectionEdit }) => {
+  
+  
+  // Predefined options
+  const olSubjectOptions = [
+    { value: 'First Language (Sinhala/Tamil)', label: 'First Language (Sinhala/Tamil)' },
+    { value: 'Mathematics', label: 'Mathematics' },
+    { value: 'English', label: 'English' },
+    { value: 'Science', label: 'Science' },
+    { value: 'Religion', label: 'Religion' },
+    { value: 'History', label: 'History' },
+    { value: 'Art', label: 'Art' },
+    { value: 'Literature', label: 'Literature' },
+    { value: 'Commerce', label: 'Commerce' },
+  ];
+
+  const alSubjectOptions = [
+    { value: 'Combined Mathematics', label: 'Combined Mathematics' },
+    { value: 'Physics', label: 'Physics' },
+    { value: 'Chemistry', label: 'Chemistry' },
+    { value: 'Biology', label: 'Biology' },
+    { value: 'Economics', label: 'Economics' },
+    { value: 'Business Studies', label: 'Business Studies' },
+    { value: 'Accounting', label: 'Accounting' },
+    { value: 'Geography', label: 'Geography' },
+    { value: 'Political Science', label: 'Political Science' },
+  ];
+
+  const streamOptions = [
+    { value: 'Science', label: 'Science' },
+    { value: 'Commerce', label: 'Commerce' },
+    { value: 'Arts', label: 'Arts' },
+    { value: 'Technology', label: 'Technology' },
+  ];
+
+  const degreeOptions = [
+    { value: 'BSc Computer Science', label: 'BSc Computer Science' },
+    { value: 'BSc Engineering', label: 'BSc Engineering' },
+    { value: 'BA Economics', label: 'BA Economics' },
+    { value: 'BCom', label: 'BCom' },
+    { value: 'LLB', label: 'LLB' },
+    { value: 'MBBS', label: 'MBBS' },
+    { value: 'BBA', label: 'BBA' },
+    { value: 'BSc Physics', label: 'BSc Physics' },
+    { value: 'BA English', label: 'BA English' },
+    { value: 'BSc Mathematics', label: 'BSc Mathematics' },
+  ];
+
+  const currentYear = 2025;
+  const yearOptions = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
+
+  // Initialize state
+  const [mode, setMode] = useState(initialMode || "add");
+  const [education, setEducation] = useState({
+    educationYears: '',
+    scholarship: { enabled: true, marks: '', schoolAdmitted: '', result: '', remark: '' },
+    ol: { enabled: true, subjects: [], remark: '' },
+    al: { enabled: true, stream: '', subjects: [], remark: '' },
+    university: [],
+    universityEnabled: true,
+    universityRemark: '',
+  });
+
+  // Separate validation errors for each section
+  const [educationYearsErrors, setEducationYearsErrors] = useState({});
+  const [scholarshipErrors, setScholarshipErrors] = useState({});
+  const [olErrors, setOLErrors] = useState({});
+  const [alErrors, setALErrors] = useState({});
+  const [universityErrors, setUniversityErrors] = useState({});
+
+  // Load mock data based on id
+  useEffect(() => {
+    if (id) {
+      const patientData = educationData.find((p) => p.id === id);
+      if (patientData) {
+        setEducation({
+          educationYears: patientData.educationYears || '',
+          scholarship: {
+            enabled: patientData.scholarship.enabled !== false,
+            marks: patientData.scholarship.marks || '',
+            schoolAdmitted: patientData.scholarship.schoolAdmitted || '',
+            result: patientData.scholarship.result || '',
+            remark: patientData.scholarship.remark || '',
+          },
+          ol: {
+            enabled: patientData.ol.enabled !== false,
+            subjects: patientData.ol.subjects || [],
+            remark: patientData.ol.remark || '',
+          },
+          al: {
+            enabled: patientData.al.enabled !== false,
+            stream: patientData.al.stream || '',
+            subjects: patientData.al.subjects || [],
+            remark: patientData.al.remark || '',
+          },
+          university: patientData.university || [],
+          universityEnabled: patientData.universityEnabled !== false,
+          universityRemark: patientData.universityRemark || '',
+        });
+        setMode("edit");
+      }
+    }
+  }, [id]);
+
+
+  // Validation functions for each section
+  const validateEducationYears = (value) => {
+    setEducationYearsErrors((prev) => {
+      const newErrors = { ...prev };
+      if (!value) {
+        newErrors.educationYears = 'Years of formal education is required.';
+      } else {
+        delete newErrors.educationYears;
+      }
+      return newErrors;
+    });
+
+    return !!value;
+  };
+
+  const validateScholarship = (field, value) => {
+    if (!education.scholarship.enabled) {
+      setScholarshipErrors({});
+      return true;
+    }
+
+    setScholarshipErrors((prev) => {
+      const newErrors = { ...prev };
+      if (field === 'marks' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors.marks = 'Marks are required.';
+        } else {
+          delete newErrors.marks;
+        }
+      }
+      if (field === 'schoolAdmitted' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors.schoolAdmitted = 'School admitted is required.';
+        } else {
+          delete newErrors.schoolAdmitted;
+        }
+      }
+      if (field === 'result' || field === undefined) {
+        if (!value) {
+          newErrors.result = 'Result is required.';
+        } else {
+          delete newErrors.result;
+        }
+      }
+      return newErrors;
+    });
+
+    return !!value;
+  };
+
+  const validateOLSubject = (index, field, value) => {
+    if (!education.ol.enabled) {
+      setOLErrors({});
+      return true;
+    }
+
+    setOLErrors((prev) => {
+      const newErrors = { ...prev };
+      const subject = education.ol.subjects[index] || {};
+
+      // Validate duplicate subject
+      if (field === 'name' || field === 'year' || field === undefined) {
+        const subjectName = field === 'name' ? value : subject.name;
+        const year = field === 'year' ? value : subject.year || currentYear;
+        const isDuplicate = education.ol.subjects.some((sub, i) => 
+          i !== index && 
+          sub.name && 
+          sub.name.toLowerCase() === (subjectName || '').toLowerCase() && 
+          sub.year === year
+        );
+
+        if (isDuplicate) {
+          newErrors[`subject_${index}_duplicate`] = `Subject "${subjectName}" for year ${year} is already added.`;
+        } else {
+          delete newErrors[`subject_${index}_duplicate`];
+        }
+      }
+
+      // Validate subject selection
+      if (field === 'name' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`subject_${index}_name`] = 'Subject is required.';
+        } else {
+          delete newErrors[`subject_${index}_name`];
+        }
+      }
+
+      // Validate grade
+      if (field === 'marks' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`subject_${index}_marks`] = 'Grade is required.';
+        } else {
+          delete newErrors[`subject_${index}_marks`];
+        }
+      }
+
+      return newErrors;
+    });
+
+    return !!value;
+  };
+
+  const validateALStream = (field, value) => {
+    if (!education.al.enabled) {
+      setALErrors({});
+      return true;
+    }
+
+    setALErrors((prev) => {
+      const newErrors = { ...prev };
+      if (field === 'stream' || field === undefined) {
+        if (!value) {
+          newErrors.stream = 'Stream is required.';
+        } else {
+          delete newErrors.stream;
+        }
+      }
+      return newErrors;
+    });
+
+    return !!value;
+  };
+
+  const validateALSubject = (index, field, value) => {
+    if (!education.al.enabled) {
+      setALErrors({});
+      return true;
+    }
+
+    setALErrors((prev) => {
+      const newErrors = { ...prev };
+      const subject = education.al.subjects[index] || {};
+
+      // Validate duplicate subject
+      if (field === 'name' || field === 'year' || field === undefined) {
+        const subjectName = field === 'name' ? value : subject.name;
+        const year = field === 'year' ? value : subject.year || currentYear;
+        const isDuplicate = education.al.subjects.some((sub, i) => 
+          i !== index && 
+          sub.name && 
+          sub.name.toLowerCase() === (subjectName || '').toLowerCase() && 
+          sub.year === year
+        );
+
+        if (isDuplicate) {
+          newErrors[`subject_${index}_duplicate`] = `Subject "${subjectName}" for year ${year} is already added.`;
+        } else {
+          delete newErrors[`subject_${index}_duplicate`];
+        }
+      }
+
+      // Validate subject selection
+      if (field === 'name' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`subject_${index}_name`] = 'Subject is required.';
+        } else {
+          delete newErrors[`subject_${index}_name`];
+        }
+      }
+
+      // Validate grade
+      if (field === 'marks' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`subject_${index}_marks`] = 'Grade is required.';
+        } else {
+          delete newErrors[`subject_${index}_marks`];
+        }
+      }
+
+      return newErrors;
+    });
+
+    return !!value;
+  };
+
+  const validateUniversity = (index, field, value) => {
+    if (!education.universityEnabled) {
+      setUniversityErrors({});
+      return true;
+    }
+
+    setUniversityErrors((prev) => {
+      const newErrors = { ...prev };
+      const qualification = education.university[index] || {};
+
+      // Validate degree
+      if (field === 'degree' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`qualification_${index}_degree`] = 'Degree is required.';
+        } else {
+          delete newErrors[`qualification_${index}_degree`];
+        }
+      }
+
+      // Validate institution
+      if (field === 'institution' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`qualification_${index}_institution`] = 'Institution is required.';
+        } else {
+          delete newErrors[`qualification_${index}_institution`];
+        }
+      }
+
+      // Validate marks
+      if (field === 'marks' || field === undefined) {
+        if (!value?.trim()) {
+          newErrors[`qualification_${index}_marks`] = 'Marks/Grade is required.';
+        } else {
+          delete newErrors[`qualification_${index}_marks`];
+        }
+      }
+
+      return newErrors;
+    });
+
+    return !!value;
+  };
+
+  // Validate all fields
+  const validateAllFields = () => {
+    const isValid = [];
+    isValid.push(validateEducationYears(education.educationYears));
+    isValid.push(validateScholarship('marks', education.scholarship.marks));
+    isValid.push(validateScholarship('schoolAdmitted', education.scholarship.schoolAdmitted));
+    isValid.push(validateScholarship('result', education.scholarship.result));
+    education.ol.subjects.forEach((s, index) => {
+      isValid.push(validateOLSubject(index, 'name', s.name));
+      isValid.push(validateOLSubject(index, 'marks', s.marks));
+      isValid.push(validateOLSubject(index, 'year', s.year));
+    });
+    isValid.push(validateALStream(undefined, education.al.stream));
+    education.al.subjects.forEach((s, index) => {
+      isValid.push(validateALSubject(index, 'name', s.name));
+      isValid.push(validateALSubject(index, 'marks', s.marks));
+      isValid.push(validateALSubject(index, 'year', s.year));
+    });
+    education.university.forEach((s, index) => {
+      isValid.push(validateUniversity(index, 'degree', s.degree));
+      isValid.push(validateUniversity(index, 'institution', s.institution));
+      isValid.push(validateUniversity(index, 'marks', s.marks));
+    });
+
+    return isValid;
+  };
+
+  // Check if form is valid
+  const isFormValid = () => {
+    return (
+      Object.keys(educationYearsErrors).length === 0 &&
+      Object.keys(scholarshipErrors).length === 0 &&
+      Object.keys(olErrors).length === 0 &&
+      Object.keys(alErrors).length === 0 &&
+      Object.keys(universityErrors).length === 0
+    );
+  };
+
+  // Check if a section can add new items
+  const canAddOLSubject = () => Object.keys(olErrors).length === 0;
+  const canAddALSubject = () => Object.keys(alErrors).length === 0;
+  const canAddUniversityQualification = () => Object.keys(universityErrors).length === 0;
+
+  // Input change handlers
+  const handleTextInputChange = (e) => {
+    const { name, value } = e.target;
+    try {
+      if (name.includes('scholarship')) {
+        const field = name.split('.')[2];
+        setEducation((prev) => ({
+          ...prev,
+          scholarship: { ...prev.scholarship, [field]: value },
+        }));
+        if (field !== 'remark') {
+          validateScholarship(field, value);
+        }
+      } else if (name.includes('ol.subjects')) {
+        const [_, __, ___, index, field] = name.split('.');
+        const indexNum = parseInt(index);
+        setEducation((prev) => {
+          const updatedSubjects = [...prev.ol.subjects];
+          updatedSubjects[indexNum] = {
+            ...updatedSubjects[indexNum],
+            [field]: field === 'year' ? parseInt(value) : value,
+          };
+          return {
+            ...prev,
+            ol: { ...prev.ol, subjects: updatedSubjects },
+          };
+        });
+        validateOLSubject(indexNum, field, value);
+      } else if (name.includes('al.subjects')) {
+        const [_, __, ___, index, field] = name.split('.');
+        const indexNum = parseInt(index);
+        setEducation((prev) => {
+          const updatedSubjects = [...prev.al.subjects];
+          updatedSubjects[indexNum] = {
+            ...updatedSubjects[indexNum],
+            [field]: field === 'year' ? parseInt(value) : value,
+          };
+          return {
+            ...prev,
+            al: { ...prev.al, subjects: updatedSubjects },
+          };
+        });
+        validateALSubject(indexNum, field, value);
+      } else if (name.includes('university')) {
+        const [_, __, index, field] = name.split('.');
+        const indexNum = parseInt(index);
+        setEducation((prev) => {
+          const updatedUniversity = [...prev.university];
+          updatedUniversity[indexNum] = {
+            ...updatedUniversity[indexNum],
+            [field]: value,
+          };
+          return {
+            ...prev,
+            university: updatedUniversity,
+          };
+        });
+        validateUniversity(indexNum, field, value);
+      } else if (name === 'ol.remark') {
+        setEducation((prev) => ({
+          ...prev,
+          ol: { ...prev.ol, remark: value },
+        }));
+      } else if (name === 'al.remark') {
+        setEducation((prev) => ({
+          ...prev,
+          al: { ...prev.al, remark: value },
+        }));
+      } else if (name === 'universityRemark') {
+        setEducation((prev) => ({
+          ...prev,
+          universityRemark: value,
+        }));
+      }
+    } catch (error) {
+      console.error(`Error in handleTextInputChange for name=${name}:`, error);
+    }
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    try {
+      if (name.includes('scholarship.enabled')) {
+        setEducation((prev) => ({
+          ...prev,
+          scholarship: { ...prev.scholarship, enabled: checked },
+        }));
+        if (checked) {
+          validateScholarship('marks', education.scholarship.marks);
+          validateScholarship('schoolAdmitted', education.scholarship.schoolAdmitted);
+          validateScholarship('result', education.scholarship.result);
+        }
+      } else if (name.includes('ol.enabled')) {
+        setEducation((prev) => ({
+          ...prev,
+          ol: { ...prev.ol, enabled: checked },
+        }));
+        if (checked) {
+          education.ol.subjects.forEach((s, index) => {
+            validateOLSubject(index, 'name', s.name);
+            validateOLSubject(index, 'marks', s.marks);
+            validateOLSubject(index, 'year', s.year);
+          });
+        }
+      } else if (name.includes('al.enabled')) {
+        setEducation((prev) => ({
+          ...prev,
+          al: { ...prev.al, enabled: checked },
+        }));
+        if (checked) {
+          validateALStream('stream', education.al.stream);
+          education.al.subjects.forEach((s, index) => {
+            validateALSubject(index, 'name', s.name);
+            validateALSubject(index, 'marks', s.marks);
+            validateALSubject(index, 'year', s.year);
+          });
+        }
+      } else if (name.includes('universityEnabled')) {
+        setEducation((prev) => ({
+          ...prev,
+          universityEnabled: checked,
+        }));
+        if (checked) {
+          education.university.forEach((s, index) => {
+            validateUniversity(index, 'degree', s.degree);
+            validateUniversity(index, 'institution', s.institution);
+            validateUniversity(index, 'marks', s.marks);
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`Error in handleCheckboxChange for name=${name}:`, error);
+    }
+  };
+
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'educationYears') {
+      setEducation((prev) => ({
+        ...prev,
+        educationYears: value,
+      }));
+      validateEducationYears(value);
+    }
+  };
+
+  const handleRadioChange = (e) => {
+    const { name, value } = e.target;
+    if (name.includes('scholarship.result')) {
+      setEducation((prev) => ({
+        ...prev,
+        scholarship: { ...prev.scholarship, result: value },
+      }));
+      validateScholarship('result', value);
+    }
+  };
+
+  const handleSubjectChange = (level, index, selectedOption) => {
+    const value = selectedOption ? selectedOption.value : '';
+    setEducation((prev) => {
+      if (level === 'ol') {
+        const updatedSubjects = [...prev.ol.subjects];
+        updatedSubjects[index] = { ...updatedSubjects[index], name: value };
+        return { ...prev, ol: { ...prev.ol, subjects: updatedSubjects } };
+      } else if (level === 'al') {
+        const updatedSubjects = [...prev.al.subjects];
+        updatedSubjects[index] = { ...updatedSubjects[index], name: value };
+        return { ...prev, al: { ...prev.al, subjects: updatedSubjects } };
+      } else if (level === 'stream') {
+        return { ...prev, al: { ...prev.al, stream: value } };
+      } else if (level === 'university') {
+        const updatedUniversity = [...prev.university];
+        updatedUniversity[index] = { ...updatedUniversity[index], degree: value };
+        return { ...prev, university: updatedUniversity };
+      }
+      return prev;
+    });
+
+    if (level === 'ol') {
+      validateOLSubject(index, 'name', value);
+    } else if (level === 'al') {
+      validateALSubject(index, 'name', value);
+    } else if (level === 'stream') {
+      validateALStream('stream', value);
+    } else if (level === 'university') {
+      validateUniversity(index, 'degree', value);
+    }
+  };
+
+  const addCustomSubject = (level) => {
+    const newSubject = { name: '', marks: '', year: currentYear };
+    setEducation((prev) => {
+      if (level === 'ol') {
+        const newSubjects = [...prev.ol.subjects, newSubject];
+        validateOLSubject(newSubjects.length - 1, undefined, '');
+        return { ...prev, ol: { ...prev.ol, subjects: newSubjects } };
+      } else if (level === 'al') {
+        const newSubjects = [...prev.al.subjects, newSubject];
+        validateALStream('stream', education.al.stream);
+        validateALSubject(newSubjects.length - 1, undefined, '');
+        return { ...prev, al: { ...prev.al, subjects: newSubjects } };
+      }
+      return prev;
+    });
+  };
+
+  const addUniversityQualification = () => {
+    const newQualification = { degree: '', institution: '', marks: '' };
+    setEducation((prev) => {
+      const newUniversity = [...prev.university, newQualification];
+      validateUniversity(newUniversity.length - 1, undefined, '');
+      return { ...prev, university: newUniversity };
+    });
+  };
+
+  const removeItem = (type, index) => {
+    setEducation((prev) => {
+      if (type === 'ol') {
+        const updatedSubjects = [...prev.ol.subjects];
+        updatedSubjects.splice(index, 1);
+        setOLErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          Object.keys(newErrors).forEach((key) => {
+            if (key.startsWith(`subject_${index}_`)) delete newErrors[key];
+          });
+          return newErrors;
+        });
+        return { ...prev, ol: { ...prev.ol, subjects: updatedSubjects } };
+      } else if (type === 'al') {
+        const updatedSubjects = [...prev.al.subjects];
+        updatedSubjects.splice(index, 1);
+        setALErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          Object.keys(newErrors).forEach((key) => {
+            if (key.startsWith(`subject_${index}_`)) delete newErrors[key];
+          });
+          return newErrors;
+        });
+        return { ...prev, al: { ...prev.al, subjects: updatedSubjects } };
+      } else if (type === 'university') {
+        const updatedUniversity = [...prev.university];
+        updatedUniversity.splice(index, 1);
+        setUniversityErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          Object.keys(newErrors).forEach((key) => {
+            if (key.startsWith(`qualification_${index}_`)) delete newErrors[key];
+          });
+          return newErrors;
+        });
+        return { ...prev, university: updatedUniversity };
+      }
+      return prev;
+    });
+  };
+
+  const handleSave = () => {
+    const validations = validateAllFields();
+    const isAllValidated = validations.every((v) => v !== false);
+
+    if (isAllValidated && isFormValid()) {
+      alert('All fields are valid. Saving data...');
+      console.log('Payload:', education);
+      // Add your save logic here (e.g., API call)
+    } else {
+      alert('Please correct the errors in the form before saving.');
+    }
+  };
+
+  return (
+    <div className="px-8">
+      {/* Educational Background */}
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-4 border-b pb-2">
+          <h3 className="text-2xl font-semibold text-gray-800">Educational Background</h3>
+          {mode !== 'add' && (
+            <button
+              onClick={() => toggleSectionEdit('educationYears')}
+              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+              aria-label={editingSection === 'educationYears' ? 'Save Educational Background' : 'Edit Educational Background'}
+            >
+              <FaEdit className="mr-2" />
+              {editingSection === 'educationYears' ? 'Save' : 'Edit'}
+            </button>
+          )}
+        </div>
+        {editingSection === 'educationYears' || mode === 'add' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Years of Formal Education Completed</label>
+              <select
+                name="educationYears"
+                value={education.educationYears || ''}
+                onChange={handleSelectChange}
+                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                disabled={editingSection !== 'educationYears' && mode !== 'add'}
+                aria-label="Years of formal education"
+                required
+              >
+                <option value="">Select years</option>
+                {[...Array(21)].map((_, i) => (
+                  <option key={i} value={i}>
+                    {i === 20 ? 'More than 20' : i}
+                  </option>
+                ))}
+              </select>
+              {educationYearsErrors.educationYears && (
+                <p className="mt-1 text-sm text-red-600">{educationYearsErrors.educationYears}</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <strong>Years of Formal Education:</strong>{' '}
+              {education.educationYears || education.educationYears === 0
+                ? education.educationYears === 20
+                  ? 'More than 20'
+                  : education.educationYears
+                : 'N/A'}
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Grade 5 Scholarship Qualification */}
+      <section className="mb-14">
+        <div className="flex justify-between items-center mb-4 border-b pb-2">
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="scholarship.enabled"
+                checked={education.scholarship.enabled !== false}
+                onChange={handleCheckboxChange}
+                className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                disabled={editingSection !== 'scholarship' && mode !== 'add'}
+                aria-label="Has Grade 5 Scholarship Qualification"
+              />
+              <span className="ml-2 text-sm text-gray-700"></span>
+            </label>
+            <h3 className="text-2xl font-semibold text-gray-800">Grade 5 Scholarship Qualification</h3>
+          </div>
+          {mode !== 'add' && (
+            <button
+              onClick={() => toggleSectionEdit('scholarship')}
+              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+              aria-label={editingSection === 'scholarship' ? 'Save Grade 5 Scholarship Qualification' : 'Edit Grade 5 Scholarship Qualification'}
+            >
+              <FaEdit className="mr-2" />
+              {editingSection === 'scholarship' ? 'Save' : 'Edit'}
+            </button>
+          )}
+        </div>
+        {editingSection === 'scholarship' || mode === 'add' ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Marks</label>
+                <input
+                  name="education.scholarship.marks"
+                  value={education.scholarship.marks || ''}
+                  onChange={handleTextInputChange}
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="Enter marks (e.g., 180)"
+                  disabled={education.scholarship.enabled === false}
+                  aria-label="Scholarship Marks"
+                  required
+                />
+                {scholarshipErrors.marks && <p className="mt-1 text-sm text-red-600">{scholarshipErrors.marks}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">School Admitted</label>
+                <input
+                  name="education.scholarship.schoolAdmitted"
+                  value={education.scholarship.schoolAdmitted || ''}
+                  onChange={handleTextInputChange}
+                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="Enter school name"
+                  disabled={education.scholarship.enabled === false}
+                  aria-label="School Admitted"
+                  required
+                />
+                {scholarshipErrors.schoolAdmitted && <p className="mt-1 text-sm text-red-600">{scholarshipErrors.schoolAdmitted}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Result</label>
+                <div className="mt-1 flex space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="education.scholarship.result"
+                      value="Pass"
+                      checked={education.scholarship.result === 'Pass'}
+                      onChange={handleRadioChange}
+                      className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                      disabled={education.scholarship.enabled === false}
+                      aria-label="Scholarship Result Pass"
+                      required
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Pass</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="education.scholarship.result"
+                      value="Fail"
+                      checked={education.scholarship.result === 'Fail'}
+                      onChange={handleRadioChange}
+                      className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                      disabled={education.scholarship.enabled === false}
+                      aria-label="Scholarship Result Fail"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Fail</span>
+                  </label>
+                </div>
+                {scholarshipErrors.result && <p className="mt-1 text-sm text-red-600">{scholarshipErrors.result}</p>}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Remark</label>
+              <textarea
+                name="education.scholarship.remark"
+                value={education.scholarship.remark || ''}
+                onChange={handleTextInputChange}
+                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                placeholder="Enter any additional remarks"
+                disabled={education.scholarship.enabled === false}
+                aria-label="Scholarship Remark"
+                rows="4"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <strong>Has Grade 5 Scholarship Qualification:</strong>{' '}
+              {education.scholarship.enabled !== false ? 'Yes' : 'No'}
+            </div>
+            {education.scholarship.enabled !== false && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <strong>Marks:</strong> {education.scholarship.marks || 'N/A'}
+                </div>
+                <div>
+                  <strong>School Admitted:</strong> {education.scholarship.schoolAdmitted || 'N/A'}
+                </div>
+                <div>
+                  <strong>Result:</strong> {education.scholarship.result || 'N/A'}
+                </div>
+                <div className="col-span-3">
+                               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                  <strong>Remark:</strong> {education.scholarship.remark || 'N/A'}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* G.C.E Ordinary Level (O/L) Qualifications */}
+      <section className="mb-14">
+        <div className="flex justify-between items-center mb-4 border-b pb-2">
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="ol.enabled"
+                checked={education.ol.enabled !== false}
+                onChange={handleCheckboxChange}
+                className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                disabled={editingSection !== 'ol' && mode !== 'add'}
+                aria-label="Has G.C.E O/L Qualifications"
+              />
+              <span className="ml-2 text-sm text-gray-700"></span>
+            </label>
+            <h3 className="text-2xl font-semibold text-gray-800">G.C.E Ordinary Level (O/L) Qualifications</h3>
+          </div>
+          {mode !== 'add' && (
+            <button
+              onClick={() => toggleSectionEdit('ol')}
+              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+              aria-label={editingSection === 'ol' ? 'Save O/L Qualifications' : 'Edit O/L Qualifications'}
+            >
+              <FaEdit className="mr-2" />
+              {editingSection === 'ol' ? 'Save' : 'Edit'}
+            </button>
+          )}
+        </div>
+        {editingSection === 'ol' || mode === 'add' ? (
+          <div className="space-y-4">
+            {education.ol.subjects.map((subject, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <div className="w-1/3">
+                  <label className="block text-sm font-medium text-gray-700">Subject</label>
+                  <CreatableSelect
+                    options={olSubjectOptions}
+                    value={subject.name ? { value: subject.name, label: subject.name } : null}
+                    onChange={(option) => handleSubjectChange('ol', index, option)}
+                    placeholder="Select or type subject"
+                    isDisabled={education.ol.enabled === false}
+                    className="mt-1"
+                    classNamePrefix="select"
+                    aria-label={`O/L Subject ${index + 1}`}
+                  />
+                  {(olErrors[`subject_${index}_name`] || olErrors[`subject_${index}_duplicate`]) && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {olErrors[`subject_${index}_name`] || olErrors[`subject_${index}_duplicate`]}
+                    </p>
+                  )}
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-sm font-medium text-gray-700">Year</label>
+                  <select
+                    name={`education.ol.subjects.${index}.year`}
+                    value={subject.year || currentYear}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    disabled={education.ol.enabled === false}
+                    aria-label={`O/L Subject ${index + 1} year`}
+                  >
+                    {yearOptions.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-sm font-medium text-gray-700">Grade</label>
+                  <input
+                    name={`education.ol.subjects.${index}.marks`}
+                    value={subject.marks || ''}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Grade (e.g., A, B, C, S, W)"
+                    disabled={education.ol.enabled === false}
+                    aria-label={`O/L Subject ${index + 1} marks`}
+                    required
+                  />
+                  {olErrors[`subject_${index}_marks`] && (
+                    <p className="mt-1 text-sm text-red-600">{olErrors[`subject_${index}_marks`]}</p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem('ol', index)}
+                  className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
+                  disabled={education.ol.enabled === false}
+                  aria-label="Remove O/L Subject"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => addCustomSubject('ol')}
+              className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
+              disabled={education.ol.enabled === false || !canAddOLSubject()}
+              aria-label="Add O/L Subject"
+            >
+              Add O/L Subject
+            </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Remark</label>
+              <textarea
+                name="ol.remark"
+                value={education.ol.remark || ''}
+                onChange={handleTextInputChange}
+                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                placeholder="Enter any additional remarks"
+                disabled={education.ol.enabled === false}
+                aria-label="O/L Remark"
+                rows="4"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <strong>Has O/L Qualifications:</strong>{' '}
+              {education.ol.enabled !== false ? 'Yes' : 'No'}
+            </div>
+            {education.ol.enabled !== false && education.ol.subjects.length > 0 ? (
+              <div>
+                <strong>Subjects:</strong>
+                <table className="w-full border-collapse border bg-sky-50 mt-2 border-sky-200 ">
+                  <thead>
+                    <tr className="bg-sky-200">
+                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
+                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
+                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {education.ol.subjects.map((subject, index) => (
+                      <tr key={index}>
+                        <td className="border border-sky-300 p-2">{subject.name || 'N/A'}</td>
+                        <td className="border border-sky-300 p-2">{subject.year || 'N/A'}</td>
+                        <td className="border border-sky-300 p-2">{subject.marks || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="mt-2">
+                               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                  <strong>Remark:</strong> {education.ol.remark || 'N/A'}
+                  </div>
+                </div>
+              </div>
+            ) : education.ol.enabled !== false ? (
+              <div>No subjects studied.</div>
+            ) : null}
+          </div>
+        )}
+      </section>
+
+      {/* G.C.E Advanced Level (A/L) Qualifications */}
+      <section className="mb-14">
+        <div className="flex justify-between items-center mb-4 border-b pb-2">
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="al.enabled"
+                checked={education.al.enabled !== false}
+                onChange={handleCheckboxChange}
+                className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                disabled={editingSection !== 'al' && mode !== 'add'}
+                aria-label="Has G.C.E A/L Qualifications"
+              />
+              <span className="ml-2 text-sm text-gray-700"></span>
+            </label>
+            <h3 className="text-2xl font-semibold text-gray-800">G.C.E Advanced Level (A/L) Qualifications</h3>
+          </div>
+          {mode !== 'add' && (
+            <button
+              onClick={() => toggleSectionEdit('al')}
+              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+              aria-label={editingSection === 'al' ? 'Save A/L Qualifications' : 'Edit A/L Qualifications'}
+            >
+              <FaEdit className="mr-2" />
+              {editingSection === 'al' ? 'Save' : 'Edit'}
+            </button>
+          )}
+        </div>
+        {editingSection === 'al' || mode === 'add' ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Stream</label>
+              <CreatableSelect
+                options={streamOptions}
+                value={education.al.stream ? { value: education.al.stream, label: education.al.stream } : null}
+                onChange={(option) => handleSubjectChange('stream', null, option)}
+                placeholder="Select or type stream"
+                isDisabled={education.al.enabled === false}
+                className="mt-1"
+                classNamePrefix="select"
+                aria-label="A/L Stream"
+              />
+              {alErrors.stream && <p className="mt-1 text-sm text-red-600">{alErrors.stream}</p>}
+            </div>
+            {education.al.subjects.map((subject, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <div className="w-1/3">
+                  <label className="block text-sm font-medium text-gray-700">Subject</label>
+                  <CreatableSelect
+                    options={alSubjectOptions}
+                    value={subject.name ? { value: subject.name, label: subject.name } : null}
+                    onChange={(option) => handleSubjectChange('al', index, option)}
+                    placeholder="Select or type subject"
+                    isDisabled={education.al.enabled === false}
+                    className="mt-1"
+                    classNamePrefix="select"
+                    aria-label={`A/L Subject ${index + 1}`}
+                  />
+                  {(alErrors[`subject_${index}_name`] || alErrors[`subject_${index}_duplicate`]) && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {alErrors[`subject_${index}_name`] || alErrors[`subject_${index}_duplicate`]}
+                    </p>
+                  )}
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-sm font-medium text-gray-700">Year</label>
+                  <select
+                    name={`education.al.subjects.${index}.year`}
+                    value={subject.year || currentYear}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    disabled={education.al.enabled === false}
+                    aria-label={`A/L Subject ${index + 1} year`}
+                  >
+                    {yearOptions.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-sm font-medium text-gray-700">Grade</label>
+                  <input
+                    name={`education.al.subjects.${index}.marks`}
+                    value={subject.marks || ''}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Grade (e.g., A, B, C, S, W)"
+                    disabled={education.al.enabled === false}
+                    aria-label={`A/L Subject ${index + 1} marks`}
+                    required
+                  />
+                  {alErrors[`subject_${index}_marks`] && (
+                    <p className="mt-1 text-sm text-red-600">{alErrors[`subject_${index}_marks`]}</p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem('al', index)}
+                  className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
+                  disabled={education.al.enabled === false}
+                  aria-label="Remove A/L Subject"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => addCustomSubject('al')}
+              className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
+              disabled={education.al.enabled === false || !canAddALSubject()}
+              aria-label="Add A/L Subject"
+            >
+              Add A/L Subject
+            </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Remark</label>
+              <textarea
+                name="al.remark"
+                value={education.al.remark || ''}
+                onChange={handleTextInputChange}
+                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                placeholder="Enter any additional remarks"
+                disabled={education.al.enabled === false}
+                aria-label="A/L Remark"
+                rows="4"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <strong>Has A/L Qualifications:</strong>{' '}
+              {education.al.enabled !== false ? 'Yes' : 'No'}
+            </div>
+            {education.al.enabled !== false && (
+              <>
+                <div>
+                  <strong>Stream:</strong> {education.al.stream || 'N/A'}
+                </div>
+                {education.al.subjects.length > 0 ? (
+                  <div>
+                    <strong>Subjects:</strong>
+                                
+                    <table className="w-full border-collapse border bg-sky-50 mt-2 border-sky-200">
+                      <thead>
+                        <tr className="bg-sky-200">
+                          <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
+                          <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
+                          <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {education.al.subjects.map((subject, index) => (
+                          <tr key={index}>
+                            <td className="border border-sky-300 p-2">{subject.name || 'N/A'}</td>
+                            <td className="border border-sky-300 p-2">{subject.year || 'N/A'}</td>
+                            <td className="border border-sky-300 p-2">{subject.marks || 'N/A'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div className="mt-2">
+                                   <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                      <strong>Remark:</strong> {education.al.remark || 'N/A'}
+                    </div></div>
+                  </div>
+                ) : (
+                  <div>No subjects studied.</div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </section>
+
+      {/* University Qualifications */}
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-4 border-b pb-2">
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="universityEnabled"
+                checked={education.universityEnabled !== false}
+                onChange={handleCheckboxChange}
+                className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                disabled={editingSection !== 'university' && mode !== 'add'}
+                aria-label="Has University Qualifications"
+              />
+              <span className="ml-2 text-sm text-gray-700"></span>
+            </label>
+            <h3 className="text-2xl font-semibold text-gray-800">University Qualifications</h3>
+          </div>
+          {mode !== 'add' && (
+            <button
+              onClick={() => toggleSectionEdit('university')}
+              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+              aria-label={editingSection === 'university' ? 'Save University Qualifications' : 'Edit University Qualifications'}
+            >
+              <FaEdit className="mr-2" />
+              {editingSection === 'university' ? 'Save' : 'Edit'}
+            </button>
+          )}
+        </div>
+        {editingSection === 'university' || mode === 'add' ? (
+          <div className="space-y-4">
+            {education.university.map((qualification, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Degree</label>
+                    <CreatableSelect
+                      options={degreeOptions}
+                      value={qualification.degree ? { value: qualification.degree, label: qualification.degree } : null}
+                      onChange={(option) => handleSubjectChange('university', index, option)}
+                      placeholder="Select or type degree"
+                      isDisabled={education.universityEnabled === false}
+                      className="mt-1"
+                      classNamePrefix="select"
+                      aria-label={`Degree ${index + 1}`}
+                    />
+                    {universityErrors[`qualification_${index}_degree`] && (
+                      <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_degree`]}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Institution</label>
+                    <input
+                      name={`education.university.${index}.institution`}
+                      value={qualification.institution || ''}
+                      onChange={handleTextInputChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="e.g., University of Colombo"
+                      disabled={education.universityEnabled === false}
+                      aria-label={`Institution ${index + 1}`}
+                      required
+                    />
+                    {universityErrors[`qualification_${index}_institution`] && (
+                      <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_institution`]}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Marks/Grade</label>
+                    <input
+                      name={`education.university.${index}.marks`}
+                      value={qualification.marks || ''}
+                      onChange={handleTextInputChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="e.g., First Class"
+                      disabled={education.universityEnabled === false}
+                      aria-label={`Marks ${index + 1}`}
+                      required
+                    />
+                    {universityErrors[`qualification_${index}_marks`] && (
+                      <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_marks`]}</p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem('university', index)}
+                  className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
+                  disabled={education.universityEnabled === false}
+                  aria-label="Remove University Qualification"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addUniversityQualification}
+              className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
+              disabled={education.universityEnabled === false || !canAddUniversityQualification()}
+              aria-label="Add University Qualification"
+            >
+              Add University Qualification
+            </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Remark</label>
+              <textarea
+                name="universityRemark"
+                value={education.universityRemark || ''}
+                onChange={handleTextInputChange}
+                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                placeholder="Enter any additional remarks"
+                disabled={education.universityEnabled === false}
+                aria-label="University Remark"
+                rows="4"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <strong>Has University Qualifications:</strong>{' '}
+              {education.universityEnabled !== false ? 'Yes' : 'No'}
+            </div>
+            {education.universityEnabled !== false && education.university.length > 0 ? (
+              <div>
+                <strong>Qualifications:</strong>
+                <table className="w-full border-collapse border bg-sky-50 border-sky-200 mt-2">
+                  <thead>
+                    <tr className="bg-sky-200">
+                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Degree</th>
+                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Institution</th>
+                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Marks/Grade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {education.university.map((qualification, index) => (
+                      <tr key={index}>
+                        <td className="border border-sky-300 p-2">{qualification.degree || 'N/A'}</td>
+                        <td className="border border-sky-300 p-2">{qualification.institution || 'N/A'}</td>
+                        <td className="border border-sky-300 p-2">{qualification.marks || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="mt-2">
+                               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                  <strong>Remark:</strong> {education.universityRemark || 'N/A'}
+                  </div>
+                </div>
+              </div>
+            ) : education.universityEnabled !== false ? (
+              <div>No university qualifications recorded.</div>
+            ) : null}
+          </div>
+        )}
+      </section>
+
+      {/* Save Button */}
+    {mode==='add' &&  <div className="flex justify-end mt-8">
+        <button
+          type="button"
+          onClick={handleSave}
+          className="bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200"
+          aria-label="Save All Education Details"
+        >
+          Save All
+        </button>
+      </div>}
+    </div>
+  );
+};
+
+export default EducationDetails;

@@ -12,3 +12,14 @@ main {
   @apply min-h-[calc(100vh-128px)];
 }
 
+
+
+.select__control {
+  border-color: #d1d5db;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+.select__control--is-focused {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
