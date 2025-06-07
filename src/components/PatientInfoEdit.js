@@ -166,23 +166,29 @@ function PatientInfoEdit({ mode = "view" }) {
           </div>
 
           {/* Profile Image and Print Button Section */}
-          <div className="col-span-2 flex justify-end items-end ">
+          <div className="col-span-2 flex flex-col justify-between items-end ">
           
-               <div className="flex flex-col justify-between ">
-              <p className="text-gray-700 font-semibold text-sm mb-2">
-                Handled by
+          <div className="flex justify-between">
+
+ <div className="flex flex-col justify-between">
+              <p className="text-sky-700 font-semibold text-sm mb-2">
+                Handled by:
               </p>
           
-               <p className="text-sky-700 text-sm mb-2">
+               <p className="text-sky-600 text-sm mb-2">
                 Dr. Chaminda Weerasiriwardane
               </p>
-              <img
+             
+            </div>
+
+             <img
                 src={profileImageUrl}
                 alt="Profile"
-                className="w-16 h-16 rounded-full object-cover border-2 border-sky-300 shadow-sm"
+                className="w-12 h-12 rounded-full object-cover border-2 border-sky-300 shadow-sm"
               />
             
-            </div>
+          </div>
+              
             <button
               className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
               aria-label="Print patient summary"
