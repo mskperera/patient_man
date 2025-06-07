@@ -86,7 +86,7 @@ function PatientInfoEdit({ mode = "view" }) {
       </div>
 
       {/* {JSON.stringify(basicInfomation)} */}
-      <div>
+     {mode!=="add" && <div>
         <section className="mb-2">
           { (
              !isLoading ? (
@@ -180,7 +180,8 @@ function PatientInfoEdit({ mode = "view" }) {
           )
           )}
         </section>
-      </div>
+      </div>}
+      
       <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gray-200 rounded-lg">
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
