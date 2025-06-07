@@ -25,6 +25,7 @@ import FamilyTab from "./FamilyTab";
 import MedicalTab from "./MedicalTab";
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
+import profileImageUrl from '../assets/doctor1.webp';
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
@@ -90,91 +91,109 @@ function PatientInfoEdit({ mode = "view" }) {
         <section className="mb-2">
           { (
              !isLoading ? (
-            <div className="mx-4">
-              <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  {/* Left Section: Patient ID, Form Date, Last Modified */}
-                  <div className="col-span-1 md:col-span-2 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <strong className="text-gray-700 font-semibold">
-                        Patient ID:
-                      </strong>
-                      <span className="text-gray-800">
-                        {basicInformation.patientId || "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <strong className="text-gray-700 font-semibold">
-                        Form Date:
-                      </strong>
-                      <span className="text-gray-800">
-                        {basicInformation.formDate || "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <strong className="text-gray-700 font-semibold">
-                        Last Modified:
-                      </strong>
-                      <span className="text-sky-600 font-medium bg-sky-100 px-2 py-1 rounded-md">
-                        {basicInformation.lastModified
-                          ? moment(basicInformation.lastModified).format(
-                              "YYYY-MM-DD HH:mm:ss"
-                            )
-                          : "N/A"}
-                      </span>
-                    </div>
-                  </div>
+          <div className="mx-4">
+      <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+       
 
-                  {/* Right Section: Name, Age, Gender */}
-                  <div className="col-span-1  space-y-4">
-                    <div className="flex items-center gap-3">
-                      <strong className="text-gray-700 font-semibold">
-                        Name:
-                      </strong>
-                      <span className="text-gray-800">
-                        {`${basicInformation.firstName || ""} ${
-                          basicInformation.middleName
-                            ? basicInformation.middleName + " "
-                            : ""
-                        }${basicInformation.lastName || ""}`.trim() || "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <strong className="text-gray-700 font-semibold">
-                        Age:
-                      </strong>
-                      <span className="text-gray-800">
-                        {basicInformation.age || "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <strong className="text-gray-700 font-semibold">
-                        Gender:
-                      </strong>
-                      <span className="flex items-center text-gray-800">
-                        {basicInformation.gender || "N/A"}
-                        {basicInformation.gender === "Male" && (
-                          <FaMale className="ml-2 text-sky-600" />
-                        )}
-                        {basicInformation.gender === "Female" && (
-                          <FaFemale className="ml-2 text-pink-500" />
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="col-span-1 space-y-4 flex justify-end">
-                    <button
-                      className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
-                      aria-label="Print patient summary"
-                    >
-                      <FaPrint />
-                      Print
-                    </button>
-                  </div>
-                </div>
-              </div>
+  
+          <div className="col-span-2 space-y-4">
+            <div className="flex items-center gap-3">
+              <strong className="text-gray-700 font-semibold">
+                Name:
+              </strong>
+              <span className="text-gray-800">
+                {`${basicInformation.firstName || ""} ${
+                  basicInformation.middleName
+                    ? basicInformation.middleName + " "
+                    : ""
+                }${basicInformation.lastName || ""}`.trim() || "N/A"}
+              </span>
             </div>
+            <div className="flex items-center gap-3">
+              <strong className="text-gray-700 font-semibold">
+                Age:
+              </strong>
+              <span className="text-gray-800">
+                {basicInformation.age || "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <strong className="text-gray-700 font-semibold">
+                Gender:
+              </strong>
+              <span className="flex items-center text-gray-800">
+                {basicInformation.gender || "N/A"}
+                {basicInformation.gender === "Male" && (
+                  <FaMale className="ml-2 text-sky-600" />
+                )}
+                {basicInformation.gender === "Female" && (
+                  <FaFemale className="ml-2 text-pink-500" />
+                )}
+              </span>
+            </div>
+          </div>
+
+             <div className="col-span-2 md:col-span-2 space-y-4">
+            <div className="flex items-center gap-3">
+              <strong className="text-gray-700 font-semibold">
+                Patient ID:
+              </strong>
+              <span className="text-gray-800">
+                {basicInformation.patientId || "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <strong className="text-sky-700 font-semibold">
+                Created Date:
+              </strong>
+              <span className="text-sky-600">
+                {basicInformation.formDate || "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <strong className="text-sky-700 font-semibold">
+                Last Modified:
+              </strong>
+              <span className="text-sky-600 rounded-md">
+                {basicInformation.lastModified
+                  ? moment(basicInformation.lastModified).format(
+                      "YYYY-MM-DD HH:mm:ss"
+                    )
+                  : "N/A"}
+              </span>
+            </div>
+          </div>
+
+          {/* Profile Image and Print Button Section */}
+          <div className="col-span-2 flex justify-end items-end ">
+          
+               <div className="flex flex-col justify-between ">
+              <p className="text-gray-700 font-semibold text-sm mb-2">
+                Handled by
+              </p>
+          
+               <p className="text-sky-700 text-sm mb-2">
+                Dr. Chaminda Weerasiriwardane
+              </p>
+              <img
+                src={profileImageUrl}
+                alt="Profile"
+                className="w-16 h-16 rounded-full object-cover border-2 border-sky-300 shadow-sm"
+              />
+            
+            </div>
+            <button
+              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
+              aria-label="Print patient summary"
+            >
+              <FaPrint />
+              Print
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
               ) : (
             <LoadingSpinner />
           )
