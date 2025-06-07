@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom'; // Assuming React Router for navigation
-import logo from '../assets/brandlogo.png'; // Adjust the path to your logo file
+import logo from '../assets/logo.png'; // Adjust the path to your logo file
 
 function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,15 +11,15 @@ function TopNav() {
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
 
   return (
-    <nav className="bg-sky-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
-      <div className=" mx-auto px-4 py-3 flex items-center justify-between">
+    <nav className="bg-sky-600 text-white  fixed top-0 left-0 right-0 z-50">
+      <div className=" mx-auto px-4  flex items-center justify-between">
     
 {/* Logo */}
 <Link to="/" className="flex items-center">
           <img
             src={logo}
             alt="Patient Management Logo"
-            className="h-8 w-auto" // Adjust size as needed
+            className="h-14 w-auto" // Adjust size as needed
           />
           {/* Optional: Keep text for accessibility or branding */}
           <span className="ml-2 text-xl font-bold hidden sm:block">

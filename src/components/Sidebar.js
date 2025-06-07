@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { FaHome, FaUsers, FaUserPlus } from 'react-icons/fa';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
   return (
     <div
-      className={`fixed top-16 left-0 h-[calc(100vh-64px)] bg-gradient-to-b from-gray-50 to-gray-200 shadow-xl border-r border-slate-200 rounded-r-lg transition-all duration-300 ease-in-out ${
+      className={`fixed top-16 left-0 h-[calc(100vh-64px)] bg-gradient-to-b from-gray-50 to-gray-200 shadow-sm border-r border-slate-200 rounded-r-lg transition-all duration-300 ease-in-out ${
         isOpen ? 'w-64' : 'w-16'
       } z-40 md:w-64`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-slate-300 bg-gradient-to-r from-slate-50 to-slate-100 rounded-t-lg">
+      {/* <div className="flex items-center justify-between p-4 border-b border-slate-300 bg-gradient-to-r from-slate-50 to-slate-100 rounded-t-lg">
         <span
           className={`${
             isOpen ? 'block' : 'hidden'
@@ -28,7 +27,7 @@ function Sidebar() {
         >
           {isOpen ? '◄' : '►'}
         </button>
-      </div>
+      </div> */}
       <nav className="mt-4">
         <Link
           to="/"

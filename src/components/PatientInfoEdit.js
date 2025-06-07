@@ -79,8 +79,8 @@ function PatientInfoEdit({ mode = "view" }) {
   return (   
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="flex items-center text-3xl font-bold text-gray-800  pb-2">
-          <FaUser className="mr-3" size={32} />
+        <h2 className="flex items-center text-2xl font-bold text-gray-800  pb-2">
+          <FaUser className="mr-3" size={28} />
           Patient Biographical Information
         </h2>
       </div>
