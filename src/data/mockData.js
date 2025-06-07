@@ -1,4 +1,7 @@
-export const occupations = [
+export const getOccupations =async()=>{
+
+   await new Promise(resolve => setTimeout(resolve, 2000));
+const data= [
   { id: 1, name: 'Software Engineer' },
   { id: 2, name: 'Teacher' },
   { id: 3, name: 'Doctor' },
@@ -16,7 +19,15 @@ export const occupations = [
   { id: 15, name: 'Other' }
 ];
 
-export const religions = [
+return {data};
+
+}
+
+export const getReligions =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
   { id: 1, name: 'Buddhism' },
   { id: 2, name: 'Christianity' },
   { id: 3, name: 'Hinduism' },
@@ -27,6 +38,10 @@ export const religions = [
   { id: 8, name: 'Agnosticism' },
   { id: 9, name: 'Other' }
 ];
+
+return {data};
+
+}
 
 
 
@@ -123,6 +138,30 @@ export const basicInformationData = [
   }
 ];
 
+
+export const getBasicInformationData = async (id) => {
+ await new Promise(resolve => setTimeout(resolve, 2000));
+  const data = basicInformationData.find((p) => p.id === id);
+  return { data: data || null };
+};
+
+
+
+export const updateBasicInformationData = async (id, updatedData) => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = basicInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  basicInformationData[index] = { ...basicInformationData[index], ...updatedData, lastModified: new Date().toISOString() };
+  return { success: true, data: basicInformationData[index] };
+};
+
+export const deleteBasicInformationData = async (id) => {
+ await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = basicInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  const deleted = basicInformationData.splice(index, 1)[0];
+  return { success: true, data: deleted };
+};
 
 export const personalInformationData = [
   {
@@ -227,6 +266,38 @@ export const personalInformationData = [
   },
 ];
 
+
+export const getPersonalInformationData = async (id) => {
+    // Simulate a delay of 1 second (1000 milliseconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const data = personalInformationData.find((p) => p.id === id);
+    return { data };
+}
+
+export const updatePersonalInformationData = async (id, updatedData) => {
+ await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = personalInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  personalInformationData[index] = { ...personalInformationData[index], ...updatedData };
+  return { success: true, data: personalInformationData[index] };
+};
+
+export const deletePersonalInformationData = async (id) => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = personalInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  const deleted = personalInformationData.splice(index, 1)[0];
+  return { success: true, data: deleted };
+};
+
+export const getFamilyInformationData = async (id) => {
+    // Simulate a delay of 1 second (1000 milliseconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const data = familyInformationData.find((p) => p.id === id);
+    return { data };
+}
 
 export const familyInformationData = [
   {
@@ -401,6 +472,81 @@ export const familyInformationData = [
   },
 ];
 
+
+export const updateFamilyInformationData = async (id, updatedData) => {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = familyInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  familyInformationData[index] = { ...familyInformationData[index], ...updatedData };
+  return { success: true, data: familyInformationData[index] };
+};
+
+export const deleteFamilyInformationData = async (id) => {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = familyInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  const deleted = familyInformationData.splice(index, 1)[0];
+  return { success: true, data: deleted };
+};
+
+
+
+export const getTypesOfPerson =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
+  { id: "201", name: "Supportive" },
+    { id: "202", name: "Strict" },
+    { id: "203", name: "Caring" },
+    { id: "204", name: "Distant" },
+    { id: "205", name: "Encouraging" },
+    { id: "206", name: "Critical" },
+    { id: "207", name: "Loving" },
+    { id: "208", name: "Overprotective" },
+    { id: "209", name: "Traditional" },
+    { id: "210", name: "Warm" },
+    { id: "211", name: "Disciplined" },
+    { id: "212", name: "Anxious" },
+    { id: "213", name: "Other" },
+];
+
+return {data};
+
+}
+
+
+export const getRaisedBy =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
+    { id: "301", name: "Parents" },
+    { id: "302", name: "Grandparents" },
+    { id: "303", name: "Aunt" },
+    { id: "304", name: "Uncle" },
+    { id: "305", name: "Older Sibling" },
+    { id: "306", name: "Foster Parents" },
+    { id: "307", name: "Adoptive Parents" },
+    { id: "308", name: "Guardian" },
+    { id: "309", name: "Single Mother" },
+    { id: "310", name: "Single Father" },
+    { id: "311", name: "Other" },
+];
+
+return {data};
+
+}
+
+
+export const getMedicalInformationData = async (id) => {
+    // Simulate a delay of 1 second (1000 milliseconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const data = medicalInformationData.find((p) => p.id === id);
+    return { data };
+}
+
 export const medicalInformationData = [
   {
     id: "1",
@@ -493,6 +639,134 @@ export const medicalInformationData = [
     additionalInfo: "Allergy testing recommended",
   },
 ];
+
+
+export const updateMedicalInformationData = async (id, updatedData) => {
+   await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = medicalInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  medicalInformationData[index] = { ...medicalInformationData[index], ...updatedData };
+  return { success: true, data: medicalInformationData[index] };
+};
+
+export const deleteMedicalInformationData = async (id) => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = medicalInformationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  const deleted = medicalInformationData.splice(index, 1)[0];
+  return { success: true, data: deleted };
+};
+
+
+
+
+
+
+export const getEducationData = async (id) => {
+    // Simulate a delay of 1 second (1000 milliseconds)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const data = educationData.find((p) => p.id === id);
+    return { data };
+}
+
+
+
+export const updateEducationData = async (id, updatedData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  educationData[index] = { ...educationData[index], ...updatedData };
+  return { success: true, data: educationData[index] };
+};
+
+
+
+export const updateEducationYearsData = async (id, updatedData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  educationData[index] = { ...educationData[index], ...updatedData };
+  return { success: true, data: educationData[index] };
+};
+
+export const updateScholarshipData = async (id, updatedData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  educationData[index] = { ...educationData[index], ...updatedData };
+  return { success: true, data: educationData[index] };
+};
+
+
+export const updateOLData = async (id, updatedData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  educationData[index] = { ...educationData[index], ...updatedData };
+  return { success: true, data: educationData[index] };
+};
+
+export const updateALData = async (id, updatedData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  educationData[index] = { ...educationData[index], ...updatedData };
+  return { success: true, data: educationData[index] };
+};
+
+export const updateUniversityData = async (id, updatedData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  educationData[index] = { ...educationData[index], ...updatedData };
+  return { success: true, data: educationData[index] };
+};
+
+export const deleteEducationData = async (id) => {
+   await new Promise(resolve => setTimeout(resolve, 2000));
+  const index = educationData.findIndex((p) => p.id === id);
+  if (index === -1) return { success: false, message: "Record not found" };
+  const deleted = educationData.splice(index, 1)[0];
+  return { success: true, data: deleted };
+};
+
+
+
+
+
+export const getEducationYearsData = async (id) => {
+  await new Promise(resolve => setTimeout(resolve, 100));
+  const record = educationData.find((p) => p.id === id);
+  return { data: record ? record.educationYears : null };
+};
+
+export const getScholarshipData = async (id) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  const record = educationData.find((p) => p.id === id);
+  return { data: record ?  record.scholarship : null };
+};
+
+export const getOLData = async (id) => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+  const record = educationData.find((p) => p.id === id);
+  return { data: record ? record.ol : null };
+};
+
+export const getALData = async (id) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  const record = educationData.find((p) => p.id === id);
+  return { data: record ? record.al : null };
+};
+
+export const getUniversityData = async (id) => {
+  await new Promise(resolve => setTimeout(resolve, 200));
+  const record = educationData.find((p) => p.id === id);
+     console.log("edudata record",record)
+  return { data: record ? { university: record.university, universityEnabled: record.universityEnabled, universityRemark: record.universityRemark } : null };
+};
+
+
 
 export const educationData = [
   {
@@ -690,3 +964,122 @@ export const educationData = [
     universityRemark: "",
   },
 ];
+
+
+
+// Mock occupations data
+export const occupations = [
+  { id: 1, name: "Engineer" },
+  { id: 2, name: "Teacher" },
+  { id: 3, name: "Doctor" },
+  { id: 4, name: "Other" },
+];
+
+// Mock options for DescriptionInput
+export const getGoodPointsOptionsData =async()=>{
+const data=  [
+  { id: "1", name: "Problem-solver – I enjoy analyzing issues and finding effective solutions." },
+  { id: "2", name: "Quick learner – I can pick up new tools and frameworks rapidly." },
+  { id: "3", name: "Strong work ethic – I am committed to meeting deadlines and taking responsibility." },
+  { id: "4", name: "Adaptable – I can adjust to new environments, teams, or technologies easily." },
+  { id: "5", name: "Team player – I communicate well and collaborate effectively with others." },
+  { id: "6", name: "Detail-oriented – I notice small issues before they grow into big problems." },
+  { id: "7", name: "Other" },
+]
+return {data};
+};
+
+export const getBadPointsOptions = async()=>{
+  const data=  [
+  { id: "101", name: "Procrastination" },
+  { id: "102", name: "Shyness" },
+  { id: "103", name: "Impatience" },
+  { id: "104", name: "Perfectionism" },
+  { id: "105", name: "Other" },
+]
+return {data};
+};
+
+
+
+
+
+export const getOLSubjects =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
+ { id: 'first-language', name: 'First Language (Sinhala/Tamil)' },
+  { id: 'mathematics', name: 'Mathematics' },
+  { id: 'english', name: 'English' },
+  { id: 'science', name: 'Science' },
+  { id: 'religion', name: 'Religion' },
+  { id: 'history', name: 'History' },
+  { id: 'art', name: 'Art' },
+  { id: 'literature', name: 'Literature' },
+  { id: 'commerce', name: 'Commerce' },
+];
+
+return {data};
+
+}
+
+
+export const getALSubjects =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
+   { id: 'combined-mathematics', name: 'Combined Mathematics' },
+  { id: 'physics', name: 'Physics' },
+  { id: 'chemistry', name: 'Chemistry' },
+  { id: 'biology', name: 'Biology' },
+  { id: 'economics', name: 'Economics' },
+  { id: 'business-studies', name: 'Business Studies' },
+  { id: 'accounting', name: 'Accounting' },
+  { id: 'geography', name: 'Geography' },
+  { id: 'political-science', name: 'Political Science' },
+];
+
+return {data};
+
+}
+
+export const getALStreams =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
+ { id: 'science', name: 'Science' },
+  { id: 'commerce', name: 'Commerce' },
+  { id: 'arts', name: 'Arts' },
+  { id: 'technology', name: 'Technology' },
+];
+
+return {data};
+
+}
+
+
+
+export const getDegrees =async()=>{ 
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+ const data= [
+  { id: 'bsc-computer-science', name: 'BSc Computer Science' },
+  { id: 'bsc-engineering', name: 'BSc Engineering' },
+  { id: 'ba-economics', name: 'BA Economics' },
+  { id: 'bcom', name: 'BCom' },
+  { id: 'llb', name: 'LLB' },
+  { id: 'mbbs', name: 'MBBS' },
+  { id: 'bba', name: 'BBA' },
+  { id: 'bsc-physics', name: 'BSc Physics' },
+  { id: 'ba-english', name: 'BA English' },
+  { id: 'bsc-mathematics', name: 'BSc Mathematics' },
+];
+
+return {data};
+
+}
+

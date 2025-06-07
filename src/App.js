@@ -3,10 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'; // Explicit imp
 import TopNav from './components/TopNav';
 import Sidebar from './components/Sidebar';
 import BottomBar from './components/BottomBar';
-import PatientProfile from './components/PatientProfile';
 import PatientList from './components/PatientList';
-import PatientInfo from './components/PatientInfo';
-import Notes from './components/Notes';
 import Home from './components/Home';
 import PatientReport from './components/PatientReport';
 import PatientInfoEdit from './components/PatientInfoEdit';
@@ -26,10 +23,10 @@ function App() {
                 <Route path="/patients" element={<PatientList />} />
                 <Route path="/patients/:id" element={<PatientInfoEdit />} />
                 {/* <Route path="/add-patient" element={<PatientInfo mode="add" />} /> */}
-                <Route path="/add-note" element={<Notes />} />
+                {/* <Route path="/add-note" element={<Notes />} /> */}
                 {/* <Route path="/edit-patient/:id" element={<PatientInfoEdit />} /> */}
                 <Route path="/add-patient" element={<PatientInfoEdit mode="add" />} />
-                <Route path="/notes" element={<Notes />} />
+                {/* <Route path="/notes" element={<Notes />} /> */}
                 <Route path="/patients/report/:id" element={<PatientReport />} />
               </Routes>
             </div>

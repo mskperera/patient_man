@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { familyInformationData } from "../data/mockData";
+import {  getFamilyInformationData, getOccupations, getRaisedBy, getReligions, getTypesOfPerson, updateFamilyInformationData } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Family = ({ id, setActiveTab }) => {
-  const navigate = useNavigate();
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+ const [isSaving, setIsSaving] = useState(false);
+   const [initialFamilyInformation, setInitialFamilyInformation] = useState(null);
 
+  
   const [familyInformation, setFamilyInformation] = useState({
     spouseOccupation: {
       label: "Spouse's Occupation",
@@ -253,123 +256,103 @@ const Family = ({ id, setActiveTab }) => {
     },
   });
 
-  // Mock data
-  const occupations = [
-    { id: 1, name: "Engineer" },
-    { id: 2, name: "Teacher" },
-    { id: 3, name: "Doctor" },
-    { id: 4, name: "Other" },
-  ];
+  const [occupations,setOccupations]=useState([]);
+  const [religions,setReligions]=useState([]);
+    const [typeOfPersonOptions,setTypeOfPersonOptions]=useState([]);
+     const [raisedByOptions,setRaisedByOptions]=useState([]);
 
-  const religions = [
-    { id: 1, name: "Christianity" },
-    { id: 2, name: "Islam" },
-    { id: 3, name: "Hinduism" },
-    { id: 4, name: "Buddhism" },
-    { id: 5, name: "Other" },
-  ];
+  useEffect(()=>{
+  loadDropdowns();
+  },[])
+  
+  
+  const loadDropdowns=async()=>{
+    const occupations=await getOccupations();
+    setOccupations(occupations.data);
+  
+    const religions=await getReligions();
+    setReligions(religions.data);
 
-  const descriptionOptions = [
-    { id: "201", text: "Supportive" },
-    { id: "202", text: "Strict" },
-    { id: "203", text: "Caring" },
-    { id: "204", text: "Distant" },
-    { id: "205", text: "Encouraging" },
-    { id: "206", text: "Critical" },
-    { id: "207", text: "Loving" },
-    { id: "208", text: "Overprotective" },
-    { id: "209", text: "Traditional" },
-    { id: "210", text: "Warm" },
-    { id: "211", text: "Disciplined" },
-    { id: "212", text: "Anxious" },
-    { id: "213", text: "Other" },
-  ];
+    const typeofPerson=await getTypesOfPerson();
+    setTypeOfPersonOptions(typeofPerson.data);
 
-  const raisedByOptions = [
-    { id: "301", text: "Parents" },
-    { id: "302", text: "Grandparents" },
-    { id: "303", text: "Aunt" },
-    { id: "304", text: "Uncle" },
-    { id: "305", text: "Older Sibling" },
-    { id: "306", text: "Foster Parents" },
-    { id: "307", text: "Adoptive Parents" },
-    { id: "308", text: "Guardian" },
-    { id: "309", text: "Single Mother" },
-    { id: "310", text: "Single Father" },
-    { id: "311", text: "Other" },
-  ];
+    const raisedByOptions=await getRaisedBy();
+    setRaisedByOptions(raisedByOptions.data);
 
-  // Load mock data based on id
-  useEffect(() => {
-    if (id) {
-      const patientData = familyInformationData.find((p) => p.id === id);
-      console.log("patientData", patientData?.patientId);
-      if (patientData) {
+  }
+
+
+const loadBasicInformationData=async()=>{
+  setIsLoading(true);
+  const result =await getFamilyInformationData(id);
+    const patientData=result.data;
+
+ if (patientData) {
         setFamilyInformation({
           spouseOccupation: {
             ...familyInformation.spouseOccupation,
             value: patientData.spouseOccupation || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           spouseOccupationFullTime: {
             ...familyInformation.spouseOccupationFullTime,
             value: patientData.spouseOccupationFullTime || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           motherAge: {
             ...familyInformation.motherAge,
             value: patientData.motherAge || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           ageWhenMotherDied: {
             ...familyInformation.ageWhenMotherDied,
             value: patientData.ageWhenMotherDied || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           fatherAge: {
             ...familyInformation.fatherAge,
             value: patientData.fatherAge || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           ageWhenFatherDied: {
             ...familyInformation.ageWhenFatherDied,
             value: patientData.ageWhenFatherDied || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           motherOccupation: {
             ...familyInformation.motherOccupation,
             value: patientData.motherOccupation || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           fatherOccupation: {
             ...familyInformation.fatherOccupation,
             value: patientData.fatherOccupation || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           motherReligion: {
             ...familyInformation.motherReligion,
             value: patientData.motherReligion || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           fatherReligion: {
             ...familyInformation.fatherReligion,
             value: patientData.fatherReligion || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           raisedBy: {
             ...familyInformation.raisedBy,
             value: patientData.raisedBy ? patientData.raisedBy.split(";;").filter((item) => item.trim()) : [],
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           motherDescription: {
@@ -377,7 +360,7 @@ const Family = ({ id, setActiveTab }) => {
             value: patientData.motherDescription
               ? patientData.motherDescription.split(";;").filter((item) => item.trim())
               : [],
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           fatherDescription: {
@@ -385,122 +368,130 @@ const Family = ({ id, setActiveTab }) => {
             value: patientData.fatherDescription
               ? patientData.fatherDescription.split(";;").filter((item) => item.trim())
               : [],
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           parentalSeparationAge: {
             ...familyInformation.parentalSeparationAge,
             value: patientData.parentalSeparationAge || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           parentalDivorceAge: {
             ...familyInformation.parentalDivorceAge,
             value: patientData.parentalDivorceAge || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           motherDivorceCount: {
             ...familyInformation.motherDivorceCount,
             value: patientData.motherDivorceCount || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           fatherDivorceCount: {
             ...familyInformation.fatherDivorceCount,
             value: patientData.fatherDivorceCount || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           livingBrothers: {
             ...familyInformation.livingBrothers,
             value: patientData.livingBrothers || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           livingSisters: {
             ...familyInformation.livingSisters,
             value: patientData.livingSisters || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           brothersAges: {
             ...familyInformation.brothersAges,
             value: patientData.brothersAges || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           sistersAges: {
             ...familyInformation.sistersAges,
             value: patientData.sistersAges || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           childNumber: {
             ...familyInformation.childNumber,
             value: patientData.childNumber || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           familyChildren: {
             ...familyInformation.familyChildren,
             value: patientData.familyChildren || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           adopted: {
             ...familyInformation.adopted,
             value: patientData.adopted || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           brotherDisturbances: {
             ...familyInformation.brotherDisturbances,
             value: patientData.brotherDisturbances || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           sisterDisturbances: {
             ...familyInformation.sisterDisturbances,
             value: patientData.sisterDisturbances || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           maleRelativesDisturbed: {
             ...familyInformation.maleRelativesDisturbed,
             value: patientData.maleRelativesDisturbed || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           maleRelativesHospitalized: {
             ...familyInformation.maleRelativesHospitalized,
             value: patientData.maleRelativesHospitalized || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           femaleRelativesDisturbed: {
             ...familyInformation.femaleRelativesDisturbed,
             value: patientData.femaleRelativesDisturbed || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           femaleRelativesHospitalized: {
             ...familyInformation.femaleRelativesHospitalized,
             value: patientData.femaleRelativesHospitalized || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
         });
-        setMode("edit");
       }
+      setIsLoading(false);
+}
+
+  // Load mock data based on id
+  useEffect(() => {
+    if (id) {
+     loadBasicInformationData();
+        setMode("edit"); 
     }
   }, [id]);
 
   // Toggle edit mode for a specific section
-  const toggleSectionEdit = (section) => {
+  const toggleSectionEdit =async (section) => {
     if (editingSection === section) {
-      handleSubmitp(section);
-      setEditingSection(null);
+    const isValid=await handleSubmitp(section);
+      if(isValid)
+    setEditingSection(null);
     } else {
       setEditingSection(section);
     }
@@ -603,7 +594,8 @@ const Family = ({ id, setActiveTab }) => {
         updatedInfo[key].isValid = true;
       }
 
-      updatedInfo[key].isTouched = true;
+     // updatedInfo[key].isTouched = true;
+        updatedInfo[key].isTouched = updatedInfo[key].isTouched || false;
     });
 
     setFamilyInformation(updatedInfo);
@@ -637,14 +629,33 @@ const Family = ({ id, setActiveTab }) => {
   };
 
   // Section-specific save logic
-  const handleSubmitp = async (section) => {
+  const handleSubmitp =async (section) => {
+
+    setIsSaving(true);
     const isValid = validateFamilyInformation();
-    if (isValid) {
-      const savedPatientId = mode === "add" ? Date.now().toString() : id;
-      if (mode === "add") {
-        navigate(`/patients/${savedPatientId}`);
-      }
+    if (!isValid) {
+ console.log("Validation failed, not saving.");
+   setIsSaving(false);
+      return false;
     }
+
+ const payload = {
+    };
+    Object.entries(familyInformation).forEach(([key, field]) => {
+     // console.log("field.",field);
+      if (field.isTouched) {
+        payload[key] = field.value;
+      }
+    });
+
+    console.log("Save Payload:", payload);
+        const res=await updateFamilyInformationData(id,payload);
+          await loadBasicInformationData();
+            console.log("update result:", res);
+            setIsSaving(false);
+return true;
+
+
   };
 
   // Helper function to render list items
@@ -669,28 +680,69 @@ const Family = ({ id, setActiveTab }) => {
     );
   };
 
-  return (
+  // Store initial state when entering edit mode
+  useEffect(() => {
+    
+      setInitialFamilyInformation({ ...familyInformation });
+  }, [editingSection]);
+  
+
+    const handleCancel = (editingSection) => {
+
+    if (initialFamilyInformation) {
+      setFamilyInformation(initialFamilyInformation);
+      setFamilyInformationErrors({});
+
+    }
+    
+    
+    setEditingSection(null); // Exit edit mode
+  };
+
+  return !isLoading ? (
     <div className="px-8">
       {/* Spouse's Information */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Spouse's Information</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-2xl font-semibold text-gray-800">
+            Spouse's Information
+          </h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("spouse")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "spouse" ? "Save Spouse Info" : "Edit Spouse Info"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "spouse" ? "Save" : "Edit"}
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => toggleSectionEdit("spouse")}
+                className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                aria-label={
+                  editingSection === "spouse"
+                    ? "Save Spouse Info"
+                    : "Edit Spouse Info"
+                }
+               disabled={isSaving}
+              >
+                <FaEdit className="mr-2" />
+                {editingSection === "spouse" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                     
+              </button>
+              {editingSection === "spouse" && (
+                <button
+                  onClick={() => handleCancel("spouse")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                   disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           )}
         </div>
         {editingSection === "spouse" || mode === "add" ? (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Spouse's Occupation</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Spouse's Occupation
+                </label>
                 <select
                   name="spouseOccupation"
                   value={familyInformation.spouseOccupation.value}
@@ -706,77 +758,129 @@ const Family = ({ id, setActiveTab }) => {
                   ))}
                 </select>
                 {familyInformationErrors.spouseOccupation && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.spouseOccupation}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.spouseOccupation}
+                  </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Spouse's Occupation Status</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Spouse's Occupation Status
+                </label>
                 <div className="flex items-center space-x-4 mt-5">
                   <label className="flex items-center">
                     <input
                       type="radio"
                       name="spouseOccupationFullTime"
                       value="full-time"
-                      checked={familyInformation.spouseOccupationFullTime.value === "full-time"}
+                      checked={
+                        familyInformation.spouseOccupationFullTime.value ===
+                        "full-time"
+                      }
                       onChange={handleOccupationStatusChange}
                       className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
                       disabled={!familyInformation.spouseOccupation.value}
                       aria-label="Spouse full-time"
                     />
-                    <span className="ml-2 text-sm text-gray-700">Full-time</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      Full-time
+                    </span>
                   </label>
                   <label className="flex items-center">
                     <input
                       type="radio"
                       name="spouseOccupationFullTime"
                       value="part-time"
-                      checked={familyInformation.spouseOccupationFullTime.value === "part-time"}
+                      checked={
+                        familyInformation.spouseOccupationFullTime.value ===
+                        "part-time"
+                      }
                       onChange={handleOccupationStatusChange}
                       className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
                       disabled={!familyInformation.spouseOccupation.value}
                       aria-label="Spouse part-time"
                     />
-                    <span className="ml-2 text-sm text-gray-700">Part-time</span>
+                    <span className="ml-2 text-sm text-gray-700">
+                      Part-time
+                    </span>
                   </label>
                 </div>
                 {familyInformationErrors.spouseOccupationFullTime && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.spouseOccupationFullTime}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.spouseOccupationFullTime}
+                  </p>
                 )}
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <strong>Spouse's Occupation:</strong> {familyInformation.spouseOccupation.value || "N/A"}
-            </div>
-            <div>
-              <strong>Spouse's Occupation Status:</strong> {familyInformation.spouseOccupationFullTime.value || "N/A"}
+          <div className="border-2 rounded-lg p-4 bg-white  border-gray-200 ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="flex justify-between items-center py-2.5 border-gray-200 last:border-b-0 mr-7">
+                <span className="font-bold text-sm w-1/3">
+                  Spouse's Occupation
+                </span>
+                <span className="text-gray-800 text-sm w-2/3 text-right">
+                  {familyInformation.spouseOccupation.value || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2.5 border-gray-200 last:border-b-0 ml-7">
+                <span className="font-bold text-sm w-1/2">
+                  Spouse's Occupation Status
+                </span>
+                <span className="text-gray-800 text-sm w-1/2 text-right">
+                  {familyInformation.spouseOccupationFullTime.value || "N/A"}
+                </span>
+              </div>
             </div>
           </div>
         )}
       </section>
 
       {/* Parental Information */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Parental Information</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-2xl font-semibold text-gray-800">
+            Parental Information
+          </h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("parental")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "parental" ? "Save Parental Info" : "Edit Parental Info"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "parental" ? "Save" : "Edit"}
-            </button>
+
+
+ <div className="flex space-x-4">
+              <button
+                onClick={() => toggleSectionEdit("parental")}
+                className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                aria-label={
+                  editingSection === "parental"
+                    ? "Save Parental Info"
+                    : "Edit Parental Info"
+                }
+                 disabled={isSaving}
+              >
+                <FaEdit className="mr-2" />
+                   {editingSection === "parental" ? (isSaving ? "Saving...": "Save") : "Edit"}
+              </button>
+              {editingSection === "parental" && (
+                <button
+                  onClick={() => handleCancel("parental")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                   disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+
           )}
         </div>
         {editingSection === "parental" || mode === "add" ? (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Mother's Age</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Mother's Age
+                </label>
                 <input
                   type="number"
                   name="motherAge"
@@ -787,7 +891,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Mother's age"
                 />
                 {familyInformationErrors.motherAge && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.motherAge}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.motherAge}
+                  </p>
                 )}
               </div>
               <div>
@@ -804,11 +910,15 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Age when mother died"
                 />
                 {familyInformationErrors.ageWhenMotherDied && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.ageWhenMotherDied}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.ageWhenMotherDied}
+                  </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Father's Age</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Father's Age
+                </label>
                 <input
                   type="number"
                   name="fatherAge"
@@ -819,7 +929,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Father's age"
                 />
                 {familyInformationErrors.fatherAge && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.fatherAge}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.fatherAge}
+                  </p>
                 )}
               </div>
               <div>
@@ -836,11 +948,15 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Age when father died"
                 />
                 {familyInformationErrors.ageWhenFatherDied && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.ageWhenFatherDied}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.ageWhenFatherDied}
+                  </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Mother's Occupation</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Mother's Occupation
+                </label>
                 <select
                   name="motherOccupation"
                   value={familyInformation.motherOccupation.value}
@@ -856,11 +972,15 @@ const Family = ({ id, setActiveTab }) => {
                   ))}
                 </select>
                 {familyInformationErrors.motherOccupation && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.motherOccupation}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.motherOccupation}
+                  </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Father's Occupation</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Father's Occupation
+                </label>
                 <select
                   name="fatherOccupation"
                   value={familyInformation.fatherOccupation.value}
@@ -876,11 +996,15 @@ const Family = ({ id, setActiveTab }) => {
                   ))}
                 </select>
                 {familyInformationErrors.fatherOccupation && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.fatherOccupation}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.fatherOccupation}
+                  </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Mother's Religion</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Mother's Religion
+                </label>
                 <select
                   name="motherReligion"
                   value={familyInformation.motherReligion.value}
@@ -896,11 +1020,15 @@ const Family = ({ id, setActiveTab }) => {
                   ))}
                 </select>
                 {familyInformationErrors.motherReligion && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.motherReligion}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.motherReligion}
+                  </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Father's Religion</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Father's Religion
+                </label>
                 <select
                   name="fatherReligion"
                   value={familyInformation.fatherReligion.value}
@@ -916,7 +1044,9 @@ const Family = ({ id, setActiveTab }) => {
                   ))}
                 </select>
                 {familyInformationErrors.fatherReligion && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.fatherReligion}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.fatherReligion}
+                  </p>
                 )}
               </div>
             </div>
@@ -932,111 +1062,177 @@ const Family = ({ id, setActiveTab }) => {
               isTypeable={false}
             />
             {familyInformationErrors.raisedBy && (
-              <p className="mt-1 text-sm text-red-600">{familyInformationErrors.raisedBy}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {familyInformationErrors.raisedBy}
+              </p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <DescriptionInput
                 patient={familyInformation}
                 setPatient={setFamilyInformation}
-                setValue={(value) => handleDescriptionChange("motherDescription", value)}
+                setValue={(value) =>
+                  handleDescriptionChange("motherDescription", value)
+                }
                 isEditing={editingSection === "parental" || mode === "add"}
                 fieldName="motherDescription"
                 label="Briefly describe the type of person your mother (or stepmother or person who substituted for your mother) was when you were a child and how you got along with her"
                 placeholder="Select or enter mother description"
-                descriptionOptions={descriptionOptions}
+                descriptionOptions={typeOfPersonOptions}
                 isTypeable={false}
               />
               {familyInformationErrors.motherDescription && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.motherDescription}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.motherDescription}
+                </p>
               )}
               <DescriptionInput
                 patient={familyInformation}
                 setPatient={setFamilyInformation}
-                setValue={(value) => handleDescriptionChange("fatherDescription", value)}
+                setValue={(value) =>
+                  handleDescriptionChange("fatherDescription", value)
+                }
                 isEditing={editingSection === "parental" || mode === "add"}
                 fieldName="fatherDescription"
                 label="Briefly describe the type of person your father (or stepfather or father substitute) was when you were a child and how you got along with him"
                 placeholder="Select or enter father description"
-                descriptionOptions={descriptionOptions}
+                descriptionOptions={typeOfPersonOptions}
                 isTypeable={false}
               />
               {familyInformationErrors.fatherDescription && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.fatherDescription}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.fatherDescription}
+                </p>
               )}
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <strong>Mother's Age:</strong> {familyInformation.motherAge.value || "N/A"}
-              </div>
-              <div>
-                <strong>If deceased, how old were you when she died?:</strong>{" "}
-                {familyInformation.ageWhenMotherDied.value || "N/A"}
-              </div>
-              <div>
-                <strong>Father's Age:</strong> {familyInformation.fatherAge.value || "N/A"}
-              </div>
-              <div>
-                <strong>If deceased, how old were you when he died?:</strong>{" "}
-                {familyInformation.ageWhenFatherDied.value || "N/A"}
-              </div>
-              <div>
-                <strong>Mother's Occupation:</strong> {familyInformation.motherOccupation.value || "N/A"}
-              </div>
-              <div>
-                <strong>Father's Occupation:</strong> {familyInformation.fatherOccupation.value || "N/A"}
-              </div>
-              <div>
-                <strong>Mother's Religion:</strong> {familyInformation.motherReligion.value || "N/A"}
-              </div>
-              <div>
-                <strong>Father's Religion:</strong> {familyInformation.fatherReligion.value || "N/A"}
-              </div>
-            </div>
-            <div>
-              <strong className="text-gray-700">
-                If your mother and father did not raise you when you were young, who did?:
-              </strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-                {renderListItems(familyInformation.raisedBy.value)}
-              </div>
-            </div>
-            <div>
-              <strong className="text-gray-700">
-                Briefly describe the type of person your mother was when you were a child and how you got along with
-                her:
-              </strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-                {renderListItems(familyInformation.motherDescription.value)}
-              </div>
-            </div>
-            <div>
-              <strong className="text-gray-700">
-                Briefly describe the type of person your father was when you were a child and how you got along with him:
-              </strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-                {renderListItems(familyInformation.fatherDescription.value)}
-              </div>
-            </div>
+          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
+  <div className="mr-5">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">Mother's Age</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.motherAge.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">Age When Mother Died</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.ageWhenMotherDied.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">Mother's Occupation</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.motherOccupation.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-gray-200">
+      <span className="font-bold text-sm w-2/3">Mother's Religion</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.motherReligion.value || "N/A"}
+      </span>
+    </div>
+  </div>
+
+  <div className="ml-5">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">Father's Age</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.fatherAge.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">Age When Father Died</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.ageWhenFatherDied.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">Father's Occupation</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.fatherOccupation.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-gray-200">
+      <span className="font-bold text-sm w-2/3">Father's Religion</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.fatherReligion.value || "N/A"}
+      </span>
+    </div>
+  </div>
+</div>
+
+
+<div className="mt-6">
+   <div className=" bg-white border border-gray-200 rounded-lg p-4">
+  <strong className="text-sm">
+    If your mother and father did not raise you when you were young, who did?
+  </strong>
+  <div className="mt-2">
+    {renderListItems(familyInformation.raisedBy.value)}
+  </div>
+</div>
+</div>
+
+<div className="mt-6">
+  <div className=" bg-white border border-gray-200 rounded-lg p-4">
+  <strong className="text-sm">
+    Describe your mother when you were a child and how you got along with her:
+  </strong>
+  <div className="mt-2">
+    {renderListItems(familyInformation.motherDescription.value)}
+  </div>
+</div></div>
+
+<div className="mt-6">
+   <div className=" bg-white border border-gray-200 rounded-lg p-4">
+ <strong className="text-sm">
+    Describe your father when you were a child and how you got along with him:
+  </strong>
+  <div className=" mt-2">
+    {renderListItems(familyInformation.fatherDescription.value)}
+  </div>
+</div></div>
+
           </div>
         )}
       </section>
 
       {/* Sibling Information */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Sibling Information</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-2xl font-semibold text-gray-800">
+            Sibling Information
+          </h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("sibling")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "sibling" ? "Save Sibling Info" : "Edit Sibling Info"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "sibling" ? "Save" : "Edit"}
-            </button>
+
+  <div className="flex space-x-4">
+              <button
+                onClick={() => toggleSectionEdit("sibling")}
+                className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                aria-label={
+                  editingSection === "sibling"
+                    ? "Save Sibling Info"
+                    : "Edit Sibling Info"
+                }
+                 disabled={isSaving}
+              >
+                <FaEdit className="mr-2" />
+                 {editingSection === "sibling" ? (isSaving ? "Saving...": "Save") : "Edit"}
+              </button>
+              {editingSection === "sibling" && (
+                <button
+                  onClick={() => handleCancel("sibling")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                   disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+
           )}
         </div>
         {editingSection === "sibling" || mode === "add" ? (
@@ -1044,7 +1240,8 @@ const Family = ({ id, setActiveTab }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  If your mother and father separated, how old were you at the time?
+                  If your mother and father separated, how old were you at the
+                  time?
                 </label>
                 <input
                   type="number"
@@ -1056,12 +1253,15 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Parental separation age"
                 />
                 {familyInformationErrors.parentalSeparationAge && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.parentalSeparationAge}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.parentalSeparationAge}
+                  </p>
                 )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  If your mother and father divorced, how old were you at the time?
+                  If your mother and father divorced, how old were you at the
+                  time?
                 </label>
                 <input
                   type="number"
@@ -1073,7 +1273,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Parental divorce age"
                 />
                 {familyInformationErrors.parentalDivorceAge && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.parentalDivorceAge}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.parentalDivorceAge}
+                  </p>
                 )}
               </div>
               <div>
@@ -1090,7 +1292,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Mother divorce count"
                 />
                 {familyInformationErrors.motherDivorceCount && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.motherDivorceCount}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.motherDivorceCount}
+                  </p>
                 )}
               </div>
               <div>
@@ -1107,7 +1311,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Father divorce count"
                 />
                 {familyInformationErrors.fatherDivorceCount && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.fatherDivorceCount}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.fatherDivorceCount}
+                  </p>
                 )}
               </div>
               <div>
@@ -1124,7 +1330,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Living brothers"
                 />
                 {familyInformationErrors.livingBrothers && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.livingBrothers}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.livingBrothers}
+                  </p>
                 )}
               </div>
               <div>
@@ -1141,7 +1349,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Living sisters"
                 />
                 {familyInformationErrors.livingSisters && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.livingSisters}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.livingSisters}
+                  </p>
                 )}
               </div>
               <div>
@@ -1157,7 +1367,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Brothers ages"
                 />
                 {familyInformationErrors.brothersAges && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.brothersAges}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.brothersAges}
+                  </p>
                 )}
               </div>
               <div>
@@ -1173,7 +1385,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Sisters ages"
                 />
                 {familyInformationErrors.sistersAges && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.sistersAges}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.sistersAges}
+                  </p>
                 )}
               </div>
               <div>
@@ -1190,7 +1404,9 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Child number"
                 />
                 {familyInformationErrors.childNumber && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.childNumber}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.childNumber}
+                  </p>
                 )}
               </div>
               <div>
@@ -1207,12 +1423,16 @@ const Family = ({ id, setActiveTab }) => {
                   aria-label="Family children"
                 />
                 {familyInformationErrors.familyChildren && (
-                  <p className="mt-1 text-sm text-red-600">{familyInformationErrors.familyChildren}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {familyInformationErrors.familyChildren}
+                  </p>
                 )}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Were you adopted?</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Were you adopted?
+              </label>
               <div className="flex space-x-4 mt-1">
                 <label className="flex items-center">
                   <input
@@ -1240,12 +1460,15 @@ const Family = ({ id, setActiveTab }) => {
                 </label>
               </div>
               {familyInformationErrors.adopted && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.adopted}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.adopted}
+                </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                If there were unusually disturbing features in your relationship to any of your brothers, briefly describe
+                If there were unusually disturbing features in your relationship
+                to any of your brothers, briefly describe
               </label>
               <textarea
                 name="brotherDisturbances"
@@ -1257,12 +1480,15 @@ const Family = ({ id, setActiveTab }) => {
                 aria-label="Brother disturbances"
               />
               {familyInformationErrors.brotherDisturbances && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.brotherDisturbances}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.brotherDisturbances}
+                </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                If there were unusually disturbing features in your relationship to any of your sisters, briefly describe
+                If there were unusually disturbing features in your relationship
+                to any of your sisters, briefly describe
               </label>
               <textarea
                 name="sisterDisturbances"
@@ -1274,72 +1500,106 @@ const Family = ({ id, setActiveTab }) => {
                 aria-label="Sister disturbances"
               />
               {familyInformationErrors.sisterDisturbances && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.sisterDisturbances}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.sisterDisturbances}
+                </p>
               )}
             </div>
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <strong>If your mother and father separated, how old were you at the time?:</strong>{" "}
-                {familyInformation.parentalSeparationAge.value || "N/A"}
-              </div>
-              <div>
-                <strong>If your mother and father divorced, how old were you at the time?:</strong>{" "}
-                {familyInformation.parentalDivorceAge.value || "N/A"}
-              </div>
-              <div>
-                <strong>Total number of times mother divorced:</strong>{" "}
-                {familyInformation.motherDivorceCount.value || "N/A"}
-              </div>
-              <div>
-                <strong>Total number of times father divorced:</strong>{" "}
-                {familyInformation.fatherDivorceCount.value || "N/A"}
-              </div>
-              <div>
-                <strong>Number of living brothers:</strong>{" "}
-                {familyInformation.livingBrothers.value || "N/A"}
-              </div>
-              <div>
-                <strong>Number of living sisters:</strong>{" "}
-                {familyInformation.livingSisters.value || "N/A"}
-              </div>
-              <div>
-                <strong>Ages of living brothers:</strong>{" "}
-                {familyInformation.brothersAges.value || "N/A"}
-              </div>
-              <div>
-                <strong>Ages of living sisters:</strong>{" "}
-                {familyInformation.sistersAges.value || "N/A"}
-              </div>
-              <div>
-                <strong>I was child number:</strong>{" "}
-                {familyInformation.childNumber.value || "N/A"}
-              </div>
-              <div>
-                <strong>In a family of children:</strong>{" "}
-                {familyInformation.familyChildren.value || "N/A"}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
+  <div className="mr-5">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">If your mother and father separated, how old were you at the time?</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.parentalSeparationAge.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">If your mother and father divorced, how old were you at the time?</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.parentalDivorceAge.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">Total number of times mother divorced</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.motherDivorceCount.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">Total number of times father divorced</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.fatherDivorceCount.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">Number of living brothers</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.livingBrothers.value || "N/A"}
+      </span>
+    </div>
+  </div>
+
+  <div className="ml-5">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">Number of living sisters</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.livingSisters.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">Ages of living brothers</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.brothersAges.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">Ages of living sisters</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.sistersAges.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">I was child number</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.childNumber.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-2/3">In a family of children</span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.familyChildren.value || "N/A"}
+      </span>
+    </div>
+  </div>
+</div>
+
+             <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Were you adopted?:</strong>{" "}
+              {familyInformation.adopted.value || "N/A"}
             </div>
-            <div>
-              <strong>Were you adopted?:</strong> {familyInformation.adopted.value || "N/A"}
-            </div>
-            <div>
-              <strong className="text-gray-700">
-                If there were unusually disturbing features in your relationship to any of your brothers, briefly
-                describe:
+                    <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">
+                If there were unusually disturbing features in your relationship
+                to any of your brothers, briefly describe:
               </strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-                <p className="text-gray-800 mt-1">{familyInformation.brotherDisturbances.value || "N/A"}</p>
+              <div className="mt-2">
+                <p className="text-gray-800 mt-1">
+                  {familyInformation.brotherDisturbances.value || "N/A"}
+                </p>
               </div>
             </div>
-            <div>
-              <strong className="text-gray-700">
-                If there were unusually disturbing features in your relationship to any of your sisters, briefly describe:
+                    <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">
+                If there were unusually disturbing features in your relationship
+                to any of your sisters, briefly describe:
               </strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-                <p className="text-gray-800 mt-1">{familyInformation.sisterDisturbances.value || "N/A"}</p>
+              <div className="mt-2">
+                <p className="text-gray-800 mt-1">
+                  {familyInformation.sisterDisturbances.value || "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -1347,27 +1607,46 @@ const Family = ({ id, setActiveTab }) => {
       </section>
 
       {/* Family Mental Health */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Family Mental Health</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-2xl font-semibold text-gray-800">
+            Family Mental Health
+          </h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("familyMentalHealth")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={
-                editingSection === "familyMentalHealth" ? "Save Family Mental Health Info" : "Edit Family Mental Health Info"
-              }
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "familyMentalHealth" ? "Save" : "Edit"}
-            </button>
+              <div className="flex space-x-4">
+              <button
+                onClick={() => toggleSectionEdit("familyMentalHealth")}
+                className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                aria-label={
+                  editingSection === "sifamilyMentalHealthbling"
+                    ? "Save Family Mental Health Info"
+                    : "Edit Family Mental Health Info"
+                }
+                 disabled={isSaving}
+              >
+                <FaEdit className="mr-2" />
+                {editingSection === "familyMentalHealth" ? (isSaving ? "Saving...": "Save") : "Edit"}
+              </button>
+              {editingSection === "familyMentalHealth" && (
+                <button
+                  onClick={() => handleCancel("familyMentalHealth")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                   disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+
           )}
         </div>
         {editingSection === "familyMentalHealth" || mode === "add" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Number of close male relatives who have been seriously emotionally disturbed
+                Number of close male relatives who have been seriously
+                emotionally disturbed
               </label>
               <input
                 type="number"
@@ -1379,12 +1658,15 @@ const Family = ({ id, setActiveTab }) => {
                 aria-label="Male relatives disturbed"
               />
               {familyInformationErrors.maleRelativesDisturbed && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.maleRelativesDisturbed}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.maleRelativesDisturbed}
+                </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Number that have been hospitalized for psychiatric treatment, or have attempted suicide
+                Number that have been hospitalized for psychiatric treatment, or
+                have attempted suicide
               </label>
               <input
                 type="number"
@@ -1396,12 +1678,15 @@ const Family = ({ id, setActiveTab }) => {
                 aria-label="Male relatives hospitalized"
               />
               {familyInformationErrors.maleRelativesHospitalized && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.maleRelativesHospitalized}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.maleRelativesHospitalized}
+                </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Number of close female relatives who have been seriously emotionally disturbed
+                Number of close female relatives who have been seriously
+                emotionally disturbed
               </label>
               <input
                 type="number"
@@ -1413,12 +1698,15 @@ const Family = ({ id, setActiveTab }) => {
                 aria-label="Female relatives disturbed"
               />
               {familyInformationErrors.femaleRelativesDisturbed && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.femaleRelativesDisturbed}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.femaleRelativesDisturbed}
+                </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Number that have been hospitalized for psychiatric treatment, or have attempted suicide
+                Number that have been hospitalized for psychiatric treatment, or
+                have attempted suicide
               </label>
               <input
                 type="number"
@@ -1430,29 +1718,53 @@ const Family = ({ id, setActiveTab }) => {
                 aria-label="Female relatives hospitalized"
               />
               {familyInformationErrors.femaleRelativesHospitalized && (
-                <p className="mt-1 text-sm text-red-600">{familyInformationErrors.femaleRelativesHospitalized}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {familyInformationErrors.femaleRelativesHospitalized}
+                </p>
               )}
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <strong>Number of close male relatives who have been seriously emotionally disturbed:</strong>{" "}
-              {familyInformation.maleRelativesDisturbed.value || "N/A"}
-            </div>
-            <div>
-              <strong>Number that have been hospitalized for psychiatric treatment, or have attempted suicide:</strong>{" "}
-              {familyInformation.maleRelativesHospitalized.value || "N/A"}
-            </div>
-            <div>
-              <strong>Number of close female relatives who have been seriously emotionally disturbed:</strong>{" "}
-              {familyInformation.femaleRelativesDisturbed.value || "N/A"}
-            </div>
-            <div>
-              <strong>Number that have been hospitalized for psychiatric treatment, or have attempted suicide:</strong>{" "}
-              {familyInformation.femaleRelativesHospitalized.value || "N/A"}
-            </div>
-          </div>
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
+  <div className="mr-5">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">
+        Number of close male relatives who have been seriously emotionally disturbed
+      </span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.maleRelativesDisturbed.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-gray-200">
+      <span className="font-bold text-sm w-2/3">
+        Number that have been hospitalized for psychiatric treatment, or have attempted suicide (male)
+      </span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.maleRelativesHospitalized.value || "N/A"}
+      </span>
+    </div>
+  </div>
+
+  <div className="ml-5">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+      <span className="font-bold text-sm w-2/3">
+        Number of close female relatives who have been seriously emotionally disturbed
+      </span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.femaleRelativesDisturbed.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-gray-200">
+      <span className="font-bold text-sm w-2/3">
+        Number that have been hospitalized for psychiatric treatment, or have attempted suicide (female)
+      </span>
+      <span className="text-gray-700 text-sm w-1/3 text-right">
+        {familyInformation.femaleRelativesHospitalized.value || "N/A"}
+      </span>
+    </div>
+  </div>
+</div>
+
         )}
       </section>
 
@@ -1469,6 +1781,8 @@ const Family = ({ id, setActiveTab }) => {
         </div>
       )}
     </div>
+  ) : (
+    <LoadingSpinner />
   );
 };
 

@@ -14,40 +14,26 @@ import {
 } from "react-icons/fa";
 import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router-dom";
-import Notes from "./Notes";
-import MentalStatusExam from "./MentalStatusExam";
-import { basicInformationData } from "../data/mockData";
-import EducationDetails from "./EducationDetails";
-import BasicInformation from "./BasicInformation";
-import PersonalInformation from "./PersonalInformation";
-import Family from "./Family";
+import NotesTab from "./NotesTab";
+import MentalStatusExamTab from "./MentalStatusExamTab";
+import {  getBasicInformationData } from "../data/mockData";
+import EducationDetailsTab from "./EducationDetailsTab";
+
+import PersonalInformationTab from "./PersonalInformationTab";
+import BasicInformationTab from "./BasicInformationTab";
+import FamilyTab from "./FamilyTab";
 import MedicalTab from "./MedicalTab";
 import moment from "moment";
+import LoadingSpinner from "./LoadingSpinner";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("basicInformation");
   const { id } = useParams(); // Get patientId from URL params
-
+  const [isLoading, setIsLoading] = useState(false);
   // Default A/L subjects (Science stream as default, will allow stream selection)
-  const defaultALSubjects = [
-    { name: "Combined Mathematics", followed: false, marks: "" },
-    { name: "Physics", followed: false, marks: "" },
-    { name: "Chemistry", followed: false, marks: "" },
-  ];
-
-  const defaultOLSubjects = [
-    { name: "First Language (Sinhala/Tamil)", followed: false, marks: "" },
-    { name: "Mathematics", followed: false, marks: "" },
-    { name: "English", followed: false, marks: "" },
-    { name: "Science", followed: false, marks: "" },
-    { name: "Religion", followed: false, marks: "" },
-    { name: "History", followed: false, marks: "" },
-    { name: "Art", followed: false, marks: "" },
-    { name: "Literature", followed: false, marks: "" },
-    { name: "Commerce", followed: false, marks: "" },
-  ];
+ 
 
   const [basicInformation, setBasicInformation] = useState({
     patientId: "",
@@ -60,13 +46,14 @@ function PatientInfoEdit({ mode = "view" }) {
   });
 
 
+  const loadBasicInformationData = async () => {
+    setIsLoading(true);
+    const result = await getBasicInformationData(id);
+    const patientData = result.data;
+    console.log('patientData', patientData);
+ if (patientData) {
 
-  useEffect(() => {
-    if (id) {
-      const patientData = basicInformationData.find((p) => p.id === id);
-      console.log("patientData", patientData.patientId);
-      if (patientData) {
-        setBasicInformation({
+   setBasicInformation({
           ...basicInformation,
           patientId: patientData.patientId || "",
           firstName: patientData.firstName,
@@ -77,33 +64,19 @@ function PatientInfoEdit({ mode = "view" }) {
           formDate: patientData.formDate,
           lastModified: patientData.lastModified,
         });
-      }
+
+ }
+   setIsLoading(false);
+  };
+
+   useEffect(() => {
+    if (id) {
+      loadBasicInformationData();
     }
   }, [id]);
 
-  // Add state for tracking which section is being edited
-  const [editingSection, setEditingSection] = useState(null);
 
-  // Function to toggle edit mode for a specific section
-  const toggleSectionEdit = (section) => {
-    if (editingSection === section) {
-      handleSubmitp(section); // Save only the specific section
-      setEditingSection(null);
-    } else {
-      setEditingSection(section);
-    }
-  };
-
-  // Modified handleSubmit to handle section-specific saving
-  const handleSubmitp = async (section) => {
-    // Here you can add logic to save only the relevant section data
-    const savedPatientId = mode === "add" ? Date.now().toString() : id;
-    if (mode === "add") {
-      navigate(`/patients/${savedPatientId}`);
-    }
-  };
-
-  return (
+  return (   
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h2 className="flex items-center text-3xl font-bold text-gray-800  pb-2">
@@ -115,9 +88,8 @@ function PatientInfoEdit({ mode = "view" }) {
       {/* {JSON.stringify(basicInfomation)} */}
       <div>
         <section className="mb-2">
-          {editingSection === "basic" || mode === "add" ? (
-            <></>
-          ) : (
+          { (
+             !isLoading ? (
             <div className="mx-4">
               <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6 shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -203,6 +175,9 @@ function PatientInfoEdit({ mode = "view" }) {
                 </div>
               </div>
             </div>
+              ) : (
+            <LoadingSpinner />
+          )
           )}
         </section>
       </div>
@@ -287,27 +262,17 @@ function PatientInfoEdit({ mode = "view" }) {
           Management and Notes
         </button>
       </div>
-      <form onSubmit={(e) => e.preventDefault()} className="space-y-8 p-6 ">
-        {activeTab === "basicInformation" && <BasicInformation id={id} />}
-
-        {activeTab === "personal" && <PersonalInformation id={id} />}
-
-        {activeTab === "family" && <Family id={id} />}
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
+        {activeTab === "basicInformation" && <BasicInformationTab id={id} />}
+        {activeTab === "personal" && <PersonalInformationTab id={id} />}
+        {activeTab === "family" && <FamilyTab id={id} />}
         {activeTab === "medical" && <MedicalTab id={id} />}
-        {activeTab === "education" && (
-          <EducationDetails
-            id={id}
-      
-            mode={mode}
-            editingSection={editingSection}
-            toggleSectionEdit={toggleSectionEdit}
-          />
-        )}
-
-        {activeTab === "notes" && <Notes />}
-        {activeTab === "mentalExam" && <MentalStatusExam />}
+        {activeTab === "education" && <EducationDetailsTab id={id} />}
+        {activeTab === "notes" && <NotesTab />}
+        {activeTab === "mentalExam" && <MentalStatusExamTab />}
       </form>
     </div>
+   
   );
 }
 

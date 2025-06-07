@@ -1,38 +1,12 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { personalInformationData } from "../data/mockData";
+import { getBadPointsOptions, getGoodPointsOptionsData, getOccupations, getPersonalInformationData, goodPointsOptionsData, personalInformationData, updatePersonalInformationData } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
+import LoadingSpinner from "./LoadingSpinner";
 
 
-// Mock occupations data
-const occupations = [
-  { id: 1, name: "Engineer" },
-  { id: 2, name: "Teacher" },
-  { id: 3, name: "Doctor" },
-  { id: 4, name: "Other" },
-];
-
-// Mock options for DescriptionInput
-const goodPointsOptions = [
-  { id: "1", text: "Problem-solver – I enjoy analyzing issues and finding effective solutions." },
-  { id: "2", text: "Quick learner – I can pick up new tools and frameworks rapidly." },
-  { id: "3", text: "Strong work ethic – I am committed to meeting deadlines and taking responsibility." },
-  { id: "4", text: "Adaptable – I can adjust to new environments, teams, or technologies easily." },
-  { id: "5", text: "Team player – I communicate well and collaborate effectively with others." },
-  { id: "6", text: "Detail-oriented – I notice small issues before they grow into big problems." },
-  { id: "7", text: "Other" },
-];
-
-const badPointsOptions = [
-  { id: "101", text: "Procrastination" },
-  { id: "102", text: "Shyness" },
-  { id: "103", text: "Impatience" },
-  { id: "104", text: "Perfectionism" },
-  { id: "105", text: "Other" },
-];
-
-const maritalStatusOptions = [
+ const maritalStatusOptions = [
   { value: "never_married", text: "Never Married" },
   { value: "married_first_time", text: "Married (Living Together) Now for First Time" },
   { value: "married_second_time", text: "Married (Living Together) Now for Second (or More) Time" },
@@ -47,6 +21,10 @@ const PersonalInformation = ({ id, setActiveTab }) => {
   const [personalInformationErrors, setPersonalInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
+ const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+  const [initialPersonalInformation, setInitialPersonalInformation] = useState(null); // Store initial state for cancel
+
 
   const [personalInformation, setPersonalInformation] = useState({
     maritalStatus: {
@@ -179,132 +157,195 @@ const PersonalInformation = ({ id, setActiveTab }) => {
     },
   });
 
-  // Load mock data based on id
-  useEffect(() => {
-    if (id) {
-      const patientData = personalInformationData.find((p) => p.id === id);
-      console.log("patientData", patientData?.patientId);
-      if (patientData) {
+  const loadPersonalInformationData=async()=>{
+  setIsLoading(true);
+  const result =await getPersonalInformationData(id);
+    const patientData=result.data;
+  if (patientData) {
         setPersonalInformation({
           maritalStatus: {
             ...personalInformation.maritalStatus,
             value: patientData.maritalStatus || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           yearsMarried: {
             ...personalInformation.yearsMarried,
             value: patientData.yearsMarried || "",
-            isTouched: true,
+        isTouched: false,
             isValid: true,
             required: patientData.maritalStatus === "married_first_time" || patientData.maritalStatus === "married_second_time",
           },
           maleChildrenAges: {
             ...personalInformation.maleChildrenAges,
             value: patientData.maleChildrenAges || "",
-            isTouched: true,
+             isTouched: false,
             isValid: true,
           },
           femaleChildrenAges: {
             ...personalInformation.femaleChildrenAges,
             value: patientData.femaleChildrenAges || "",
-            isTouched: true,
+         isTouched: false,
             isValid: true,
           },
           religiosity: {
             ...personalInformation.religiosity,
             value: patientData.religiosity || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           thingsLiked: {
             ...personalInformation.thingsLiked,
             value: patientData.thingsLiked || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           assets: {
             ...personalInformation.assets,
             value: patientData.assets || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           badPoints: {
             ...personalInformation.badPoints,
             value: patientData.badPoints || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           socialDifficulties: {
             ...personalInformation.socialDifficulties,
             value: patientData.socialDifficulties || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           loveSexDifficulties: {
             ...personalInformation.loveSexDifficulties,
             value: patientData.loveSexDifficulties || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           schoolWorkDifficulties: {
             ...personalInformation.schoolWorkDifficulties,
             value: patientData.schoolWorkDifficulties || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           lifeGoals: {
             ...personalInformation.lifeGoals,
             value: patientData.lifeGoals || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           thingsToChange: {
             ...personalInformation.thingsToChange,
             value: patientData.thingsToChange || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           occupationTrained: {
             ...personalInformation.occupationTrained,
             value: patientData.occupationTrained || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           occupation: {
             ...personalInformation.occupation,
             value: patientData.occupation || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           occupationFullTime: {
             ...personalInformation.occupationFullTime,
             value: patientData.occupationFullTime || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
         });
+
+ setIsLoading(false);
+
+  }
+}
+  // Load mock data based on id
+  useEffect(() => {
+    if (id) {
+
+      loadPersonalInformationData();
         setMode("edit");
-      }
+      
     }
   }, [id]);
 
+const [goodPointsOptions,setGoodPointsOptions]=useState([]);
+const [badPointsOptions,setBadPointsOptions]=useState([]);
+const [occupations,setOccupations]=useState([]);
+
+useEffect(()=>{
+loadDropdowns();
+},[])
+
+
+const loadDropdowns=async()=>{
+  const goodPointsOptions=await getGoodPointsOptionsData();
+  setGoodPointsOptions(goodPointsOptions.data);
+
+  const badPoints=await getBadPointsOptions();
+  setBadPointsOptions(badPoints.data);
+
+  const occupations=await getOccupations();
+  setOccupations(occupations.data);
+
+}
+
+  // Store initial state when entering edit mode
+  useEffect(() => {
+
+      setInitialPersonalInformation({ ...personalInformation });
+    
+  }, [editingSection]);
+  
   // Toggle edit mode for a specific section
-  const toggleSectionEdit = (section) => {
+  const toggleSectionEdit =async (section) => {
+
     if (editingSection === section) {
-      handleSubmitp(section);
+     const isValid=await handleSubmitp(section);
+      console.log("isValidoo.",isValid);
+     if(isValid)
       setEditingSection(null);
+
     } else {
       setEditingSection(section);
     }
   };
 
-  // Section-specific save logic
-  const handleSubmitp = async (section) => {
-    const savedPatientId = mode === "add" ? Date.now().toString() : id;
-    if (mode === "add") {
-      navigate(`/patients/${savedPatientId}`);
+
+  const handleSubmitp =async (section) => {
+  
+setIsSaving(true);
+    const isValid = validatePersonalInformation();
+    if (!isValid) {
+      console.log("Validation failed, not saving.");
+       setIsSaving(false);
+      return false;
     }
+
+
+    const payload = {
+    };
+    Object.entries(personalInformation).forEach(([key, field]) => {
+     // console.log("field.",field);
+      if (field.isTouched) {
+        payload[key] = field.value;
+      }
+    });
+
+    console.log("Save Payload:", payload);
+      const res=await updatePersonalInformationData(id,payload);
+        await loadPersonalInformationData();
+          console.log("update result:", res);
+          setIsSaving(false);
+
+return true;
   };
 
   // Validate individual field
@@ -413,7 +454,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
       const { value, required, dataType } = field;
       let errorMessage = validateField(field.label, value, required, dataType);
 
-      if (key === "yearsMarried" && personalInformation.maritalStatus.value.includes("married")) {
+      if (key === "yearsMarried" && (["married_first_time", "married_second_time"].includes(personalInformation.maritalStatus.value))) {
         if (!value || value.trim() === "") {
           errorMessage = "Number of Years Married is required for current marriage";
         }
@@ -427,7 +468,8 @@ const PersonalInformation = ({ id, setActiveTab }) => {
         updatedInfo[key].isValid = true;
       }
 
-      updatedInfo[key].isTouched = true;
+      //updatedInfo[key].isTouched = true;
+      updatedInfo[key].isTouched = updatedInfo[key].isTouched || false;
     });
 
     setPersonalInformation(updatedInfo);
@@ -459,6 +501,20 @@ const PersonalInformation = ({ id, setActiveTab }) => {
     }
   };
 
+
+    // Function to handle cancel action
+  const handleCancel = (editingSection) => {
+
+    if (initialPersonalInformation) {
+      setPersonalInformation(initialPersonalInformation);
+      setPersonalInformationErrors({});
+
+    }
+    
+    
+    setEditingSection(null); // Exit edit mode
+  };
+
   // Helper function to render list items
   const renderListItems = (value) => {
     let items = [];
@@ -475,27 +531,50 @@ const PersonalInformation = ({ id, setActiveTab }) => {
     return (
       <ul className="list-disc pl-5 space-y-1">
         {items.map((item, index) => (
-          <li key={index} className="text-gray-800">{item}</li>
+          <li key={index} className="text-gray-700">{item}</li>
         ))}
       </ul>
     );
   };
 
+
+
   return (
+!isLoading ?
     <div className="px-8">
+
       {/* Personal Details */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Personal Details</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2  pb-2">
+          <h3 className="text-2xl font-semibold text-gray-700">Personal Details</h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("personalDetails")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "personalDetails" ? "Save Personal Details" : "Edit Personal Details"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "personalDetails" ? "Save" : "Edit"}
-            </button>
+          
+                 <div className="flex space-x-4">
+                        <button
+                          onClick={() => toggleSectionEdit("personalDetails")}
+                          className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                          aria-label={
+                            editingSection === "personalDetails"
+                              ? "Save Personal Details"
+                              : "Edit Personal Details"
+                          }
+                          disabled={isSaving}
+                        >
+                          <FaEdit className="mr-2" />
+                         {editingSection === "personalDetails" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        </button>
+                        {editingSection === "personalDetails" && (
+                          <button
+                            onClick={()=>handleCancel("personalDetails")}
+                            className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                            aria-label="Cancel Editing"
+                              disabled={isSaving}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+
           )}
         </div>
         {editingSection === "personalDetails" || mode === "add" ? (
@@ -610,43 +689,78 @@ const PersonalInformation = ({ id, setActiveTab }) => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <strong>Marital Status:</strong>{" "}
-              {maritalStatusOptions.find((opt) => opt.value === personalInformation.maritalStatus.value)?.text || "N/A"}
-            </div>
-            <div>
-              <strong>Years Married:</strong> {personalInformation.yearsMarried.value || "N/A"}
-            </div>
-            <div>
-              <strong>Male Children Ages:</strong> {personalInformation.maleChildrenAges.value || "N/A"}
-            </div>
-            <div>
-              <strong>Female Children Ages:</strong> {personalInformation.femaleChildrenAges.value || "N/A"}
-            </div>
-            <div>
-              <strong>Religiosity:</strong>{" "}
-              {personalInformation.religiosity.value
-                ? `${personalInformation.religiosity.value} (1=Very Religious, 9=Atheist)`
-                : "N/A"}
-            </div>
-          </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2  ">
+      <div className="mr-5">
+        <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+          <span className="font-bold text-sm w-1/3">Present Marital Status</span>
+          <span className="text-gray-700 text-sm w-2/3 text-right">
+            {maritalStatusOptions.find((opt) => opt.value === personalInformation.maritalStatus.value)?.text || "N/A"}
+          </span>
+        </div>
+        <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+          <span className="font-bold text-sm w-2/3">Number of Years Married to Present Spouse</span>
+          <span className="text-gray-700 text-sm w-1/3 text-right">{personalInformation.yearsMarried.value || "N/A"}</span>
+        </div>
+        <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+          <span className="font-bold text-sm w-1/3">Ages of Male Children</span>
+          <span className="text-gray-700 text-sm w-2/3 text-right">{personalInformation.maleChildrenAges.value || "N/A"}</span>
+        </div>
+      </div>
+      <div className="ml-5">
+        <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+          <span className="font-bold text-sm w-1/3">Ages of Female Children</span>
+          <span className="text-gray-700 text-sm w-2/3 text-right">{personalInformation.femaleChildrenAges.value || "N/A"}</span>
+        </div>
+        <div className="flex justify-between items-center py-2.5 border-gray-200 last:border-b-0">
+          <span className="font-bold text-sm w-2/3">How religious are you?</span>
+          <span className="text-gray-700 text-sm w-1/3 text-right">
+            {personalInformation.religiosity.value
+              ? `${personalInformation.religiosity.value}`
+              : "N/A"}
+          </span>
+        </div>
+
+         <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+          <span className="text-sm w-2/3">(1 = Very Religious, 5 = Average, 9 = Atheist)</span>
+        </div>
+
+      </div>
+    </div>
         )}
       </section>
 
       {/* Personal Insights */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Personal Insights</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-2xl font-semibold text-gray-700">Personal Insights</h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("insights")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "insights" ? "Save Personal Insights" : "Edit Personal Insights"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "insights" ? "Save" : "Edit"}
-            </button>
+
+   <div className="flex space-x-4">
+                        <button
+                          onClick={() => toggleSectionEdit("insights")}
+                          className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                          aria-label={
+                            editingSection === "insights"
+                              ? "Save Personal Insights"
+                              : "Edit Personal Insights"
+                          }
+                            disabled={isSaving}
+                        >
+                          <FaEdit className="mr-2" />
+                           {editingSection === "insights" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        </button>
+                        {editingSection === "insights" && (
+                          <button
+                            onClick={()=>handleCancel("insights")}
+                            className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                            aria-label="Cancel Editing"
+                              disabled={isSaving}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+            
           )}
         </div>
         {editingSection === "insights" || mode === "add" ? (
@@ -795,53 +909,53 @@ const PersonalInformation = ({ id, setActiveTab }) => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div>
-              <strong className="text-gray-700">Things Liked:</strong>
-                  <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2"> 
-              <p className="text-gray-800 mt-1">{personalInformation.thingsLiked.value || "N/A"}</p>
+          <div className="space-y-4">
+            <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Things Liked:</strong>
+                  <div className="mt-2"> 
+              <p className="text-gray-700 mt-1">{personalInformation.thingsLiked.value || "N/A"}</p>
               </div>
             </div>
-            <div>
-              <strong className="text-gray-700">Assets:</strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+               <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main assets and good points:</strong>
+                  <div className="mt-2"> 
                 {renderListItems(personalInformation.assets.value)}
               </div>
             </div>
-            <div>
-              <strong className="text-gray-700">Bad Points:</strong>
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main bad points:</strong>
+                <div className="mt-2"> 
                 {renderListItems(personalInformation.badPoints.value)}
               </div>
             </div>
-            <div>
-              <strong className="text-gray-700">Social Difficulties:</strong>
-               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-              <p className="text-gray-800 mt-1">{personalInformation.socialDifficulties.value || "N/A"}</p>
+                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main Social Difficulties:</strong>
+                 <div className="mt-2"> 
+              <p className="text-gray-700 mt-1">{personalInformation.socialDifficulties.value || "N/A"}</p>
            </div>
             </div>
-            <div>
-              <strong className="text-gray-700">Love/Sex Difficulties:</strong>
-               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
-              <p className="text-gray-800 mt-1">{personalInformation.loveSexDifficulties.value || "N/A"}</p>
+              <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main Love/Sex Difficulties:</strong>
+                <div className="mt-2"> 
+              <p className="text-gray-700 mt-1">{personalInformation.loveSexDifficulties.value || "N/A"}</p>
             </div>
             </div>
-            <div>
-              <strong className="text-gray-700">School/Work Difficulties:</strong>
-                <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">  
-                     <p className="text-gray-800 mt-1">{personalInformation.schoolWorkDifficulties.value || "N/A"}</p>
+             <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main School or Work Difficulties:</strong>
+                <div className="mt-2"> 
+                     <p className="text-gray-700 mt-1">{personalInformation.schoolWorkDifficulties.value || "N/A"}</p>
           </div>
            </div>
-            <div>
-              <strong className="text-gray-700">Life Goals:</strong>
-                  <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2"> 
-              <p className="text-gray-800 mt-1">{personalInformation.lifeGoals.value || "N/A"}</p>
+            <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main Life Goals:</strong>
+                <div className="mt-2"> 
+              <p className="text-gray-700 mt-1">{personalInformation.lifeGoals.value || "N/A"}</p>
               </div>
             </div>
-            <div>
-              <strong className="text-gray-700">Things to Change:</strong>
-                  <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2"> 
-              <p className="text-gray-800 mt-1">{personalInformation.thingsToChange.value || "N/A"}</p>
+            <div className=" bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Things Most Like to Change:</strong>
+                <div className="mt-2"> 
+              <p className="text-gray-700 mt-1">{personalInformation.thingsToChange.value || "N/A"}</p>
            </div>
             </div>
           </div>
@@ -849,18 +963,37 @@ const PersonalInformation = ({ id, setActiveTab }) => {
       </section>
 
       {/* Occupation Information */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
-          <h3 className="text-2xl font-semibold text-gray-800">Occupation Information</h3>
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2  pb-2">
+          <h3 className="text-2xl font-semibold text-gray-700">Occupation Information</h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("occupation")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "occupation" ? "Save Occupation Info" : "Edit Occupation Info"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "occupation" ? "Save" : "Edit"}
-            </button>
+
+   <div className="flex space-x-4">
+                        <button
+                          onClick={() => toggleSectionEdit("occupation")}
+                          className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                          aria-label={
+                            editingSection === "occupation"
+                              ? "Save Occupation Info"
+                              : "Edit Occupation Info"
+                          }
+                            disabled={isSaving}
+                        >
+                          <FaEdit className="mr-2" />
+                          {editingSection === "occupation" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        </button>
+                        {editingSection === "occupation" && (
+                          <button
+                            onClick={()=>handleCancel("occupation")}
+                            className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                            aria-label="Cancel Editing"
+                              disabled={isSaving}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+
           )}
         </div>
         {editingSection === "occupation" || mode === "add" ? (
@@ -945,18 +1078,28 @@ const PersonalInformation = ({ id, setActiveTab }) => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <strong>What occupation(s) have you mainly been trained for?:</strong>{" "}
-              {personalInformation.occupationTrained.value || "N/A"}
-            </div>
-            <div>
-              <strong>Present Occupation:</strong> {personalInformation.occupation.value || "N/A"}
-            </div>
-            <div>
-              <strong>Occupation Status:</strong> {personalInformation.occupationFullTime.value || "N/A"}
-            </div>
-          </div>
+          <div className="grid grid-cols-1 gap-4">
+  <div className="border-2 bg-white  border-gray-200 rounded-lg p-4 ">
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-1/2">What occupation(s) have you mainly been trained for?</span>
+      <span className="text-gray-700 text-sm w-1/2 text-right">
+        {personalInformation.occupationTrained.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-1/3">Present Occupation</span>
+      <span className="text-gray-700 text-sm w-2/3 text-right">
+        {personalInformation.occupation.value || "N/A"}
+      </span>
+    </div>
+    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
+      <span className="font-bold text-sm w-1/3">Occupation Status</span>
+      <span className="text-gray-700 text-sm w-2/3 text-right">
+        {personalInformation.occupationFullTime.value || "N/A"}
+      </span>
+    </div>
+  </div>
+</div>
         )}
       </section>
 
@@ -973,6 +1116,10 @@ const PersonalInformation = ({ id, setActiveTab }) => {
         </div>
       )}
     </div>
+    :
+    <LoadingSpinner />
+
+
   );
 };
 

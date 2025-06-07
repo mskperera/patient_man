@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { medicalInformationData } from "../data/mockData";
+import { getMedicalInformationData, medicalInformationData, updateMedicalInformationData } from "../data/mockData";
+import LoadingSpinner from "./LoadingSpinner";
 
 
 const MedicalTab = ({ id, setActiveTab }) => {
-  const navigate = useNavigate();
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
@@ -124,100 +123,122 @@ const MedicalTab = ({ id, setActiveTab }) => {
     },
   });
 
-  // Load mock data based on id
-  useEffect(() => {
-    if (id) {
-      const patientData = medicalInformationData.find((p) => p.id === id);
-      console.log("patientData", patientData?.patientId);
-      if (patientData) {
+  const [initialMedicalInformation, setInitialMedicalInformation] = useState(null);
+  
+    const [isLoading, setIsLoading] = useState(false);
+     const [isSaving, setIsSaving] = useState(false);
+  
+    const loadMedicalInformationData=async()=>{
+      setIsLoading(true);
+      const result =await getMedicalInformationData(id);
+        const patientData=result.data;
+        console.log('patientData',patientData.patientId)
+        if (patientData) {
+    
         setMedicalInformation({
           physicalAilments: {
             ...medicalInformation.physicalAilments,
             value: patientData.physicalAilments || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           mainComplaints: {
             ...medicalInformation.mainComplaints,
             value: patientData.mainComplaints || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           pastComplaints: {
             ...medicalInformation.pastComplaints,
             value: patientData.pastComplaints || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           worseConditions: {
             ...medicalInformation.worseConditions,
             value: patientData.worseConditions || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           improvedConditions: {
             ...medicalInformation.improvedConditions,
             value: patientData.improvedConditions || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           individualTherapyHours: {
             ...medicalInformation.individualTherapyHours,
             value: patientData.individualTherapyHours || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           individualTherapyYears: {
             ...medicalInformation.individualTherapyYears,
             value: patientData.individualTherapyYears || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           individualTherapyEndYears: {
             ...medicalInformation.individualTherapyEndYears,
             value: patientData.individualTherapyEndYears || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           groupTherapyHours: {
             ...medicalInformation.groupTherapyHours,
             value: patientData.groupTherapyHours || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           psychiatricHospitalizationMonths: {
             ...medicalInformation.psychiatricHospitalizationMonths,
             value: patientData.psychiatricHospitalizationMonths || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           currentTreatment: {
             ...medicalInformation.currentTreatment,
             value: patientData.currentTreatment || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           antidepressantsCount: {
             ...medicalInformation.antidepressantsCount,
             value: patientData.antidepressantsCount || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           psychotherapyType: {
             ...medicalInformation.psychotherapyType,
             value: patientData.psychotherapyType || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
           additionalInfo: {
             ...medicalInformation.additionalInfo,
             value: patientData.additionalInfo || "",
-            isTouched: true,
+            isTouched: false,
             isValid: true,
           },
         });
-        setMode("edit");
+    }
+      setIsLoading(false);
+    }
+    
+    useEffect(() => {
+      if (id) {  
+        loadMedicalInformationData();
+           setMode("edit");
       }
+    }, [id]);
+
+  // Load mock data based on id
+  useEffect(() => {
+    if (id) {
+     
+
+        setMode("edit");
+      
     }
   }, [id]);
 
@@ -278,7 +299,8 @@ const MedicalTab = ({ id, setActiveTab }) => {
         updatedInfo[key].isValid = true;
       }
 
-      updatedInfo[key].isTouched = true;
+     // updatedInfo[key].isTouched = true;
+     updatedInfo[key].isTouched = updatedInfo[key].isTouched || false;
     });
 
     setMedicalInformation(updatedInfo);
@@ -310,26 +332,47 @@ const MedicalTab = ({ id, setActiveTab }) => {
   };
 
   // Modified handleSubmit to handle section-specific saving
-  const handleSubmitp = async (section) => {
+  const handleSubmitp =async (section) => {
+       setIsSaving(true);
     const isValid = validateMedicalInformation();
-    if (isValid) {
-      const savedPatientId = mode === "add" ? Date.now().toString() : id;
-      console.log(`Saving ${section} section:`, generateSubmitPayload(medicalInformation));
-      if (mode === "add") {
-        navigate(`/patients/${savedPatientId}`);
-      }
+    if (!isValid) {
+         console.log("Validation failed, not saving.");
+            setIsSaving(false);
+     return false;
     }
+
+  const payload = {
+    };
+    Object.entries(medicalInformation).forEach(([key, field]) => {
+     // console.log("field.",field);
+      if (field.isTouched) {
+        payload[key] = field.value;
+      }
+    });
+
+   console.log("Save Payload:", payload);
+          const res=await updateMedicalInformationData(id,payload);
+            await loadMedicalInformationData();
+              console.log("update result:", res);
+              setIsSaving(false);
+
+return true;
+
+
   };
 
-  // Function to toggle edit mode for a specific section
-  const toggleSectionEdit = (section) => {
+
+    // Toggle edit mode for a specific section
+  const toggleSectionEdit =async (section) => {
     if (editingSection === section) {
-      handleSubmitp(section);
-      setEditingSection(null);
+    const isValid=await handleSubmitp(section);
+      if(isValid)
+    setEditingSection(null);
     } else {
       setEditingSection(section);
     }
   };
+
 
   // Helper function to render list items (for consistency with PersonalInformation)
   const renderListItems = (value) => {
@@ -349,21 +392,60 @@ const MedicalTab = ({ id, setActiveTab }) => {
     return <p className="text-gray-800">{value}</p>;
   };
 
+
+ useEffect(() => {
+    
+      setInitialMedicalInformation({ ...medicalInformation });
+  }, [editingSection]);
+  
+
+    const handleCancel = (editingSection) => {
+
+    if (initialMedicalInformation) {
+      setMedicalInformation(initialMedicalInformation);
+      setMedicalInformationErrors({});
+
+    }
+
+        setEditingSection(null);
+  }
+
+
   return (
+    !isLoading ?
     <div className="px-8">
       {/* Health Details */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+      <section className=" mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <h3 className="text-2xl font-semibold text-gray-800">Health Details</h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("health")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "health" ? "Save Health Details" : "Edit Health Details"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "health" ? "Save" : "Edit"}
-            </button>
+             <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("health")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "health"
+                                ? "Save Health Details"
+                                : "Edit Health Details"
+                            }
+                            disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                           {editingSection === "health" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        
+                          </button>
+
+                          {editingSection === "health" && (
+                            <button
+                              onClick={() => handleCancel("health")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                     disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
           )}
         </div>
         {editingSection === "health" || mode === "add" ? (
@@ -456,33 +538,33 @@ const MedicalTab = ({ id, setActiveTab }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            <div>
-              <strong>Chief Physical Ailments:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+           <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Chief Physical Ailments:</strong>{" "}
+              <div className="mt-2">
                 {renderListItems(medicalInformation.physicalAilments.value)}
               </div>
             </div>
-            <div>
-              <strong>Present Main Complaints:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+          <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Present Main Complaints:</strong>{" "}
+              <div className="mt-2">
                 {renderListItems(medicalInformation.mainComplaints.value)}
               </div>
             </div>
-            <div>
-              <strong>Past Complaints:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+             <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Past Complaints:</strong>{" "}
+              <div className="mt-2">
                 {renderListItems(medicalInformation.pastComplaints.value)}
               </div>
             </div>
-            <div>
-              <strong>Conditions When Problems Worsen:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+             <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Conditions When Problems Worsen:</strong>{" "}
+              <div className=" mt-2">
                 {renderListItems(medicalInformation.worseConditions.value)}
               </div>
             </div>
-            <div>
-              <strong>Conditions When Problems Improve:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+            <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Conditions When Problems Improve:</strong>{" "}
+              <div className=" mt-2">
                 {renderListItems(medicalInformation.improvedConditions.value)}
               </div>
             </div>
@@ -491,18 +573,37 @@ const MedicalTab = ({ id, setActiveTab }) => {
       </section>
 
       {/* Treatment History */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <h3 className="text-2xl font-semibold text-gray-800">Treatment History</h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("treatment")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === "treatment" ? "Save Treatment History" : "Edit Treatment History"}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "treatment" ? "Save" : "Edit"}
-            </button>
+
+               <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("treatment")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "treatment"
+                                ? "Save Treatment History"
+                                : "Edit Treatment History"
+                            }
+                                   disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                             {editingSection === "treatment" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                          </button>
+
+                          {editingSection === "treatment" && (
+                            <button
+                              onClick={() => handleCancel("treatment")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                     disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
           )}
         </div>
         {editingSection === "treatment" || mode === "add" ? (
@@ -688,61 +789,62 @@ const MedicalTab = ({ id, setActiveTab }) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <strong>Individual Therapy Hours:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Individual Therapy Hours:</strong>{" "}
+              <div className="text-sm text-right">
                 {medicalInformation.individualTherapyHours.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Individual Therapy Years:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+ <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Individual Therapy Years:</strong>{" "}
+              <div className="text-sm text-right">
                 {medicalInformation.individualTherapyYears.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Individual Therapy Ended Years Ago:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+             <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Individual Therapy Ended Years Ago:</strong>{" "}
+              <div className="text-sm text-right">
                 {medicalInformation.individualTherapyEndYears.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Group Therapy Hours:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+             <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Group Therapy Hours:</strong>{" "}
+             <div className="text-sm text-right">
                 {medicalInformation.groupTherapyHours.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Psychiatric Hospitalization Months:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Psychiatric Hospitalization Months:</strong>{" "}
+             <div className="text-sm text-right">
                 {medicalInformation.psychiatricHospitalizationMonths.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Current Treatment:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+             <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Current Treatment:</strong>{" "}
+              <div className="text-sm text-right">
                 {medicalInformation.currentTreatment.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Antidepressants Count (Past Year):</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+               <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Antidepressants Count (Past Year):</strong>{" "}
+            <div className="text-sm text-right">
                 {medicalInformation.antidepressantsCount.value || "N/A"}
               </div>
             </div>
-            <div>
-              <strong>Psychotherapy Type:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+             <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Psychotherapy Type:</strong>{" "}
+              <div className="">
                 {medicalInformation.psychotherapyType.value || "N/A"}
               </div>
             </div>
             <div className="md:col-span-2">
-              <strong>Additional Information:</strong>{" "}
-              <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+               <div className=" bg-white border border-gray-200 rounded-lg p-4">
+             <strong className="text-sm">Additional Information:</strong>{" "}
+             
                 {renderListItems(medicalInformation.additionalInfo.value)}
-              </div>
+              
             </div>
-          </div>
+          </div></div>
         )}
       </section>
 
@@ -759,6 +861,8 @@ const MedicalTab = ({ id, setActiveTab }) => {
         </div>
       )}
     </div>
+        :
+        <LoadingSpinner />
   );
 };
 

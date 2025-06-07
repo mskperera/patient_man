@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { useNavigate, useParams } from "react-router-dom";
-import { basicInformationData } from "../data/mockData";
+import { getBasicInformationData, updateBasicInformationData } from "../data/mockData";
+import LoadingSpinner from "./LoadingSpinner";
 
-const BasicInformation = ({id}) => {
-  const navigate = useNavigate();
+const BasicInformationTab = ({ id }) => {
+
 
   const [basicInformationErrors, setBasicInformationErrors] = useState({});
-
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+   const [isSaving, setIsSaving] = useState(false);
+  const [initialBasicInformation, setInitialBasicInformation] = useState(null); // Store initial state for cancel
 
   const [basicInformation, setBasicInformation] = useState({
     patientId: {
@@ -118,135 +120,174 @@ const BasicInformation = ({id}) => {
     },
   });
 
-
-
-useEffect(() => {
-  if (id) {
-    const patientData = basicInformationData.find((p) => p.id === id);
-    console.log('patientData',patientData.patientId)
+  const loadBasicInformationData = async () => {
+    setIsLoading(true);
+    const result = await getBasicInformationData(id);
+    const patientData = result.data;
+    //console.log('patientData', patientData.patientId);
     if (patientData) {
       setBasicInformation({
         patientId: {
           ...basicInformation.patientId,
           value: patientData.patientId || '',
-          isTouched: true,
+          isTouched: false,
           isValid: true,
         },
         firstName: {
           ...basicInformation.firstName,
           value: patientData.firstName,
-          isTouched: true,
+          isTouched: false,
           isValid: true,
-       },
-
+        },
         lastName: {
           ...basicInformation.lastName,
           value: patientData?.lastName || '',
-          isTouched: true,
+         isTouched: false,
           isValid: true,
         },
         middleName: {
           ...basicInformation.middleName,
           value: patientData.middleName,
-          isTouched: true,
+          isTouched: false,
           isValid: true,
         },
         dob: {
           ...basicInformation.dob,
           value: patientData.dateOfBirth,
-          isTouched: true,
+          isTouched: false,
           isValid: true,
         },
         age: {
           ...basicInformation.age,
           value: patientData.age,
-          isTouched: true,
+          isTouched: false,
           isValid: true,
         },
         gender: {
           ...basicInformation.gender,
           value: patientData.gender,
-          isTouched: true,
+         isTouched: false,
           isValid: true,
         },
         email: {
           ...basicInformation.email,
           value: patientData.email,
-          isTouched: true,
+         isTouched: false,
           isValid: true,
         },
         homePhone: {
           ...basicInformation.homePhone,
           value: patientData.homePhone,
-          isTouched: true,
+          isTouched: false,
           isValid: true,
         },
         businessPhone: {
           ...basicInformation.businessPhone,
           value: patientData.businessPhone,
-          isTouched: true,
+         isTouched: false,
           isValid: true,
         },
         permanentAddress: {
           ...basicInformation.permanentAddress,
           value: patientData.permanentAddress,
-          isTouched: true,
+        isTouched: false,
           isValid: true,
         },
         referralSource: {
           ...basicInformation.referralSource,
           value: patientData.referralSource,
-          isTouched: true,
+       isTouched: false,
           isValid: true,
         },
         referralPartyPresent: {
           ...basicInformation.referralPartyPresent,
           value: patientData.referralPartyPresent,
-          isTouched: true,
+         isTouched: false,
           isValid: true,
         },
-       });
-       setMode("edit");
-     }
-  }
-}, [id]);
+      });
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (id) {
+      loadBasicInformationData();
+      setMode("edit");
+    }
+  }, [id]);
 
 
-useEffect(()=>{
-  console.log('basicInformation',basicInformation)
-},[basicInformation])
-  // Function to toggle edit mode for a specific section
-  const toggleSectionEdit = (section) => {
+  useEffect(() => {
+    if (editingSection === "basic") {
+      setInitialBasicInformation({ ...basicInformation });
+    }
+  }, [editingSection]);
+
+  const toggleSectionEdit =async (section) => {
     if (editingSection === section) {
-      handleSubmitp(section); // Save only the specific section
+      const isValid=await handleSubmitp(section);
+      if(isValid)
       setEditingSection(null);
+
     } else {
       setEditingSection(section);
     }
   };
 
+
+  const handleCancel = () => {
+    if (initialBasicInformation) {
+      setBasicInformation(initialBasicInformation); // Restore initial state
+      setBasicInformationErrors({}); // Clear errors
+    }
+    setEditingSection(null); // Exit edit mode
+  };
+
   // Modified handleSubmit to handle section-specific saving
   const handleSubmitp = async (section) => {
-    // Here you can add logic to save only the relevant section data
-    const savedPatientId = mode === "add" ? Date.now().toString() : "patientId";
-    if (mode === "add") {
-      navigate(`/patients/${savedPatientId}`);
+setIsSaving(true);
+      // Validate the form before saving
+    const isValid = validateBasicInformation();
+    if (!isValid) {
+      console.log("Validation failed, not saving.");
+      setIsSaving(false);
+      return false;
     }
+
+    // Generate payload with only touched fields and add status
+    const payload = {};
+    Object.entries(basicInformation).forEach(([key, field]) => {
+     // console.log("field.",field);
+      if (field.isTouched) {
+        payload[key] = field.value;
+      }
+    });
+
+    console.log("Save Payload:", payload);
+
+   const res=await updateBasicInformationData(id,payload);
+   await loadBasicInformationData();
+     console.log("update result:", res);
+     setIsSaving(false);
+
+    return true;
+    // const savedPatientId = mode === "add" ? Date.now().toString() : "patientId";
+    // if (mode === "add") {
+    //   navigate(`/patients/${savedPatientId}`);
+    // }
   };
 
   const validateField = (name, value, required) => {
     if (required && value.trim() === "") {
       return `${name} is required`;
     }
-
-    // You can extend here with dataType checks, minLength, etc.
     return "";
   };
 
   const handleChangeBasicInfo = (e) => {
     const { name, value } = e.target;
-
-    console.log('handlechangebais',name,value)
+    console.log('handlechangebais', name, value);
     const required = basicInformation[name].required;
     const error = validateField(basicInformation[name].label, value, required);
 
@@ -260,7 +301,6 @@ useEffect(()=>{
       },
     };
 
-    // If dob is changed, calculate and update age
     if (name === "dob") {
       const birthDate = new Date(value);
       const today = new Date();
@@ -269,17 +309,15 @@ useEffect(()=>{
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-
       updatedInfo["age"] = {
         ...basicInformation["age"],
         value: age.toString(),
         isTouched: true,
-        isValid: true, // Assume age is always valid when calculated from dob
+        isValid: true,
       };
     }
 
     setBasicInformation(updatedInfo);
-
     setBasicInformationErrors((prev) => ({
       ...prev,
       [name]: error,
@@ -293,20 +331,15 @@ useEffect(()=>{
     const updatedInfo = { ...basicInformation };
 
     Object.entries(basicInformation).forEach(([key, field]) => {
-      // Skip if field is not in new format (e.g., accidentally unconverted)
       if (!field || typeof field !== "object" || !("value" in field)) return;
 
-      // console.log('key, field',key, field)
       const { value, required, dataType } = field;
-
       let errorMessage = "";
 
-      // Required check
       if (required && (!value || value.toString().trim() === "")) {
         errorMessage = `${field.label} is required.`;
       }
 
-      // Data type checks
       if (!errorMessage && value) {
         switch (dataType) {
           case "email":
@@ -341,7 +374,6 @@ useEffect(()=>{
         }
       }
 
-      // Set error message if any
       if (errorMessage) {
         isFormValid = false;
         errors[key] = errorMessage;
@@ -350,13 +382,12 @@ useEffect(()=>{
         updatedInfo[key].isValid = true;
       }
 
-      updatedInfo[key].isTouched = true;
+    //  updatedInfo[key].isTouched = true;
+    updatedInfo[key].isTouched = updatedInfo[key].isTouched || false;
     });
 
-    // Update state with touched + valid flags
     setBasicInformation(updatedInfo);
     setBasicInformationErrors(errors);
-
     return isFormValid;
   };
 
@@ -375,41 +406,49 @@ useEffect(()=>{
     const isValid = validateBasicInformation();
     console.log("isValid", isValid);
     if (isValid) {
-      // Usage
       const submitPayload = generateSubmitPayload(basicInformation);
       console.log(submitPayload);
-
       setMode("edit");
-      // proceed to submit form
     }
   };
 
   return (
     <div className="px-8">
-      {/* Basic Information */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+      <section className="mb-4">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <h3 className="text-2xl font-semibold text-gray-800">
             Basic Information
           </h3>
           {mode !== "add" && (
-            <button
-              onClick={() => toggleSectionEdit("basic")}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={
-                editingSection === "basic"
-                  ? "Save Basic Info"
-                  : "Edit Basic Info"
-              }
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === "basic" ? "Save" : "Edit"}
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => toggleSectionEdit("basic")}
+                className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                aria-label={
+                  editingSection === "basic"
+                    ? "Save Basic Info"
+                    : "Edit Basic Info"
+                }
+                disabled={isSaving}
+              >
+                <FaEdit className="mr-2" />
+                {editingSection === "basic" ? (isSaving ? "Saving...": "Save") : "Edit"}
+              </button>
+              {editingSection === "basic" && (
+                <button
+                  onClick={handleCancel}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                    disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           )}
         </div>
         {editingSection === "basic" || mode === "add" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* {JSON.stringify(basicInformation)} */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Last Name
@@ -428,7 +467,6 @@ useEffect(()=>{
                 </p>
               )}
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 First Name
@@ -494,7 +532,6 @@ useEffect(()=>{
                 <span className="text-gray-600 text-sm">Years</span>
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Sex
@@ -531,7 +568,6 @@ useEffect(()=>{
                 </p>
               )}
             </div>
-
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700">
                 Permanent Address
@@ -551,7 +587,6 @@ useEffect(()=>{
                 </p>
               )}
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Home Phone
@@ -607,7 +642,6 @@ useEffect(()=>{
                 </p>
               )}
             </div>
-
             <div className="col-span-3 mt-5">
               <div className="space-y-4">
                 <div>
@@ -653,7 +687,7 @@ useEffect(()=>{
                   {basicInformation.referralSource.value === "other" && (
                     <input
                       name="referralSourceOther"
-                      value={basicInformation.referralSourceOther.value || ""}
+                      value={basicInformation.referralSourceOther?.value || ""}
                       onChange={handleChangeBasicInfo}
                       className="mt-3 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       placeholder="Please specify"
@@ -705,58 +739,95 @@ useEffect(()=>{
             </div>
           </div>
         ) : (
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <strong>Last Name:</strong>{" "}
-              {basicInformation.lastName?.value || "N/A"}
-            </div>
-            <div>
-              <strong>First Name:</strong>{" "}
-              {basicInformation.firstName?.value || "N/A"}
-            </div>
-            <div>
-              <strong>Middle Name:</strong>{" "}
-              {basicInformation.middleName?.value || "N/A"}
-            </div>
-            <div>
-              <strong>Date of Birth:</strong>{" "}
-              {basicInformation.dob?.value || "N/A"}
-            </div>
-            <div>
-              <strong>Age:</strong> {basicInformation.age?.value || "N/A"}
-            </div>
-            <div>
-              <strong>Gender:</strong> {basicInformation.gender?.value || "N/A"}
-            </div>
-
-            <div className="md:col-span-3">
-              <strong>Permanent Address:</strong>{" "}
-              {basicInformation.permanentAddress?.value || "N/A"}
-            </div>
-
-            <div>
-              <strong>Home Phone:</strong>{" "}
-              {basicInformation.homePhone?.value || "N/A"}
-            </div>
-            <div>
-              <strong>Business Phone:</strong>{" "}
-              {basicInformation.businessPhone?.value || "N/A"}
-            </div>
-
-            <div>
-              <strong>Referral Source:</strong>{" "}
-              {basicInformation.referralSource?.value === "other"
-                ? basicInformation.referralSourceOther?.value
-                : basicInformation.referralSource?.value || "N/A"}
-            </div>
-
-            <div>
-              <strong>Referral Party Present:</strong>{" "}
-              {basicInformation.referralPartyPresent?.value || "N/A"}
+          !isLoading ? (
+        <div className="max-w-6xl mx-auto my-4 p-6 rounded-xl border-4 border-gradient-to-r from-blue-400 to-purple-500  transition-shadow duration-300">
+          {/* Personal Details Section */}
+          <div className="mb-6 ">
+            <h3 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Personal Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">First Name</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.firstName?.value || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Last Name</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.lastName?.value || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Middle Name</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.middleName?.value || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Date of Birth</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.dob?.value || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Age</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.age?.value || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Gender</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.gender?.value || "N/A"}</span>
+              </div>
             </div>
           </div>
 
+          {/* Contact Information Section */}
+         <div className="mb-6 ">
+            <h3 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Contact Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-green-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Home Phone</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.homePhone?.value || "N/A"}</span>
+              </div>
+              <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-green-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Business Phone</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.businessPhone?.value || "N/A"}</span>
+              </div>
+              <div className="col-span-2 flex justify-between items-center p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-green-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Permanent Address</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.permanentAddress?.value || "N/A"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Referral Information Section */}
+         <div className="mb-6 ">
+            <h3 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Referral Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-purple-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/3">Referral Source</span>
+                <span className="text-gray-800 w-2/3 text-right">
+                  {basicInformation.referralSource?.value === "other"
+                    ? basicInformation.referralSourceOther?.value
+                    : basicInformation.referralSource?.value || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 ml-5 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-purple-500 transition-colors">
+                <span className="font-semibold text-gray-700 w-1/2">Referral Party Present</span>
+                <span className="text-gray-800 w-1/2 text-right">{basicInformation.referralPartyPresent?.value || "N/A"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+          ) : (
+            <LoadingSpinner />
+          )
         )}
       </section>
 
@@ -766,8 +837,6 @@ useEffect(()=>{
             type="button"
             onClick={async (e) => {
               handleSubmitBasicInformation(e);
-              //await handleSubmitp("personal");
-              //setActiveTab("family");
             }}
             className="flex items-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
             aria-label="Save and go to next tab"
@@ -780,4 +849,4 @@ useEffect(()=>{
   );
 };
 
-export default BasicInformation;
+export default BasicInformationTab;

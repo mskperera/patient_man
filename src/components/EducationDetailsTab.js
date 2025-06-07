@@ -1,62 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { FaEdit, FaSlideshare } from 'react-icons/fa';
-import Select from 'react-select';
-import CreatableSelect from 'react-select/creatable';
-import { educationData } from '../data/mockData';
+import { FaEdit } from 'react-icons/fa';
+import { getALData, getALStreams, getALSubjects, getDegrees, getEducationData, getEducationYearsData, getOLData, getOLSubjects, getScholarshipData, getUniversityData, updateALData, updateEducationYearsData, updateOLData, updateScholarshipData, updateUniversityData } from '../data/mockData';
+import { useNavigate } from 'react-router-dom';
+import TypeableDropdown from './TypeableDropdown';
+import LoadingSpinner from './LoadingSpinner';
 
-const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSectionEdit }) => {
+const EducationDetails = ({ id }) => {
   
+    const navigate = useNavigate();
   
+
+
+
   // Predefined options
-  const olSubjectOptions = [
-    { value: 'First Language (Sinhala/Tamil)', label: 'First Language (Sinhala/Tamil)' },
-    { value: 'Mathematics', label: 'Mathematics' },
-    { value: 'English', label: 'English' },
-    { value: 'Science', label: 'Science' },
-    { value: 'Religion', label: 'Religion' },
-    { value: 'History', label: 'History' },
-    { value: 'Art', label: 'Art' },
-    { value: 'Literature', label: 'Literature' },
-    { value: 'Commerce', label: 'Commerce' },
-  ];
 
-  const alSubjectOptions = [
-    { value: 'Combined Mathematics', label: 'Combined Mathematics' },
-    { value: 'Physics', label: 'Physics' },
-    { value: 'Chemistry', label: 'Chemistry' },
-    { value: 'Biology', label: 'Biology' },
-    { value: 'Economics', label: 'Economics' },
-    { value: 'Business Studies', label: 'Business Studies' },
-    { value: 'Accounting', label: 'Accounting' },
-    { value: 'Geography', label: 'Geography' },
-    { value: 'Political Science', label: 'Political Science' },
-  ];
 
-  const streamOptions = [
-    { value: 'Science', label: 'Science' },
-    { value: 'Commerce', label: 'Commerce' },
-    { value: 'Arts', label: 'Arts' },
-    { value: 'Technology', label: 'Technology' },
-  ];
+  // const alSubjectOptions = [
+  //   { value: 'Combined Mathematics', label: 'Combined Mathematics' },
+  //   { value: 'Physics', label: 'Physics' },
+  //   { value: 'Chemistry', label: 'Chemistry' },
+  //   { value: 'Biology', label: 'Biology' },
+  //   { value: 'Economics', label: 'Economics' },
+  //   { value: 'Business Studies', label: 'Business Studies' },
+  //   { value: 'Accounting', label: 'Accounting' },
+  //   { value: 'Geography', label: 'Geography' },
+  //   { value: 'Political Science', label: 'Political Science' },
+  // ];
 
-  const degreeOptions = [
-    { value: 'BSc Computer Science', label: 'BSc Computer Science' },
-    { value: 'BSc Engineering', label: 'BSc Engineering' },
-    { value: 'BA Economics', label: 'BA Economics' },
-    { value: 'BCom', label: 'BCom' },
-    { value: 'LLB', label: 'LLB' },
-    { value: 'MBBS', label: 'MBBS' },
-    { value: 'BBA', label: 'BBA' },
-    { value: 'BSc Physics', label: 'BSc Physics' },
-    { value: 'BA English', label: 'BA English' },
-    { value: 'BSc Mathematics', label: 'BSc Mathematics' },
-  ];
+  // const streamOptions = [
+  //   { value: 'Science', label: 'Science' },
+  //   { value: 'Commerce', label: 'Commerce' },
+  //   { value: 'Arts', label: 'Arts' },
+  //   { value: 'Technology', label: 'Technology' },
+  // ];
+
+  // const degreeOptions = [
+  //   { value: 'BSc Computer Science', label: 'BSc Computer Science' },
+  //   { value: 'BSc Engineering', label: 'BSc Engineering' },
+  //   { value: 'BA Economics', label: 'BA Economics' },
+  //   { value: 'BCom', label: 'BCom' },
+  //   { value: 'LLB', label: 'LLB' },
+  //   { value: 'MBBS', label: 'MBBS' },
+  //   { value: 'BBA', label: 'BBA' },
+  //   { value: 'BSc Physics', label: 'BSc Physics' },
+  //   { value: 'BA English', label: 'BA English' },
+  //   { value: 'BSc Mathematics', label: 'BSc Mathematics' },
+  // ];
 
   const currentYear = 2025;
   const yearOptions = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
+
+    const [editingSection, setEditingSection] = useState(null);
+  
   // Initialize state
-  const [mode, setMode] = useState(initialMode || "add");
+  const [mode, setMode] = useState("add");
   const [education, setEducation] = useState({
     educationYears: '',
     scholarship: { enabled: true, marks: '', schoolAdmitted: '', result: '', remark: '' },
@@ -74,39 +72,307 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
   const [alErrors, setALErrors] = useState({});
   const [universityErrors, setUniversityErrors] = useState({});
 
-  // Load mock data based on id
+  const [olsubjectsOptions, setOlsubjectsOptions] = useState([]);
+    const [alStremsOptions, setAlStremsOptions] = useState([]);
+    const [alSubjectsOptions, setAlSubjectsOptions] = useState([]);
+   const [degreeOptions, setDegreeOptions] = useState([]);
+
+    const [isLoading, setIsLoading] = useState(false);
+     const [isSaving, setIsSaving] = useState(false);
+       const [initialEducationInformation, setInitialEducationInformation] = useState(null);
+    
+        const [initialEducationYears, setInitialEducationYears] = useState(null);
+  const [initialScholarship, setInitialScholarship] = useState(null);
+  const [initialOL, setInitialOL] = useState(null);
+  const [initialAL, setInitialAL] = useState(null);
+  const [initialUniversity, setInitialUniversity] = useState(null);
+  const [initialUniversityEnabled, setInitialUniversityEnabled] = useState(null);
+  const [initialUniversityRemark, setInitialUniversityRemark] = useState(null);
+
+
+useEffect(()=>{
+loadDropdowns();
+},[])
+
+
+const loadDropdowns=async()=>{
+  const olsubjectsOptions=await getOLSubjects();
+  setOlsubjectsOptions(olsubjectsOptions.data);
+
+  const alStrems=await getALStreams();
+  setAlStremsOptions(alStrems.data);
+
+  const alSubjects=await getALSubjects();
+  setAlSubjectsOptions(alSubjects.data);
+
+    const degreeOptions=await getDegrees();
+  setDegreeOptions(degreeOptions.data);
+
+}
+
+
+//   const loadEducationnData=async()=>{
+//   setIsLoading(true);
+//   const result =await getEducationData(id);
+//     const patientData=result.data;
+//   if (patientData) {
+//        setEducation({
+//           educationYears: patientData.educationYears || '',
+//           scholarship: {
+//             enabled: patientData.scholarship.enabled !== false,
+//             marks: patientData.scholarship.marks || '',
+//             schoolAdmitted: patientData.scholarship.schoolAdmitted || '',
+//             result: patientData.scholarship.result || '',
+//             remark: patientData.scholarship.remark || '',
+//           },
+//           ol: {
+//             enabled: patientData.ol.enabled !== false,
+//             subjects: patientData.ol.subjects || [],
+//             remark: patientData.ol.remark || '',
+//           },
+//           al: {
+//             enabled: patientData.al.enabled !== false,
+//             stream: patientData.al.stream || '',
+//             subjects: patientData.al.subjects || [],
+//             remark: patientData.al.remark || '',
+//           },
+//           university: patientData.university || [],
+//           universityEnabled: patientData.universityEnabled !== false,
+//           universityRemark: patientData.universityRemark || '',
+//         });
+
+//  setIsLoading(false);
+
+//   }
+// }
+
+
+
+  const loadEducationYearsData = async () => {
+  const result = await getEducationYearsData(id);
+  const patientData = result.data;
+  console.log('loadeducation years',patientData)
+  if (patientData) {
+    setEducation(prev => ({
+      ...prev,
+      educationYears: patientData || '',
+    }));
+  }
+};
+
+
+ const loadScholarshipData = async () => {
+  const result = await getScholarshipData(id);
+  const patientData = result.data;
+  if (patientData) {
+    setEducation(prev => ({
+      ...prev,
+      scholarship:patientData
+    }));
+  }
+};
+
+
+  const loadOLData = async () => {
+    const result = await getOLData(id);
+    const patientData = result.data;
+    if (patientData) {
+      setEducation(prev=>({...prev,ol:patientData
+      }));
+    }
+  };
+
+  const loadALData = async () => {
+    const result = await getALData(id);
+   const patientData = result.data;
+    if (patientData) {
+      setEducation(prev=>({...prev,al:patientData
+      }));
+    }
+  };
+
+  const loadUniversityData = async () => {
+    const result = await getUniversityData(id);
+      const patientData = result.data;
+   
+    if (patientData) {
+      setEducation(prev=>({...prev,university:patientData.university,universityEnabled:patientData.universityEnabled,universityRemark:patientData.universityRemark
+      }));
+    }
+  };
+
+ const loadAllEducationData = async () => {
+    setIsLoading(true);
+   
+      
+       await loadEducationYearsData();
+       await loadScholarshipData();
+       await loadOLData();
+       await loadALData();
+       await loadUniversityData();
+      
+      setIsLoading(false);
+    
+  };
+
+
   useEffect(() => {
     if (id) {
-      const patientData = educationData.find((p) => p.id === id);
-      if (patientData) {
-        setEducation({
-          educationYears: patientData.educationYears || '',
-          scholarship: {
-            enabled: patientData.scholarship.enabled !== false,
-            marks: patientData.scholarship.marks || '',
-            schoolAdmitted: patientData.scholarship.schoolAdmitted || '',
-            result: patientData.scholarship.result || '',
-            remark: patientData.scholarship.remark || '',
-          },
-          ol: {
-            enabled: patientData.ol.enabled !== false,
-            subjects: patientData.ol.subjects || [],
-            remark: patientData.ol.remark || '',
-          },
-          al: {
-            enabled: patientData.al.enabled !== false,
-            stream: patientData.al.stream || '',
-            subjects: patientData.al.subjects || [],
-            remark: patientData.al.remark || '',
-          },
-          university: patientData.university || [],
-          universityEnabled: patientData.universityEnabled !== false,
-          universityRemark: patientData.universityRemark || '',
-        });
-        setMode("edit");
-      }
+      setMode("edit");
+      loadAllEducationData();
     }
   }, [id]);
+
+  // Load mock data based on id
+  // useEffect(() => {
+  //   if (id) {
+
+  //     loadEducationnData();
+  //       setMode("edit");
+      
+  //   }
+  // }, [id]);
+
+
+
+
+ const handleSubmitp = async (section) => {
+     setIsSaving(true);
+    let isValid = false;
+    if (section === 'educationYears') {
+      isValid = _validateEducationYears();
+      if (!isValid) {
+        console.log("Validation failed, not saving.");
+          setIsSaving(false);
+         return false;  
+      }
+
+  const res=await updateEducationYearsData(id,education.educationYears);
+
+   console.log("update result:", res);
+    } else if (section === 'scholarship') {
+
+isValid = _validateScholarship();
+      if (!isValid) {
+        console.log("Validation failed, not saving.");
+        setIsSaving(false);
+         return false;  
+      }
+
+    const res=  await updateScholarshipData(id,education.scholarship);
+  console.log("update result:", res);
+
+    } else if (section === 'ol') {
+
+     isValid = _validateOLSubject();
+      if (!isValid) {
+        console.log("Validation failed, not saving.");
+        setIsSaving(false);
+         return false;  
+      }
+
+     const res= await updateOLData(id,education.ol);
+  console.log("update result:", res);
+   
+    } else if (section === 'al') {
+         isValid = _validateALSubject();
+      if (!isValid) {
+        console.log("Validation failed, not saving.");
+                  setIsSaving(false);
+         return false;  
+      }
+ const res=await updateALData(id,education.al);
+  console.log("update result:", res);
+
+    } else if (section === 'university') {
+
+         isValid = _validateUniversity();
+      if (!isValid) {
+        console.log("Validation failed, not saving.");
+                  setIsSaving(false);
+         return false;  
+      }
+
+      const universityData= {university: [],
+    universityEnabled: true,
+    universityRemark: ''};
+
+     const res=  await updateUniversityData(id,universityData)
+  console.log("update result:", res);
+  
+    }
+
+      setIsSaving(false);
+
+    return isValid;
+  };
+
+
+//   const handleSubmitp = (section) => {
+    
+//        const validations = validateAllFields();
+//     const isAllValidated = validations.every((v) => v !== false);
+
+//     if (!isAllValidated) {
+//  console.log("Validation failed, not saving.");
+//       return false;
+//     }
+  
+
+//  const payload = {
+//     };
+
+//     Object.entries(education).forEach(([key, field]) => {
+//      // console.log("field.",field);
+//       //if (field.isTouched) {
+//         payload[key] = field.value;
+//       //}
+//     });
+
+//     console.log("Save Payload:", payload);
+// return true;
+
+
+//   };
+
+
+
+    const toggleSectionEdit =async (section) => {
+    if (editingSection === section) {
+    const isValid=await handleSubmitp(section);
+    console.log('ttttttt',isValid)
+      if(isValid)
+    setEditingSection(null);
+    } else {
+      setEditingSection(section);
+       console.log('ttttttt llll')
+    }
+  };
+
+
+    useEffect(() => {
+      
+        setInitialEducationInformation({ ...education });
+    }, [editingSection]);
+
+
+
+
+
+ const handleCancel = (editingSection) => {
+
+    if (initialEducationInformation) {
+      setEducation(initialEducationInformation);
+      setEducationYearsErrors({});
+    setScholarshipErrors({});
+     setOLErrors({});
+       setALErrors({});
+        setUniversityErrors({});
+    }
+    
+    
+     setEditingSection(null); // Exit edit mode
+  };
 
 
   // Validation functions for each section
@@ -327,30 +593,75 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
     return !!value;
   };
 
+   
+
+    const _validateEducationYears=()=>{
+  return  validateEducationYears(education.educationYears);
+    }
+
+       const _validateScholarship=()=>{
+   
+    return validateScholarship('marks', education.scholarship.marks) && validateScholarship('schoolAdmitted', education.scholarship.schoolAdmitted) &&
+    validateScholarship('result', education.scholarship.result);
+    }
+
+
+  const _validateOLSubject = () => {
+  const validations = [];
+
+  education.ol.subjects.forEach((s, index) => {
+    validations.push(validateOLSubject(index, 'name', s.name));
+    validations.push(validateOLSubject(index, 'marks', s.marks));
+    validations.push(validateOLSubject(index, 'year', s.year));
+  });
+
+  return validations.every(v => v === true);
+};
+
+
+
+   const _validateALSubject = () => {
+  const validations = [];
+
+  validations.push(validateEducationYears(education.educationYears));
+  validations.push(validateALStream(undefined, education.al.stream));
+
+  education.al.subjects.forEach((s, index) => {
+    validations.push(validateALSubject(index, 'name', s.name));
+    validations.push(validateALSubject(index, 'marks', s.marks));
+    validations.push(validateALSubject(index, 'year', s.year));
+  });
+
+  // Return true only if all validations passed
+  return validations.every(v => v === true);
+};
+
+
+
+const _validateUniversity = () => {
+  const validations = [];
+
+  education.university.forEach((s, index) => {
+    validations.push(validateUniversity(index, 'degree', s.degree));
+    validations.push(validateUniversity(index, 'institution', s.institution));
+    validations.push(validateUniversity(index, 'marks', s.marks));
+  });
+
+  return validations.every(v => v === true);
+};
+
+
   // Validate all fields
   const validateAllFields = () => {
-    const isValid = [];
-    isValid.push(validateEducationYears(education.educationYears));
-    isValid.push(validateScholarship('marks', education.scholarship.marks));
-    isValid.push(validateScholarship('schoolAdmitted', education.scholarship.schoolAdmitted));
-    isValid.push(validateScholarship('result', education.scholarship.result));
-    education.ol.subjects.forEach((s, index) => {
-      isValid.push(validateOLSubject(index, 'name', s.name));
-      isValid.push(validateOLSubject(index, 'marks', s.marks));
-      isValid.push(validateOLSubject(index, 'year', s.year));
-    });
-    isValid.push(validateALStream(undefined, education.al.stream));
-    education.al.subjects.forEach((s, index) => {
-      isValid.push(validateALSubject(index, 'name', s.name));
-      isValid.push(validateALSubject(index, 'marks', s.marks));
-      isValid.push(validateALSubject(index, 'year', s.year));
-    });
-    education.university.forEach((s, index) => {
-      isValid.push(validateUniversity(index, 'degree', s.degree));
-      isValid.push(validateUniversity(index, 'institution', s.institution));
-      isValid.push(validateUniversity(index, 'marks', s.marks));
-    });
+  
+     const isValid = [];
 
+isValid.push(_validateEducationYears());
+  isValid.push(_validateScholarship());
+ isValid.push(_validateOLSubject());
+ isValid.push(_validateALSubject());
+    isValid.push(_validateUniversity());
+ 
     return isValid;
   };
 
@@ -639,20 +950,40 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
   };
 
   return (
+    !isLoading ?
     <div className="px-8">
       {/* Educational Background */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <h3 className="text-2xl font-semibold text-gray-800">Educational Background</h3>
           {mode !== 'add' && (
-            <button
-              onClick={() => toggleSectionEdit('educationYears')}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === 'educationYears' ? 'Save Educational Background' : 'Edit Educational Background'}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === 'educationYears' ? 'Save' : 'Edit'}
-            </button>
+            
+                <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("educationYears")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "educationYears"
+                                ? "Save Educational Background"
+                                : "Edit Educational Background"
+                            }
+                               disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                            {editingSection === "educationYears" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                          </button>
+                          {editingSection === "educationYears" && (
+                            <button
+                              onClick={() => handleCancel("educationYears")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                 disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+
           )}
         </div>
         {editingSection === 'educationYears' || mode === 'add' ? (
@@ -696,7 +1027,7 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
 
       {/* Grade 5 Scholarship Qualification */}
       <section className="mb-14">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <div className="flex items-center space-x-3">
             <label className="flex items-center">
               <input
@@ -713,14 +1044,34 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
             <h3 className="text-2xl font-semibold text-gray-800">Grade 5 Scholarship Qualification</h3>
           </div>
           {mode !== 'add' && (
-            <button
-              onClick={() => toggleSectionEdit('scholarship')}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === 'scholarship' ? 'Save Grade 5 Scholarship Qualification' : 'Edit Grade 5 Scholarship Qualification'}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === 'scholarship' ? 'Save' : 'Edit'}
-            </button>
+                 <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("scholarship")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "scholarship"
+                                ? "Save Grade 5 Scholarship Qualification"
+                                : "Edit Grade 5 Scholarship Qualification"
+                            }
+                               disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                  
+                            {editingSection === "scholarship" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        
+                          </button>
+                          {editingSection === "scholarship" && (
+                            <button
+                              onClick={() => handleCancel("scholarship")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                 disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+
           )}
         </div>
         {editingSection === 'scholarship' || mode === 'add' ? (
@@ -820,7 +1171,7 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
                   <strong>Result:</strong> {education.scholarship.result || 'N/A'}
                 </div>
                 <div className="col-span-3">
-                               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong>Remark:</strong> {education.scholarship.remark || 'N/A'}
                   </div>
                 </div>
@@ -832,7 +1183,7 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
 
       {/* G.C.E Ordinary Level (O/L) Qualifications */}
       <section className="mb-14">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <div className="flex items-center space-x-3">
             <label className="flex items-center">
               <input
@@ -849,14 +1200,34 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
             <h3 className="text-2xl font-semibold text-gray-800">G.C.E Ordinary Level (O/L) Qualifications</h3>
           </div>
           {mode !== 'add' && (
-            <button
-              onClick={() => toggleSectionEdit('ol')}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === 'ol' ? 'Save O/L Qualifications' : 'Edit O/L Qualifications'}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === 'ol' ? 'Save' : 'Edit'}
-            </button>
+
+   <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("ol")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "ol"
+                                ? "Save O/L Qualifications"
+                                : "Edit O/L Qualifications"
+                            }
+                               disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                           {editingSection === "ol" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        
+                          </button>
+                          {editingSection === "ol" && (
+                            <button
+                              onClick={() => handleCancel("ol")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                 disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+
           )}
         </div>
         {editingSection === 'ol' || mode === 'add' ? (
@@ -865,16 +1236,16 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
               <div key={index} className="flex items-center space-x-4">
                 <div className="w-1/3">
                   <label className="block text-sm font-medium text-gray-700">Subject</label>
-                  <CreatableSelect
-                    options={olSubjectOptions}
-                    value={subject.name ? { value: subject.name, label: subject.name } : null}
-                    onChange={(option) => handleSubjectChange('ol', index, option)}
-                    placeholder="Select or type subject"
-                    isDisabled={education.ol.enabled === false}
-                    className="mt-1"
-                    classNamePrefix="select"
-                    aria-label={`O/L Subject ${index + 1}`}
-                  />
+                 <TypeableDropdown
+  options={olsubjectsOptions}
+  value={subject.name ? { value: subject.name, label: subject.name } : null}
+  onChange={(option) => handleSubjectChange('ol', index, option)}
+  placeholder="Select or type subject"
+  isDisabled={education.ol.enabled === false}
+  className="mt-1"
+  classNamePrefix="select"
+  aria-label={`O/L Subject ${index + 1}`}
+/>
                   {(olErrors[`subject_${index}_name`] || olErrors[`subject_${index}_duplicate`]) && (
                     <p className="mt-1 text-sm text-red-600">
                       {olErrors[`subject_${index}_name`] || olErrors[`subject_${index}_duplicate`]}
@@ -970,26 +1341,26 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
             {education.ol.enabled !== false && education.ol.subjects.length > 0 ? (
               <div>
                 <strong>Subjects:</strong>
-                <table className="w-full border-collapse border bg-sky-50 mt-2 border-sky-200 ">
+                <table className="w-full border-collapse border bg-white mt-2 border-gray-200 ">
                   <thead>
-                    <tr className="bg-sky-200">
-                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
-                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
-                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
+                    <tr className="bg-gray-200">
+                      <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
+                      <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
+                      <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
                     </tr>
                   </thead>
                   <tbody>
                     {education.ol.subjects.map((subject, index) => (
                       <tr key={index}>
-                        <td className="border border-sky-300 p-2">{subject.name || 'N/A'}</td>
-                        <td className="border border-sky-300 p-2">{subject.year || 'N/A'}</td>
-                        <td className="border border-sky-300 p-2">{subject.marks || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2">{subject.name || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2">{subject.year || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2">{subject.marks || 'N/A'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
                 <div className="mt-2">
-                               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+               <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong>Remark:</strong> {education.ol.remark || 'N/A'}
                   </div>
                 </div>
@@ -1003,7 +1374,7 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
 
       {/* G.C.E Advanced Level (A/L) Qualifications */}
       <section className="mb-14">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <div className="flex items-center space-x-3">
             <label className="flex items-center">
               <input
@@ -1020,22 +1391,42 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
             <h3 className="text-2xl font-semibold text-gray-800">G.C.E Advanced Level (A/L) Qualifications</h3>
           </div>
           {mode !== 'add' && (
-            <button
-              onClick={() => toggleSectionEdit('al')}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === 'al' ? 'Save A/L Qualifications' : 'Edit A/L Qualifications'}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === 'al' ? 'Save' : 'Edit'}
-            </button>
+
+   <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("al")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "al"
+                                ? "Save A/L Qualifications"
+                                : "Edit A/L Qualifications"
+                            }
+                               disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                           {editingSection === "al" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                        
+                          </button>
+                          {editingSection === "al" && (
+                            <button
+                              onClick={() => handleCancel("al")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                 disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+
           )}
         </div>
         {editingSection === 'al' || mode === 'add' ? (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Stream</label>
-              <CreatableSelect
-                options={streamOptions}
+              <TypeableDropdown
+                options={alStremsOptions}
                 value={education.al.stream ? { value: education.al.stream, label: education.al.stream } : null}
                 onChange={(option) => handleSubjectChange('stream', null, option)}
                 placeholder="Select or type stream"
@@ -1050,8 +1441,8 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
               <div key={index} className="flex items-center space-x-4">
                 <div className="w-1/3">
                   <label className="block text-sm font-medium text-gray-700">Subject</label>
-                  <CreatableSelect
-                    options={alSubjectOptions}
+                  <TypeableDropdown
+                    options={alSubjectsOptions}
                     value={subject.name ? { value: subject.name, label: subject.name } : null}
                     onChange={(option) => handleSubjectChange('al', index, option)}
                     placeholder="Select or type subject"
@@ -1161,26 +1552,26 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
                   <div>
                     <strong>Subjects:</strong>
                                 
-                    <table className="w-full border-collapse border bg-sky-50 mt-2 border-sky-200">
+                    <table className="w-full border-collapse border bg-white mt-2 border-gray-200">
                       <thead>
-                        <tr className="bg-sky-200">
-                          <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
-                          <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
-                          <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
+                        <tr className="bg-gray-200">
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
                         </tr>
                       </thead>
                       <tbody>
                         {education.al.subjects.map((subject, index) => (
                           <tr key={index}>
-                            <td className="border border-sky-300 p-2">{subject.name || 'N/A'}</td>
-                            <td className="border border-sky-300 p-2">{subject.year || 'N/A'}</td>
-                            <td className="border border-sky-300 p-2">{subject.marks || 'N/A'}</td>
+                            <td className="border border-gray-300 p-2">{subject.name || 'N/A'}</td>
+                            <td className="border border-gray-300 p-2">{subject.year || 'N/A'}</td>
+                            <td className="border border-gray-300 p-2">{subject.marks || 'N/A'}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                     <div className="mt-2">
-                                   <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
                       <strong>Remark:</strong> {education.al.remark || 'N/A'}
                     </div></div>
                   </div>
@@ -1194,8 +1585,8 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
       </section>
 
       {/* University Qualifications */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4 border-b pb-2">
+      <section className="mb-14">
+        <div className="flex justify-between items-center mb-2 pb-2">
           <div className="flex items-center space-x-3">
             <label className="flex items-center">
               <input
@@ -1212,14 +1603,32 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
             <h3 className="text-2xl font-semibold text-gray-800">University Qualifications</h3>
           </div>
           {mode !== 'add' && (
-            <button
-              onClick={() => toggleSectionEdit('university')}
-              className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-              aria-label={editingSection === 'university' ? 'Save University Qualifications' : 'Edit University Qualifications'}
-            >
-              <FaEdit className="mr-2" />
-              {editingSection === 'university' ? 'Save' : 'Edit'}
-            </button>
+
+   <div className="flex space-x-4">
+                          <button
+                            onClick={() => toggleSectionEdit("university")}
+                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
+                            aria-label={
+                              editingSection === "university"
+                                ? "Save University Qualifications"
+                                : "Edit University Qualifications"
+                            }
+                            disabled={isSaving}
+                          >
+                            <FaEdit className="mr-2" />
+                           {editingSection === "university" ? (isSaving ? "Saving...": "Save") : "Edit"}
+                          </button>
+                          {editingSection === "university" && (
+                            <button
+                              onClick={() => handleCancel("university")}
+                              className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                              aria-label="Cancel Editing"
+                                 disabled={isSaving}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
           )}
         </div>
         {editingSection === 'university' || mode === 'add' ? (
@@ -1229,7 +1638,7 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Degree</label>
-                    <CreatableSelect
+                    <TypeableDropdown
                       options={degreeOptions}
                       value={qualification.degree ? { value: qualification.degree, label: qualification.degree } : null}
                       onChange={(option) => handleSubjectChange('university', index, option)}
@@ -1332,26 +1741,26 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
             {education.universityEnabled !== false && education.university.length > 0 ? (
               <div>
                 <strong>Qualifications:</strong>
-                <table className="w-full border-collapse border bg-sky-50 border-sky-200 mt-2">
+                <table className="w-full border-collapse border bg-white border-gray-200 mt-2">
                   <thead>
-                    <tr className="bg-sky-200">
-                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Degree</th>
-                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Institution</th>
-                      <th className="border border-sky-300 p-2 text-left text-sm font-bold text-gray-700">Marks/Grade</th>
+                    <tr className="bg-gray-200">
+                      <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Degree</th>
+                      <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Institution</th>
+                      <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Marks/Grade</th>
                     </tr>
                   </thead>
                   <tbody>
                     {education.university.map((qualification, index) => (
                       <tr key={index}>
-                        <td className="border border-sky-300 p-2">{qualification.degree || 'N/A'}</td>
-                        <td className="border border-sky-300 p-2">{qualification.institution || 'N/A'}</td>
-                        <td className="border border-sky-300 p-2">{qualification.marks || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2">{qualification.degree || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2">{qualification.institution || 'N/A'}</td>
+                        <td className="border border-gray-300 p-2">{qualification.marks || 'N/A'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
                 <div className="mt-2">
-                               <div className="bg-sky-50 border border-sky-200 rounded-lg p-4 mt-2">
+                <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong>Remark:</strong> {education.universityRemark || 'N/A'}
                   </div>
                 </div>
@@ -1375,6 +1784,8 @@ const EducationDetails = ({ id, mode: initialMode, editingSection, toggleSection
         </button>
       </div>}
     </div>
+       :
+        <LoadingSpinner />
   );
 };
 
