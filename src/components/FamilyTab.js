@@ -3,6 +3,7 @@ import { FaEdit } from "react-icons/fa";
 import {  getFamilyInformationData, getOccupations, getRaisedBy, getReligions, getTypesOfPerson, updateFamilyInformationData } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
+import MessageModel from "./MessageModel";
 
 const Family = ({ id, setActiveTab }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
@@ -12,7 +13,8 @@ const Family = ({ id, setActiveTab }) => {
  const [isSaving, setIsSaving] = useState(false);
    const [initialFamilyInformation, setInitialFamilyInformation] = useState(null);
 
-  
+  const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
+
   const [familyInformation, setFamilyInformation] = useState({
     spouseOccupation: {
       label: "Spouse's Occupation",
@@ -649,12 +651,26 @@ const loadBasicInformationData=async()=>{
     });
 
     console.log("Save Payload:", payload);
-        const res=await updateFamilyInformationData(id,payload);
-          await loadBasicInformationData();
-            console.log("update result:", res);
-            setIsSaving(false);
-return true;
 
+try{
+    
+        const res=await updateFamilyInformationData(id,payload);
+      console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+
+   }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setFamilyInformation(initialFamilyInformation);
+      setIsSaving(false);
+      return false;
+    }
 
   };
 
@@ -699,7 +715,17 @@ return true;
     setEditingSection(null); // Exit edit mode
   };
 
-  return !isLoading ? (
+  return (
+    <>
+         <MessageModel
+            isOpen={modal.isOpen}
+            onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+            message={modal.message}
+            type={modal.type}
+          />
+    
+  
+    !isLoading ? (
     <div className="px-8">
       {/* Spouse's Information */}
       <section className="mb-12">
@@ -747,7 +773,7 @@ return true;
                   name="spouseOccupation"
                   value={familyInformation.spouseOccupation.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Spouse's occupation"
                 >
                   <option value="">Select occupation</option>
@@ -886,7 +912,7 @@ return true;
                   name="motherAge"
                   value={familyInformation.motherAge.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter mother's age"
                   aria-label="Mother's age"
                 />
@@ -905,7 +931,7 @@ return true;
                   name="ageWhenMotherDied"
                   value={familyInformation.ageWhenMotherDied.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter your age at time of death"
                   aria-label="Age when mother died"
                 />
@@ -924,7 +950,7 @@ return true;
                   name="fatherAge"
                   value={familyInformation.fatherAge.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter father's age"
                   aria-label="Father's age"
                 />
@@ -943,7 +969,7 @@ return true;
                   name="ageWhenFatherDied"
                   value={familyInformation.ageWhenFatherDied.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter your age at time of death"
                   aria-label="Age when father died"
                 />
@@ -961,7 +987,7 @@ return true;
                   name="motherOccupation"
                   value={familyInformation.motherOccupation.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Mother's occupation"
                 >
                   <option value="">Select occupation</option>
@@ -985,7 +1011,7 @@ return true;
                   name="fatherOccupation"
                   value={familyInformation.fatherOccupation.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Father's occupation"
                 >
                   <option value="">Select occupation</option>
@@ -1009,7 +1035,7 @@ return true;
                   name="motherReligion"
                   value={familyInformation.motherReligion.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Mother's religion"
                 >
                   <option value="">Select religion</option>
@@ -1033,7 +1059,7 @@ return true;
                   name="fatherReligion"
                   value={familyInformation.fatherReligion.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Father's religion"
                 >
                   <option value="">Select religion</option>
@@ -1248,7 +1274,7 @@ return true;
                   name="parentalSeparationAge"
                   value={familyInformation.parentalSeparationAge.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter age"
                   aria-label="Parental separation age"
                 />
@@ -1268,7 +1294,7 @@ return true;
                   name="parentalDivorceAge"
                   value={familyInformation.parentalDivorceAge.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter age"
                   aria-label="Parental divorce age"
                 />
@@ -1287,7 +1313,7 @@ return true;
                   name="motherDivorceCount"
                   value={familyInformation.motherDivorceCount.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter number"
                   aria-label="Mother divorce count"
                 />
@@ -1306,7 +1332,7 @@ return true;
                   name="fatherDivorceCount"
                   value={familyInformation.fatherDivorceCount.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter number"
                   aria-label="Father divorce count"
                 />
@@ -1325,7 +1351,7 @@ return true;
                   name="livingBrothers"
                   value={familyInformation.livingBrothers.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter number"
                   aria-label="Living brothers"
                 />
@@ -1344,7 +1370,7 @@ return true;
                   name="livingSisters"
                   value={familyInformation.livingSisters.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter number"
                   aria-label="Living sisters"
                 />
@@ -1362,7 +1388,7 @@ return true;
                   name="brothersAges"
                   value={familyInformation.brothersAges.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="e.g., 20, 25"
                   aria-label="Brothers ages"
                 />
@@ -1380,7 +1406,7 @@ return true;
                   name="sistersAges"
                   value={familyInformation.sistersAges.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="e.g., 18, 22"
                   aria-label="Sisters ages"
                 />
@@ -1399,7 +1425,7 @@ return true;
                   name="childNumber"
                   value={familyInformation.childNumber.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter number"
                   aria-label="Child number"
                 />
@@ -1418,7 +1444,7 @@ return true;
                   name="familyChildren"
                   value={familyInformation.familyChildren.value}
                   onChange={handleChange}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter total number"
                   aria-label="Family children"
                 />
@@ -1474,7 +1500,7 @@ return true;
                 name="brotherDisturbances"
                 value={familyInformation.brotherDisturbances.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe any issues"
                 aria-label="Brother disturbances"
@@ -1494,7 +1520,7 @@ return true;
                 name="sisterDisturbances"
                 value={familyInformation.sisterDisturbances.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe any issues"
                 aria-label="Sister disturbances"
@@ -1653,7 +1679,7 @@ return true;
                 name="maleRelativesDisturbed"
                 value={familyInformation.maleRelativesDisturbed.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter number"
                 aria-label="Male relatives disturbed"
               />
@@ -1673,7 +1699,7 @@ return true;
                 name="maleRelativesHospitalized"
                 value={familyInformation.maleRelativesHospitalized.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter number"
                 aria-label="Male relatives hospitalized"
               />
@@ -1693,7 +1719,7 @@ return true;
                 name="femaleRelativesDisturbed"
                 value={familyInformation.femaleRelativesDisturbed.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter number"
                 aria-label="Female relatives disturbed"
               />
@@ -1713,7 +1739,7 @@ return true;
                 name="femaleRelativesHospitalized"
                 value={familyInformation.femaleRelativesHospitalized.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter number"
                 aria-label="Female relatives hospitalized"
               />
@@ -1783,7 +1809,9 @@ return true;
     </div>
   ) : (
     <LoadingSpinner />
-  );
+  )
+  </>
+);
 };
 
 export default Family;

@@ -4,6 +4,7 @@ import { getALData, getALStreams, getALSubjects, getDegrees, getEducationData, g
 import { useNavigate } from 'react-router-dom';
 import TypeableDropdown from './TypeableDropdown';
 import LoadingSpinner from './LoadingSpinner';
+import MessageModel from './MessageModel';
 
 const EducationDetails = ({ id }) => {
   
@@ -81,13 +82,8 @@ const EducationDetails = ({ id }) => {
      const [isSaving, setIsSaving] = useState(false);
        const [initialEducationInformation, setInitialEducationInformation] = useState(null);
     
-        const [initialEducationYears, setInitialEducationYears] = useState(null);
-  const [initialScholarship, setInitialScholarship] = useState(null);
-  const [initialOL, setInitialOL] = useState(null);
-  const [initialAL, setInitialAL] = useState(null);
-  const [initialUniversity, setInitialUniversity] = useState(null);
-  const [initialUniversityEnabled, setInitialUniversityEnabled] = useState(null);
-  const [initialUniversityRemark, setInitialUniversityRemark] = useState(null);
+       const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
+      
 
 
 useEffect(()=>{
@@ -247,9 +243,26 @@ const loadDropdowns=async()=>{
          return false;  
       }
 
-  const res=await updateEducationYearsData(id,education.educationYears);
 
-   console.log("update result:", res);
+  try{
+ 
+  const res=await updateEducationYearsData(id,education.educationYears);
+          console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setIsSaving(false);
+      return false;
+    }
+
+
     } else if (section === 'scholarship') {
 
 isValid = _validateScholarship();
@@ -259,8 +272,25 @@ isValid = _validateScholarship();
          return false;  
       }
 
-    const res=  await updateScholarshipData(id,education.scholarship);
-  console.log("update result:", res);
+
+
+  try{
+ 
+  const res=  await updateScholarshipData(id,education.scholarship);
+          console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setIsSaving(false);
+      return false;
+    }
 
     } else if (section === 'ol') {
 
@@ -271,8 +301,24 @@ isValid = _validateScholarship();
          return false;  
       }
 
-     const res= await updateOLData(id,education.ol);
-  console.log("update result:", res);
+ try{
+ 
+    const res= await updateOLData(id,education.ol);
+          console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setIsSaving(false);
+      return false;
+    }
+
    
     } else if (section === 'al') {
          isValid = _validateALSubject();
@@ -281,8 +327,27 @@ isValid = _validateScholarship();
                   setIsSaving(false);
          return false;  
       }
- const res=await updateALData(id,education.al);
-  console.log("update result:", res);
+
+
+
+ try{
+ 
+    const res=await updateALData(id,education.al);
+          console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setIsSaving(false);
+      return false;
+    }
+
 
     } else if (section === 'university') {
 
@@ -297,8 +362,25 @@ isValid = _validateScholarship();
     universityEnabled: true,
     universityRemark: ''};
 
-     const res=  await updateUniversityData(id,universityData)
-  console.log("update result:", res);
+ try{
+ 
+        const res=  await updateUniversityData(id,universityData)
+          console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setIsSaving(false);
+      return false;
+    }
+
+
   
     }
 
@@ -950,6 +1032,15 @@ isValid.push(_validateEducationYears());
   };
 
   return (
+<>
+        <MessageModel
+            isOpen={modal.isOpen}
+            onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+            message={modal.message}
+            type={modal.type}
+          />
+
+{
     !isLoading ?
     <div className="px-8">
       {/* Educational Background */}
@@ -1771,7 +1862,6 @@ isValid.push(_validateEducationYears());
           </div>
         )}
       </section>
-
       {/* Save Button */}
     {mode==='add' &&  <div className="flex justify-end mt-8">
         <button
@@ -1786,6 +1876,10 @@ isValid.push(_validateEducationYears());
     </div>
        :
         <LoadingSpinner />
+}
+
+</>
+
   );
 };
 

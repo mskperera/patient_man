@@ -1,6 +1,6 @@
 export const getOccupations =async()=>{
 
-   await new Promise(resolve => setTimeout(resolve, 2000));
+       await new Promise(resolve => setTimeout(resolve, 500));
 const data= [
   { id: 1, name: 'Software Engineer' },
   { id: 2, name: 'Teacher' },
@@ -25,7 +25,7 @@ return {data};
 
 export const getReligions =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
   { id: 1, name: 'Buddhism' },
@@ -140,7 +140,7 @@ export const basicInformationData = [
 
 
 export const getBasicInformationData = async (id) => {
- await new Promise(resolve => setTimeout(resolve, 2000));
+     await new Promise(resolve => setTimeout(resolve, 500));
   const data = basicInformationData.find((p) => p.id === id);
   return { data: data || null };
 };
@@ -148,15 +148,16 @@ export const getBasicInformationData = async (id) => {
 
 
 export const updateBasicInformationData = async (id, updatedData) => {
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
   const index = basicInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   basicInformationData[index] = { ...basicInformationData[index], ...updatedData, lastModified: new Date().toISOString() };
+ //throw new Error("update basic error")
   return { success: true, data: basicInformationData[index] };
 };
 
 export const deleteBasicInformationData = async (id) => {
- await new Promise(resolve => setTimeout(resolve, 2000));
+     await new Promise(resolve => setTimeout(resolve, 500));
   const index = basicInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = basicInformationData.splice(index, 1)[0];
@@ -269,22 +270,23 @@ export const personalInformationData = [
 
 export const getPersonalInformationData = async (id) => {
     // Simulate a delay of 1 second (1000 milliseconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const data = personalInformationData.find((p) => p.id === id);
     return { data };
 }
 
 export const updatePersonalInformationData = async (id, updatedData) => {
- await new Promise(resolve => setTimeout(resolve, 2000));
+     await new Promise(resolve => setTimeout(resolve, 500));
   const index = personalInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   personalInformationData[index] = { ...personalInformationData[index], ...updatedData };
+  //throw new Error("errrrrrr")
   return { success: true, data: personalInformationData[index] };
 };
 
 export const deletePersonalInformationData = async (id) => {
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
   const index = personalInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = personalInformationData.splice(index, 1)[0];
@@ -293,7 +295,7 @@ export const deletePersonalInformationData = async (id) => {
 
 export const getFamilyInformationData = async (id) => {
     // Simulate a delay of 1 second (1000 milliseconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const data = familyInformationData.find((p) => p.id === id);
     return { data };
@@ -474,15 +476,16 @@ export const familyInformationData = [
 
 
 export const updateFamilyInformationData = async (id, updatedData) => {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
   const index = familyInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   familyInformationData[index] = { ...familyInformationData[index], ...updatedData };
+  //throw new Error("fdfsfkldfjsdfjsldjfsjkl")
   return { success: true, data: familyInformationData[index] };
 };
 
 export const deleteFamilyInformationData = async (id) => {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
   const index = familyInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = familyInformationData.splice(index, 1)[0];
@@ -493,7 +496,7 @@ export const deleteFamilyInformationData = async (id) => {
 
 export const getTypesOfPerson =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
   { id: "201", name: "Supportive" },
@@ -518,7 +521,7 @@ return {data};
 
 export const getRaisedBy =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
     { id: "301", name: "Parents" },
@@ -541,7 +544,7 @@ return {data};
 
 export const getMedicalInformationData = async (id) => {
     // Simulate a delay of 1 second (1000 milliseconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const data = medicalInformationData.find((p) => p.id === id);
     return { data };
@@ -642,15 +645,16 @@ export const medicalInformationData = [
 
 
 export const updateMedicalInformationData = async (id, updatedData) => {
-   await new Promise(resolve => setTimeout(resolve, 2000));
+       await new Promise(resolve => setTimeout(resolve, 500));
   const index = medicalInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   medicalInformationData[index] = { ...medicalInformationData[index], ...updatedData };
+  throw new Error("dfsjfloooooooooooooooo")
   return { success: true, data: medicalInformationData[index] };
 };
 
 export const deleteMedicalInformationData = async (id) => {
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
   const index = medicalInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = medicalInformationData.splice(index, 1)[0];
@@ -664,7 +668,7 @@ export const deleteMedicalInformationData = async (id) => {
 
 export const getEducationData = async (id) => {
     // Simulate a delay of 1 second (1000 milliseconds)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const data = educationData.find((p) => p.id === id);
     return { data };
@@ -673,7 +677,7 @@ export const getEducationData = async (id) => {
 
 
 export const updateEducationData = async (id, updatedData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
@@ -683,48 +687,53 @@ export const updateEducationData = async (id, updatedData) => {
 
 
 export const updateEducationYearsData = async (id, updatedData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
+     // throw new Error("error updateEducationYearsData")
   return { success: true, data: educationData[index] };
 };
 
 export const updateScholarshipData = async (id, updatedData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
+     // throw new Error("error updateScholarshipData")
   return { success: true, data: educationData[index] };
 };
 
 
 export const updateOLData = async (id, updatedData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
+   // throw new Error("error updateOLData")
   return { success: true, data: educationData[index] };
 };
 
 export const updateALData = async (id, updatedData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
+   // throw new Error("error updateALData")
   return { success: true, data: educationData[index] };
 };
 
 export const updateUniversityData = async (id, updatedData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
+   //   throw new Error("error updateUniversityData")
   return { success: true, data: educationData[index] };
 };
 
 export const deleteEducationData = async (id) => {
-   await new Promise(resolve => setTimeout(resolve, 2000));
+       await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = educationData.splice(index, 1)[0];
@@ -742,19 +751,19 @@ export const getEducationYearsData = async (id) => {
 };
 
 export const getScholarshipData = async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 100));
   const record = educationData.find((p) => p.id === id);
   return { data: record ?  record.scholarship : null };
 };
 
 export const getOLData = async (id) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 100));
   const record = educationData.find((p) => p.id === id);
   return { data: record ? record.ol : null };
 };
 
 export const getALData = async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 100));
   const record = educationData.find((p) => p.id === id);
   return { data: record ? record.al : null };
 };
@@ -1006,7 +1015,7 @@ return {data};
 
 export const getOLSubjects =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
  const data= [
  { id: 'first-language', name: 'First Language (Sinhala/Tamil)' },
@@ -1027,7 +1036,7 @@ return {data};
 
 export const getALSubjects =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 100));
 
  const data= [
    { id: 'combined-mathematics', name: 'Combined Mathematics' },
@@ -1047,7 +1056,7 @@ return {data};
 
 export const getALStreams =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
  { id: 'science', name: 'Science' },
@@ -1064,7 +1073,7 @@ return {data};
 
 export const getDegrees =async()=>{ 
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
   { id: 'bsc-computer-science', name: 'BSc Computer Science' },

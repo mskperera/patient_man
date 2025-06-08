@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getBadPointsOptions, getGoodPointsOptionsData, getOccupations, getPersonalInformationData, goodPointsOptionsData, personalInformationData, updatePersonalInformationData } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
+import MessageModel from "./MessageModel";
 
 
  const maritalStatusOptions = [
@@ -16,6 +17,7 @@ import LoadingSpinner from "./LoadingSpinner";
 ];
 
 
+
 const PersonalInformation = ({ id, setActiveTab }) => {
   const navigate = useNavigate();
   const [personalInformationErrors, setPersonalInformationErrors] = useState({});
@@ -24,7 +26,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
  const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
   const [initialPersonalInformation, setInitialPersonalInformation] = useState(null); // Store initial state for cancel
-
+  const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
 
   const [personalInformation, setPersonalInformation] = useState({
     maritalStatus: {
@@ -340,12 +342,26 @@ setIsSaving(true);
     });
 
     console.log("Save Payload:", payload);
+    try{
       const res=await updatePersonalInformationData(id,payload);
-        await loadPersonalInformationData();
+        //await loadPersonalInformationData();
           console.log("update result:", res);
           setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      //setPersonalInformation(initialPersonalInformation);
+      setIsSaving(false);
+      return false;
+    }
 
-return true;
+
   };
 
   // Validate individual field
@@ -540,7 +556,15 @@ return true;
 
 
   return (
-!isLoading ?
+    <>
+     <MessageModel
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+        message={modal.message}
+        type={modal.type}
+      />
+   
+ {!isLoading ?
     <div className="px-8">
 
       {/* Personal Details */}
@@ -611,7 +635,7 @@ return true;
                   name="yearsMarried"
                   value={personalInformation.yearsMarried.value}
                   onChange={handleChangePersonalInfo}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter years"
                   disabled={!(
                     ["married_first_time", "married_second_time"].includes(personalInformation.maritalStatus.value)
@@ -628,7 +652,7 @@ return true;
                   name="maleChildrenAges"
                   value={personalInformation.maleChildrenAges.value}
                   onChange={handleChangePersonalInfo}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="e.g., 5, 10, 15"
                   aria-label="Male children ages"
                 />
@@ -642,7 +666,7 @@ return true;
                   name="femaleChildrenAges"
                   value={personalInformation.femaleChildrenAges.value}
                   onChange={handleChangePersonalInfo}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="e.g., 3, 8"
                   aria-label="Female children ages"
                 />
@@ -773,7 +797,7 @@ return true;
                 name="thingsLiked"
                 value={personalInformation.thingsLiked.value}
                 onChange={handleChangePersonalInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe your interests and pleasures"
                 aria-label="Things liked"
@@ -832,7 +856,7 @@ return true;
                 name="socialDifficulties"
                 value={personalInformation.socialDifficulties.value}
                 onChange={handleChangePersonalInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe social challenges"
                 aria-label="Social difficulties"
@@ -849,7 +873,7 @@ return true;
                 name="loveSexDifficulties"
                 value={personalInformation.loveSexDifficulties.value}
                 onChange={handleChangePersonalInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe relationship challenges"
                 aria-label="Love and sex difficulties"
@@ -866,7 +890,7 @@ return true;
                 name="schoolWorkDifficulties"
                 value={personalInformation.schoolWorkDifficulties.value}
                 onChange={handleChangePersonalInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe professional/academic challenges"
                 aria-label="School or work difficulties"
@@ -881,7 +905,7 @@ return true;
                 name="lifeGoals"
                 value={personalInformation.lifeGoals.value}
                 onChange={handleChangePersonalInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="List your life goals"
                 aria-label="Life goals"
@@ -898,7 +922,7 @@ return true;
                 name="thingsToChange"
                 value={personalInformation.thingsToChange.value}
                 onChange={handleChangePersonalInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe desired changes"
                 aria-label="Things to change"
@@ -1007,7 +1031,7 @@ return true;
                   name="occupationTrained"
                   value={personalInformation.occupationTrained.value}
                   onChange={handleChangePersonalInfo}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Occupation trained for"
                 >
                   <option value="">Select occupation</option>
@@ -1029,7 +1053,7 @@ return true;
                   name="occupation"
                   value={personalInformation.occupation.value}
                   onChange={handleChangePersonalInfo}
-                  className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Present occupation"
                 >
                   <option value="">Select occupation</option>
@@ -1118,8 +1142,8 @@ return true;
     </div>
     :
     <LoadingSpinner />
-
-
+    }
+ </>
   );
 };
 

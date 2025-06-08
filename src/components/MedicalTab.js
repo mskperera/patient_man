@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { getMedicalInformationData, medicalInformationData, updateMedicalInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
+import MessageModel from "./MessageModel";
 
 
 const MedicalTab = ({ id, setActiveTab }) => {
@@ -124,7 +125,8 @@ const MedicalTab = ({ id, setActiveTab }) => {
   });
 
   const [initialMedicalInformation, setInitialMedicalInformation] = useState(null);
-  
+    const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
+
     const [isLoading, setIsLoading] = useState(false);
      const [isSaving, setIsSaving] = useState(false);
   
@@ -350,14 +352,30 @@ const MedicalTab = ({ id, setActiveTab }) => {
       }
     });
 
-   console.log("Save Payload:", payload);
+
+
+
+
+
+  try{
+     console.log("Save Payload:", payload);
           const res=await updateMedicalInformationData(id,payload);
-            await loadMedicalInformationData();
-              console.log("update result:", res);
-              setIsSaving(false);
-
-return true;
-
+        //await loadPersonalInformationData();
+          console.log("update result:", res);
+          setIsSaving(false);
+          return true;
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+     // setMedicalInformation(initialMedicalInformation);
+      setIsSaving(false);
+      return false;
+    }
 
   };
 
@@ -412,7 +430,16 @@ return true;
 
 
   return (
-    !isLoading ?
+<>
+     <MessageModel
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+        message={modal.message}
+        type={modal.type}
+      />
+
+{
+   !isLoading ?
     <div className="px-8">
       {/* Health Details */}
       <section className=" mb-12">
@@ -458,7 +485,7 @@ return true;
                 name="physicalAilments"
                 value={medicalInformation.physicalAilments.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="List physical health issues"
                 aria-label="Physical ailments"
@@ -475,7 +502,7 @@ return true;
                 name="mainComplaints"
                 value={medicalInformation.mainComplaints.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="List current issues"
                 aria-label="Main complaints"
@@ -492,7 +519,7 @@ return true;
                 name="pastComplaints"
                 value={medicalInformation.pastComplaints.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="List past issues"
                 aria-label="Past complaints"
@@ -509,7 +536,7 @@ return true;
                 name="worseConditions"
                 value={medicalInformation.worseConditions.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe conditions"
                 aria-label="Worse conditions"
@@ -526,7 +553,7 @@ return true;
                 name="improvedConditions"
                 value={medicalInformation.improvedConditions.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe conditions"
                 aria-label="Improved conditions"
@@ -622,7 +649,7 @@ return true;
                     name="individualTherapyHours"
                     value={medicalInformation.individualTherapyHours.value}
                     onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter hours"
                     aria-label="Individual therapy hours"
                   />
@@ -639,7 +666,7 @@ return true;
                     name="individualTherapyYears"
                     value={medicalInformation.individualTherapyYears.value}
                     onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter years"
                     aria-label="Individual therapy years"
                   />
@@ -656,7 +683,7 @@ return true;
                     name="individualTherapyEndYears"
                     value={medicalInformation.individualTherapyEndYears.value}
                     onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter years"
                     aria-label="Individual therapy end years"
                   />
@@ -675,7 +702,7 @@ return true;
                     name="groupTherapyHours"
                     value={medicalInformation.groupTherapyHours.value}
                     onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter hours"
                     aria-label="Group therapy hours"
                   />
@@ -692,7 +719,7 @@ return true;
                     name="psychiatricHospitalizationMonths"
                     value={medicalInformation.psychiatricHospitalizationMonths.value}
                     onChange={handleChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter months"
                     aria-label="Psychiatric hospitalization months"
                   />
@@ -745,7 +772,7 @@ return true;
                 name="antidepressantsCount"
                 value={medicalInformation.antidepressantsCount.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter number"
                 aria-label="Antidepressants count"
               />
@@ -761,7 +788,7 @@ return true;
                 name="psychotherapyType"
                 value={medicalInformation.psychotherapyType.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter type of psychotherapy"
                 aria-label="Psychotherapy type"
               />
@@ -777,7 +804,7 @@ return true;
                 name="additionalInfo"
                 value={medicalInformation.additionalInfo.value}
                 onChange={handleChange}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Provide additional details"
                 aria-label="Additional info"
@@ -863,6 +890,12 @@ return true;
     </div>
         :
         <LoadingSpinner />
+
+}
+
+</>
+
+ 
   );
 };
 

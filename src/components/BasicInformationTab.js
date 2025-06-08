@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { getBasicInformationData, updateBasicInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
+import MessageModel from "./MessageModel";
 
 const BasicInformationTab = ({ id }) => {
 
@@ -12,6 +13,7 @@ const BasicInformationTab = ({ id }) => {
   const [isLoading, setIsLoading] = useState(false);
    const [isSaving, setIsSaving] = useState(false);
   const [initialBasicInformation, setInitialBasicInformation] = useState(null); // Store initial state for cancel
+ const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
 
   const [basicInformation, setBasicInformation] = useState({
     patientId: {
@@ -266,12 +268,27 @@ setIsSaving(true);
 
     console.log("Save Payload:", payload);
 
+    try{
    const res=await updateBasicInformationData(id,payload);
    await loadBasicInformationData();
      console.log("update result:", res);
      setIsSaving(false);
 
     return true;
+    }
+    catch(err){
+
+
+   console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+  // setBasicInformation(initialBasicInformation); // Restore initial state
+      setIsSaving(false);
+      return false;
+    }
     // const savedPatientId = mode === "add" ? Date.now().toString() : "patientId";
     // if (mode === "add") {
     //   navigate(`/patients/${savedPatientId}`);
@@ -413,6 +430,13 @@ setIsSaving(true);
   };
 
   return (
+        <>
+         <MessageModel
+            isOpen={modal.isOpen}
+            onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+            message={modal.message}
+            type={modal.type}
+          />
     <div className="px-8">
       <section className="mb-4">
         <div className="flex justify-between items-center mb-2 pb-2">
@@ -457,7 +481,7 @@ setIsSaving(true);
                 name="lastName"
                 value={basicInformation.lastName.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter last name"
                 aria-label="Last name"
               />
@@ -475,7 +499,7 @@ setIsSaving(true);
                 name="firstName"
                 value={basicInformation.firstName.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter first name"
                 aria-label="First name"
               />
@@ -493,7 +517,7 @@ setIsSaving(true);
                 name="middleName"
                 value={basicInformation.middleName.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter middle name"
                 aria-label="Middle name"
               />
@@ -512,7 +536,7 @@ setIsSaving(true);
                 name="dob"
                 value={basicInformation.dob.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 aria-label="Date of birth"
               />
               {basicInformationErrors.dob && (
@@ -525,7 +549,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Age
               </label>
-              <div className="flex items-center gap-2 p-3 border border-gray-300 rounded-md bg-gray-50">
+              <div className="flex items-center gap-2 p-3 border text-sm border-gray-300 rounded-md bg-gray-50">
                 <span className="text-gray-900 text-base font-medium">
                   {basicInformation.age.value || "--"}
                 </span>
@@ -576,7 +600,7 @@ setIsSaving(true);
                 name="permanentAddress"
                 value={basicInformation.permanentAddress.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="3"
                 placeholder="Enter permanent address"
                 aria-label="Permanent address"
@@ -595,7 +619,7 @@ setIsSaving(true);
                 name="homePhone"
                 value={basicInformation.homePhone.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter home phone"
                 aria-label="Home phone"
               />
@@ -613,7 +637,7 @@ setIsSaving(true);
                 name="businessPhone"
                 value={basicInformation.businessPhone.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter business phone"
                 aria-label="Business phone"
               />
@@ -632,7 +656,7 @@ setIsSaving(true);
                 type="email"
                 value={basicInformation.email.value}
                 onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 placeholder="Enter Email"
                 aria-label="Email"
               />
@@ -846,6 +870,7 @@ setIsSaving(true);
         </div>
       )}
     </div>
+    </>
   );
 };
 
