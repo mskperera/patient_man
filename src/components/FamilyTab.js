@@ -725,7 +725,7 @@ try{
           />
     
   
-    !isLoading ? (
+  { !isLoading ? (
     <div className="px-8">
       {/* Spouse's Information */}
       <section className="mb-12">
@@ -1810,6 +1810,8 @@ try{
   ) : (
     <LoadingSpinner />
   )
+}
+
   </>
 );
 };
