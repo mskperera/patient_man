@@ -138,6 +138,28 @@ export const basicInformationData = [
   }
 ];
 
+export const getPatientList = async () => {
+    // Simulate a delay of 500 milliseconds
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Format name from firstName, middleName, and lastName
+    const formatName = (patient) => {
+        const parts = [patient.firstName, patient.middleName, patient.lastName].filter(Boolean);
+        return parts.join(' ').trim();
+    };
+
+    // Map basicInformationData to the required patient list format
+    const patients = basicInformationData.map(patient => ({
+        id: patient.id,
+        patientId: patient.patientId,
+        name: formatName(patient),
+        gender: patient.gender,
+        phone: patient.homePhone,
+        email: patient.email
+    }));
+
+    return { data: patients };
+};
 
 export const getBasicInformationData = async (id) => {
      await new Promise(resolve => setTimeout(resolve, 500));
@@ -146,6 +168,39 @@ export const getBasicInformationData = async (id) => {
 };
 
 
+export const addBasicInformationData = async (newData) => {
+    // Simulate a delay of 500 milliseconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Generate a new unique ID
+    const newId = (basicInformationData.length + 1).toString();
+    const newPatientId = `PT-${String(basicInformationData.length + 1).padStart(4, '0')}`;
+
+    // Create new patient record
+    const newRecord = {
+        id: newId,
+        patientId: newPatientId,
+        firstName: newData.firstName || '',
+        lastName: newData.lastName || '',
+        middleName: newData.middleName || '',
+        dateOfBirth: newData.dob || '',
+        age: newData.age || '',
+        gender: newData.gender || '',
+        email: newData.email || '',
+        homePhone: newData.homePhone || '',
+        businessPhone: newData.businessPhone || '',
+        permanentAddress: newData.permanentAddress || '',
+        referralSource: newData.referralSource || '',
+        referralPartyPresent: newData.referralPartyPresent || '',
+        formDate: new Date().toISOString().split('T')[0],
+        lastModified: new Date().toISOString()
+    };
+
+    // Add to basicInformationData array
+    basicInformationData.push(newRecord);
+
+    return { success: true, data: newRecord,newId };
+};
 
 export const updateBasicInformationData = async (id, updatedData) => {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -276,6 +331,70 @@ export const getPersonalInformationData = async (id) => {
     return { data };
 }
 
+
+export const addPersonalInformationData = async (newData) => {
+    // Simulate a delay of 500 milliseconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Generate a new unique ID
+    const newId = (personalInformationData.length + 1).toString();
+
+    // Create new personal information record
+    const newRecord = {
+        id: newId,
+        maritalStatus: newData.maritalStatus || '',
+        yearsMarried: newData.yearsMarried || '',
+        maleChildrenAges: newData.maleChildrenAges || '',
+        femaleChildrenAges: newData.femaleChildrenAges || '',
+        religiosity: newData.religiosity || '',
+        thingsLiked: newData.thingsLiked || '',
+        assets: newData.assets || '',
+        badPoints: newData.badPoints || '',
+        socialDifficulties: newData.socialDifficulties || '',
+        loveSexDifficulties: newData.loveSexDifficulties || '',
+        schoolWorkDifficulties: newData.schoolWorkDifficulties || '',
+        lifeGoals: newData.lifeGoals || '',
+        thingsToChange: newData.thingsToChange || '',
+        occupationTrained: newData.occupationTrained || '',
+        occupation: newData.occupation || '',
+        occupationFullTime: newData.occupationFullTime || ''
+    };
+
+    // Validate required fields
+    const requiredFields = [
+        'maritalStatus', 'religiosity', 'thingsLiked', 'assets', 'badPoints',
+        'socialDifficulties', 'loveSexDifficulties', 'schoolWorkDifficulties',
+        'lifeGoals', 'thingsToChange', 'occupationTrained', 'occupation', 'occupationFullTime'
+    ];
+
+    for (const field of requiredFields) {
+        if (!newRecord[field] || newRecord[field].toString().trim() === '') {
+            return { success: false, message: `${field.replace(/([A-Z])/g, ' $1').trim()} is required` };
+        }
+    }
+
+    // Validate yearsMarried if maritalStatus is married
+    if (['married_first_time', 'married_second_time'].includes(newRecord.maritalStatus)) {
+        if (!newRecord.yearsMarried || newRecord.yearsMarried.trim() === '') {
+            return { success: false, message: 'Number of Years Married is required for current marriage' };
+        }
+        if (isNaN(newRecord.yearsMarried) || Number(newRecord.yearsMarried) < 0) {
+            return { success: false, message: 'Number of Years Married must be a valid non-negative number' };
+        }
+    }
+
+    // Validate religiosity
+    if (newRecord.religiosity && (isNaN(newRecord.religiosity) || Number(newRecord.religiosity) < 1 || Number(newRecord.religiosity) > 9)) {
+        return { success: false, message: 'Religiosity must be a number between 1 and 9' };
+    }
+
+    // Add to personalInformationData array
+    personalInformationData.push(newRecord);
+
+    return { success: true, data: newRecord };
+};
+
+
 export const updatePersonalInformationData = async (id, updatedData) => {
      await new Promise(resolve => setTimeout(resolve, 500));
   const index = personalInformationData.findIndex((p) => p.id === id);
@@ -315,9 +434,9 @@ export const familyInformationData = [
     fatherOccupation: "Engineer",
     motherReligion: "Christianity",
     fatherReligion: "Christianity",
-    raisedBy: "Parents",
-    motherDescription: "Supportive;;Caring;;Loving",
-    fatherDescription: "Strict;;Disciplined;;Encouraging",
+    raisedBy: ["Parents"],
+    motherDescription: ['Supportive','Caring','Loving'],
+    fatherDescription: ['Strict','Disciplined','Encouraging'],
     parentalSeparationAge: "",
     parentalDivorceAge: "",
     motherDivorceCount: "0",
@@ -349,9 +468,9 @@ export const familyInformationData = [
     fatherOccupation: "Other",
     motherReligion: "Hinduism",
     fatherReligion: "Hinduism",
-    raisedBy: "Single Mother",
-    motherDescription: "Warm;;Overprotective",
-    fatherDescription: "Distant",
+    raisedBy: ["Single Mother"],
+    motherDescription: ['Warm','Overprotective'],
+    fatherDescription: ["Distant"],
     parentalSeparationAge: "8",
     parentalDivorceAge: "9",
     motherDivorceCount: "1",
@@ -383,9 +502,9 @@ export const familyInformationData = [
     fatherOccupation: "Doctor",
     motherReligion: "Buddhism",
     fatherReligion: "Buddhism",
-    raisedBy: "Single Father;;Grandparents",
-    motherDescription: "Caring",
-    fatherDescription: "Supportive;;Warm",
+    raisedBy: ['Single Father','Grandparents'],
+    motherDescription: ["Caring"],
+    fatherDescription: ['Supportive','Warm'],
     parentalSeparationAge: "",
     parentalDivorceAge: "",
     motherDivorceCount: "0",
@@ -417,9 +536,9 @@ export const familyInformationData = [
     fatherOccupation: "Teacher",
     motherReligion: "Islam",
     fatherReligion: "Islam",
-    raisedBy: "Parents",
-    motherDescription: "Strict;;Traditional",
-    fatherDescription: "Loving;;Encouraging",
+    raisedBy: ["Parents"],
+    motherDescription: ['Strict','Traditional'],
+    fatherDescription: ['Loving','Encouraging'],
     parentalSeparationAge: "",
     parentalDivorceAge: "",
     motherDivorceCount: "0",
@@ -451,9 +570,9 @@ export const familyInformationData = [
     fatherOccupation: "Other",
     motherReligion: "Other",
     fatherReligion: "Other",
-    raisedBy: "Grandparents;;Aunt",
-    motherDescription: "Distant",
-    fatherDescription: "Distant",
+    raisedBy: ['Grandparents','Aunt'],
+    motherDescription: ["Distant"],
+    fatherDescription: ["Distant"],
     parentalSeparationAge: "",
     parentalDivorceAge: "",
     motherDivorceCount: "0",
@@ -474,6 +593,96 @@ export const familyInformationData = [
   },
 ];
 
+export const addFamilyInformationData = async (newData) => {
+    // Simulate a delay of 500 milliseconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Generate a new unique ID
+    const newId = (familyInformationData.length + 1).toString();
+
+    // Create new family information record
+    const newRecord = {
+        id: newId,
+        spouseOccupation: newData.spouseOccupation || '',
+        spouseOccupationFullTime: newData.spouseOccupationFullTime || '',
+        motherAge: newData.motherAge || '',
+        ageWhenMotherDied: newData.ageWhenMotherDied || '',
+        fatherAge: newData.fatherAge || '',
+        ageWhenFatherDied: newData.ageWhenFatherDied || '',
+        motherOccupation: newData.motherOccupation || '',
+        fatherOccupation: newData.fatherOccupation || '',
+        motherReligion: newData.motherReligion || '',
+        fatherReligion: newData.fatherReligion || '',
+        raisedBy: Array.isArray(newData.raisedBy) ? newData.raisedBy.join(';;') : newData.raisedBy || '',
+        motherDescription: Array.isArray(newData.motherDescription) ? newData.motherDescription.join(';;') : newData.motherDescription || '',
+        fatherDescription: Array.isArray(newData.fatherDescription) ? newData.fatherDescription.join(';;') : newData.fatherDescription || '',
+        parentalSeparationAge: newData.parentalSeparationAge || '',
+        parentalDivorceAge: newData.parentalDivorceAge || '',
+        motherDivorceCount: newData.motherDivorceCount || '',
+        fatherDivorceCount: newData.fatherDivorceCount || '',
+        livingBrothers: newData.livingBrothers || '',
+        livingSisters: newData.livingSisters || '',
+        brothersAges: newData.brothersAges || '',
+        sistersAges: newData.sistersAges || '',
+        childNumber: newData.childNumber || '',
+        familyChildren: newData.familyChildren || '',
+        adopted: newData.adopted || '',
+        brotherDisturbances: newData.brotherDisturbances || '',
+        sisterDisturbances: newData.sisterDisturbances || '',
+        maleRelativesDisturbed: newData.maleRelativesDisturbed || '',
+        maleRelativesHospitalized: newData.maleRelativesHospitalized || '',
+        femaleRelativesDisturbed: newData.femaleRelativesDisturbed || '',
+        femaleRelativesHospitalized: newData.femaleRelativesHospitalized || ''
+    };
+
+    // Validate required fields
+    const requiredFields = [
+        'motherAge', 'fatherAge', 'motherOccupation', 'fatherOccupation',
+        'motherReligion', 'fatherReligion', 'raisedBy', 'motherDescription',
+        'fatherDescription', 'motherDivorceCount', 'fatherDivorceCount',
+        'livingBrothers', 'livingSisters', 'brothersAges', 'sistersAges',
+        'childNumber', 'familyChildren', 'adopted', 'brotherDisturbances',
+        'sisterDisturbances', 'maleRelativesDisturbed', 'maleRelativesHospitalized',
+        'femaleRelativesDisturbed', 'femaleRelativesHospitalized'
+    ];
+
+    for (const field of requiredFields) {
+        const value = newRecord[field];
+        if (field === 'raisedBy' || field === 'motherDescription' || field === 'fatherDescription') {
+            if (!value || value.split(';;').filter(item => item.trim()).length === 0) {
+                return { success: false, message: `${field.replace(/([A-Z])/g, ' $1').trim()} is required` };
+            }
+        } else if (!value || value.toString().trim() === '') {
+            return { success: false, message: `${field.replace(/([A-Z])/g, ' $1').trim()} is required` };
+        }
+    }
+
+    // Validate numeric fields
+    const numericFields = [
+        'motherAge', 'ageWhenMotherDied', 'fatherAge', 'ageWhenFatherDied',
+        'parentalSeparationAge', 'parentalDivorceAge', 'motherDivorceCount',
+        'fatherDivorceCount', 'livingBrothers', 'livingSisters', 'childNumber',
+        'familyChildren', 'maleRelativesDisturbed', 'maleRelativesHospitalized',
+        'femaleRelativesDisturbed', 'femaleRelativesHospitalized'
+    ];
+
+    for (const field of numericFields) {
+        const value = newRecord[field];
+        if (value && (isNaN(value) || Number(value) < 0)) {
+            return { success: false, message: `${field.replace(/([A-Z])/g, ' $1').trim()} must be a valid non-negative number` };
+        }
+    }
+
+    // Validate spouseOccupationFullTime if spouseOccupation is provided
+    if (newRecord.spouseOccupation && !newRecord.spouseOccupationFullTime) {
+        return { success: false, message: 'Spouse Occupation Status is required when Spouse Occupation is provided' };
+    }
+
+    // Add to familyInformationData array
+    familyInformationData.push(newRecord);
+
+    return { success: true, data: newRecord };
+};
 
 export const updateFamilyInformationData = async (id, updatedData) => {
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -643,13 +852,79 @@ export const medicalInformationData = [
   },
 ];
 
+export const addMedicalInformationData = async (newData) => {
+    // Simulate a delay of 500 milliseconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Generate a new unique ID
+    const newId = (medicalInformationData.length + 1).toString();
+
+    // Create new medical information record
+    const newRecord = {
+        id: newId,
+        physicalAilments: newData.physicalAilments || '',
+        mainComplaints: newData.mainComplaints || '',
+        pastComplaints: newData.pastComplaints || '',
+        worseConditions: newData.worseConditions || '',
+        improvedConditions: newData.improvedConditions || '',
+        individualTherapyHours: newData.individualTherapyHours || '',
+        individualTherapyYears: newData.individualTherapyYears || '',
+        individualTherapyEndYears: newData.individualTherapyEndYears || '',
+        groupTherapyHours: newData.groupTherapyHours || '',
+        psychiatricHospitalizationMonths: newData.psychiatricHospitalizationMonths || '',
+        currentTreatment: newData.currentTreatment || '',
+        antidepressantsCount: newData.antidepressantsCount || '',
+        psychotherapyType: newData.psychotherapyType || '',
+        additionalInfo: newData.additionalInfo || ''
+    };
+
+    // Validate required fields
+    const requiredFields = [
+        'physicalAilments',
+        'mainComplaints',
+        'currentTreatment'
+    ];
+
+    for (const field of requiredFields) {
+        if (!newRecord[field] || newRecord[field].toString().trim() === '') {
+            return { success: false, message: `${field.replace(/([A-Z])/g, ' $1').trim()} is required` };
+        }
+    }
+
+    // Validate numeric fields
+    const numericFields = [
+        'individualTherapyHours',
+        'individualTherapyYears',
+        'individualTherapyEndYears',
+        'groupTherapyHours',
+        'psychiatricHospitalizationMonths',
+        'antidepressantsCount'
+    ];
+
+    for (const field of numericFields) {
+        const value = newRecord[field];
+        if (value && (isNaN(value) || Number(value) < 0)) {
+            return { success: false, message: `${field.replace(/([A-Z])/g, ' $1').trim()} must be a valid non-negative number` };
+        }
+    }
+
+    // Validate currentTreatment
+    if (newRecord.currentTreatment && !['Yes', 'No'].includes(newRecord.currentTreatment)) {
+        return { success: false, message: 'Current Treatment must be either "Yes" or "No"' };
+    }
+
+    // Add to medicalInformationData array
+    medicalInformationData.push(newRecord);
+
+    return { success: true, data: newRecord };
+};
 
 export const updateMedicalInformationData = async (id, updatedData) => {
        await new Promise(resolve => setTimeout(resolve, 500));
   const index = medicalInformationData.findIndex((p) => p.id === id);
   if (index === -1) return { success: false, message: "Record not found" };
   medicalInformationData[index] = { ...medicalInformationData[index], ...updatedData };
-  throw new Error("dfsjfloooooooooooooooo")
+  //throw new Error("dfsjfloooooooooooooooo")
   return { success: true, data: medicalInformationData[index] };
 };
 
@@ -675,7 +950,134 @@ export const getEducationData = async (id) => {
 }
 
 
+export const addEducationData = async (id, newData) => {
+    // Simulate a delay of 500 milliseconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
+    // Create new education record
+    const newRecord = {
+        id: id,
+        educationYears: newData.educationYears || '',
+        scholarship: {
+            enabled: newData.scholarship?.enabled !== false,
+            marks: newData.scholarship?.marks || '',
+            schoolAdmitted: newData.scholarship?.schoolAdmitted || '',
+            result: newData.scholarship?.result || '',
+            remark: newData.scholarship?.remark || ''
+        },
+        ol: {
+            enabled: newData.ol?.enabled !== false,
+            subjects: newData.ol?.subjects || [],
+            remark: newData.ol?.remark || ''
+        },
+        al: {
+            enabled: newData.al?.enabled !== false,
+            stream: newData.al?.stream || '',
+            subjects: newData.al?.subjects || [],
+            remark: newData.al?.remark || ''
+        },
+        university: {
+            enabled: newData.university?.enabled !== false,
+            subjects: newData.university?.subjects || [],
+            remark: newData.university?.remark || ''
+        }
+    };
+
+    // Validate educationYears
+    if (!newRecord.educationYears || newRecord.educationYears.toString().trim() === '') {
+        return { success: false, message: 'Years of formal education is required' };
+    }
+    if (isNaN(newRecord.educationYears) || Number(newRecord.educationYears) < 0) {
+        return { success: false, message: 'Years of formal education must be a valid non-negative number' };
+    }
+
+    // Validate scholarship if enabled
+    if (newRecord.scholarship.enabled) {
+        if (!newRecord.scholarship.marks || newRecord.scholarship.marks.toString().trim() === '') {
+            return { success: false, message: 'Scholarship marks are required' };
+        }
+        if (!newRecord.scholarship.schoolAdmitted || newRecord.scholarship.schoolAdmitted.trim() === '') {
+            return { success: false, message: 'School admitted is required' };
+        }
+        if (!newRecord.scholarship.result || !['Pass', 'Fail'].includes(newRecord.scholarship.result)) {
+            return { success: false, message: 'Scholarship result must be either "Pass" or "Fail"' };
+        }
+    }
+
+    // Validate O/L subjects if enabled
+    if (newRecord.ol.enabled && newRecord.ol.subjects.length > 0) {
+        const subjectSet = new Set();
+        for (let i = 0; i < newRecord.ol.subjects.length; i++) {
+            const subject = newRecord.ol.subjects[i];
+            if (!subject.name || subject.name.trim() === '') {
+                return { success: false, message: `O/L subject ${i + 1} name is required` };
+            }
+            if (!subject.marks || subject.marks.trim() === '') {
+                return { success: false, message: `O/L subject ${i + 1} grade is required` };
+            }
+            if (!subject.year || isNaN(subject.year) || subject.year < 1900 || subject.year > 2025) {
+                return { success: false, message: `O/L subject ${i + 1} year must be a valid year between 1900 and 2025` };
+            }
+            const key = `${subject.name.toLowerCase()}|${subject.year}`;
+            if (subjectSet.has(key)) {
+                return { success: false, message: `Duplicate O/L subject "${subject.name}" for year ${subject.year}` };
+            }
+            subjectSet.add(key);
+        }
+    }
+
+    // Validate A/L stream and subjects if enabled
+    if (newRecord.al.enabled) {
+        if (!newRecord.al.stream || newRecord.al.stream.trim() === '') {
+            return { success: false, message: 'A/L stream is required' };
+        }
+        if (newRecord.al.subjects.length > 0) {
+            const subjectSet = new Set();
+            for (let i = 0; i < newRecord.al.subjects.length; i++) {
+                const subject = newRecord.al.subjects[i];
+                if (!subject.name || subject.name.trim() === '') {
+                    return { success: false, message: `A/L subject ${i + 1} name is required` };
+                }
+                if (!subject.marks || subject.marks.trim() === '') {
+                    return { success: false, message: `A/L subject ${i + 1} grade is required` };
+                }
+                if (!subject.year || isNaN(subject.year) || subject.year < 1900 || subject.year > 2025) {
+                    return { success: false, message: `A/L subject ${i + 1} year must be a valid year between 1900 and 2025` };
+                }
+                const key = `${subject.name.toLowerCase()}|${subject.year}`;
+                if (subjectSet.has(key)) {
+                    return { success: false, message: `Duplicate A/L subject "${subject.name}" for year ${subject.year}` };
+                }
+                subjectSet.add(key);
+            }
+        }
+    }
+
+    // Validate university qualifications if enabled
+    if (newRecord.university.enabled && newRecord.university.subjects.length > 0) {
+        for (let i = 0; i < newRecord.university.subjects.length; i++) {
+            const qualification = newRecord.university.subjects[i];
+            if (!qualification.name || qualification.name.trim() === '') {
+                return { success: false, message: `University qualification ${i + 1} degree is required` };
+            }
+            if (!qualification.institution || qualification.institution.trim() === '') {
+                return { success: false, message: `University qualification ${i + 1} institution is required` };
+            }
+            if (!qualification.marks || qualification.marks.trim() === '') {
+                return { success: false, message: `University qualification ${i + 1} marks/grade is required` };
+            }
+        }
+    }
+
+    // Add to educationData array
+    console.log('newRecord',newRecord)
+    try {
+        educationData.push(newRecord);
+        return { success: true, data: newRecord, educationData };
+    } catch (error) {
+        return { success: false, error: `Error saving data: ${error.message}` };
+    }
+};
 export const updateEducationData = async (id, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
   const index = educationData.findIndex((p) => p.id === id);
@@ -765,6 +1167,7 @@ export const getOLData = async (id) => {
 export const getALData = async (id) => {
     await new Promise(resolve => setTimeout(resolve, 100));
   const record = educationData.find((p) => p.id === id);
+  console.log("edudata record getALData",record)
   return { data: record ? record.al : null };
 };
 
@@ -772,7 +1175,7 @@ export const getUniversityData = async (id) => {
   await new Promise(resolve => setTimeout(resolve, 200));
   const record = educationData.find((p) => p.id === id);
      console.log("edudata record",record)
-  return { data: record ? { university: record.university, universityEnabled: record.universityEnabled, universityRemark: record.universityRemark } : null };
+  return { data: record ? record.university:null};
 };
 
 
@@ -780,7 +1183,6 @@ export const getUniversityData = async (id) => {
 export const educationData = [
   {
     id: "1",
-    patientId: "PT-0001",
     educationYears: "12",
     scholarship: {
       enabled: true,
@@ -809,15 +1211,26 @@ export const educationData = [
       ],
       remark: "Strong performance in Science stream",
     },
-    university: [
-      {
-        degree: "BSc Computer Science",
-        institution: "University of Colombo",
-        marks: "First Class",
-      },
-    ],
-    universityEnabled: true,
-    universityRemark: "Graduated with honors",
+
+
+
+  university: {
+      enabled: true,
+      subjects: [
+        { name: "BSc Computer Science",institution: "University of Colombo", marks: "First Class" },
+      ],
+      remark: "",
+    },
+
+    // university: [
+    //   {
+    //     degree: "BSc Computer Science",
+    //     institution: "University of Colombo",
+    //     marks: "First Class",
+    //   },
+    // ],
+    // universityEnabled: true,
+    // universityRemark: "Graduated with honors",
   },
   {
     id: "2",
@@ -845,9 +1258,14 @@ export const educationData = [
       subjects: [],
       remark: "",
     },
-    university: [],
-    universityEnabled: false,
-    universityRemark: "",
+     university: {
+      enabled: true,
+      subjects: [
+        { name: "BSc Computer Science",institution: "University of Colombo", marks: "First Class" },
+      ],
+      remark: "Completed O/Ls with distinction",
+    },
+    
   },
   {
     id: "3",
@@ -880,15 +1298,16 @@ export const educationData = [
       ],
       remark: "Excelled in Commerce subjects",
     },
-    university: [
-      {
-        degree: "BCom",
-        institution: "University of Sri Jayewardenepura",
-        marks: "Second Class Upper",
-      },
-    ],
-    universityEnabled: true,
-    universityRemark: "Active in university societies",
+
+     university: {
+      enabled: true,
+      subjects: [
+        { name: "BCom",institution: "University of Sri Jayewardenepura", marks: "First Class" },
+      ],
+      remark: "Active in university societies",
+    },
+
+
   },
   {
     id: "4",
@@ -922,20 +1341,16 @@ export const educationData = [
       ],
       remark: "Strong interest in social sciences",
     },
-    university: [
-      {
-        degree: "BA English",
-        institution: "University of Peradeniya",
-        marks: "First Class",
-      },
-      {
-        degree: "MA English Literature",
-        institution: "University of Peradeniya",
-        marks: "Merit",
-      },
-    ],
-    universityEnabled: true,
-    universityRemark: "Pursued postgraduate studies",
+
+       university: {
+      enabled: true,
+      subjects: [
+        { name: "BA English",institution: "University of Peradeniya", marks: "First Class" },
+         { name: "MA English Literature",institution: "University of Peradeniya", marks: "First Class" },
+      ],
+      remark: "Pursued postgraduate studies",
+    },
+
   },
   {
     id: "5",
@@ -968,9 +1383,12 @@ export const educationData = [
       ],
       remark: "Interested in technical fields",
     },
-    university: [],
-    universityEnabled: false,
-    universityRemark: "",
+
+         university: {
+      enabled: false,
+      subjects: [],
+      remark: "",
+    },
   },
 ];
 

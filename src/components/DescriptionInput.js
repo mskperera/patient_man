@@ -75,7 +75,7 @@ const DescriptionInput = ({ patient, setPatient, setValue, isEditing, fieldName,
         htmlFor={`${fieldName}-description`}
         className="block text-sm text-gray-800"
       >
-        {label}
+      {label}   {patient[fieldName].required && <span className="text-red-500">*</span>} 
       </label>
       {isEditing ? (
         <div className="space-y-3">

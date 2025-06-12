@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getBadPointsOptions, getGoodPointsOptionsData, getOccupations, getPersonalInformationData, goodPointsOptionsData, personalInformationData, updatePersonalInformationData } from "../data/mockData";
+import { addPersonalInformationData, getBadPointsOptions, getGoodPointsOptionsData, getOccupations, getPersonalInformationData, goodPointsOptionsData, personalInformationData, updatePersonalInformationData } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
@@ -83,7 +83,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
       isTouched: false,
       isValid: true,
       required: true,
-      dataType: "string",
+      dataType: "array",
     },
     badPoints: {
       label: "Main Bad Points",
@@ -91,7 +91,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
       isTouched: false,
       isValid: true,
       required: true,
-      dataType: "string",
+      dataType: "array",
     },
     socialDifficulties: {
       label: "Main Social Difficulties",
@@ -264,8 +264,13 @@ const PersonalInformation = ({ id, setActiveTab }) => {
           },
         });
 
+ 
  setIsLoading(false);
-
+ setMode("edit");
+  }
+  else{
+   // setMode("add");
+    setIsLoading(false);
   }
 }
   // Load mock data based on id
@@ -273,7 +278,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
     if (id) {
 
       loadPersonalInformationData();
-        setMode("edit");
+      
       
     }
   }, [id]);
@@ -366,9 +371,19 @@ setIsSaving(true);
 
   // Validate individual field
   const validateField = (name, value, required, dataType) => {
+   
+    console.log('ddddata',name,dataType)
+   if(dataType==="string"){
     if (required && value.trim() === "") {
       return `${name} is required`;
     }
+  }
+
+  if(dataType==="array"){
+    if (required && value.length===0) {
+      return `${name} is required`;
+    }
+  }
 
     if (value && dataType === "number") {
       if (isNaN(value) || Number(value) < 0) {
@@ -424,15 +439,17 @@ setIsSaving(true);
     const { required, dataType } = personalInformation[fieldName];
     const error = validateField(personalInformation[fieldName].label, value, required, dataType);
 
+
     setPersonalInformation((prev) => ({
       ...prev,
       [fieldName]: {
         ...prev[fieldName],
-        value: dataType === "array" ? value.split(";;").filter((item) => item.trim()) : value,
+        value: value.split(";;").filter((item) => item.trim()),
         isTouched: true,
         isValid: error === "",
       },
     }));
+  
 
     setPersonalInformationErrors((prev) => ({
       ...prev,
@@ -507,14 +524,18 @@ setIsSaving(true);
   // Handle form submission
   const handleSubmitPersonalInformation = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     const isValid = validatePersonalInformation();
     console.log("isValid", isValid);
     if (isValid) {
       const submitPayload = generateSubmitPayload(personalInformation);
       console.log(submitPayload);
+      await addPersonalInformationData(submitPayload)
       setMode("edit");
-      setActiveTab("family");
+     // setActiveTab("family");
     }
+
+      setIsSaving(false);
   };
 
 
@@ -534,7 +555,7 @@ setIsSaving(true);
   // Helper function to render list items
   const renderListItems = (value) => {
     let items = [];
-    if (typeof value === "string" && value.includes(";;")) {
+    if (typeof value === "string") {
       items = value.split(";;").filter((item) => item.trim());
     } else if (Array.isArray(value)) {
       items = value.filter((item) => item.trim());
@@ -604,7 +625,7 @@ setIsSaving(true);
         {editingSection === "personalDetails" || mode === "add" ? (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Present Marital Status</label>
+              <label className="block text-sm font-medium text-gray-700">Present Marital Status {personalInformation.maritalStatus.required && <span className="text-red-500">*</span>}</label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 {maritalStatusOptions.map((option) => (
                   <label key={option.value} className="flex items-center">
@@ -628,7 +649,7 @@ setIsSaving(true);
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Number of Years Married to Present Spouse
+                  Number of Years Married to Present Spouse{personalInformation.yearsMarried.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
@@ -647,9 +668,11 @@ setIsSaving(true);
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Ages of Male Children</label>
+                <label className="block text-sm font-medium text-gray-700">Ages of Male Children{personalInformation.maleChildrenAges.required && <span className="text-red-500">*</span>}</label>
                 <input
                   name="maleChildrenAges"
+                  type="number"
+                  min="0"
                   value={personalInformation.maleChildrenAges.value}
                   onChange={handleChangePersonalInfo}
                   className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
@@ -661,9 +684,11 @@ setIsSaving(true);
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Ages of Female Children</label>
+                <label className="block text-sm font-medium text-gray-700">Ages of Female Children {personalInformation.femaleChildrenAges.required && <span className="text-red-500">*</span>}</label>
                 <input
                   name="femaleChildrenAges"
+                  type="number"
+                  min="0"
                   value={personalInformation.femaleChildrenAges.value}
                   onChange={handleChangePersonalInfo}
                   className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
@@ -678,7 +703,7 @@ setIsSaving(true);
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="col-span-2 mx-20">
                 <label className="block text-sm font-medium text-gray-700">
-                  How religious are you? (1 = Very Religious, 5 = Average, 9 = Atheist)
+                  How religious are you?{personalInformation.religiosity.required && <span className="text-red-500">*</span>} (1 = Very Religious, 5 = Average, 9 = Atheist)
                 </label>
                 <div className="mt-2 flex items-start justify-between">
                   <div className="flex w-full justify-between">
@@ -791,7 +816,7 @@ setIsSaving(true);
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                List the things you like to do most, kinds of things and persons that give you pleasure
+                List the things you like to do most, kinds of things and persons that give you pleasure {personalInformation.thingsLiked.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="thingsLiked"
@@ -850,7 +875,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                List your main social difficulties
+                List your main social difficulties{personalInformation.socialDifficulties.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="socialDifficulties"
@@ -867,7 +892,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                List your main love and sex difficulties
+                List your main love and sex difficulties{personalInformation.loveSexDifficulties.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="loveSexDifficulties"
@@ -884,7 +909,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                List your main school or work difficulties
+                List your main school or work difficulties{personalInformation.schoolWorkDifficulties.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="schoolWorkDifficulties"
@@ -900,7 +925,7 @@ setIsSaving(true);
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">List your main life goals</label>
+              <label className="block text-sm font-medium text-gray-700">List your main life goals{personalInformation.lifeGoals.required && <span className="text-red-500">*</span>}</label>
               <textarea
                 name="lifeGoals"
                 value={personalInformation.lifeGoals.value}
@@ -916,7 +941,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                List the things about yourself you would most like to change
+                List the things about yourself you would most like to change{personalInformation.thingsToChange.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="thingsToChange"
@@ -940,6 +965,7 @@ setIsSaving(true);
               <p className="text-gray-700 mt-1">{personalInformation.thingsLiked.value || "N/A"}</p>
               </div>
             </div>
+       
                <div className=" bg-white border border-gray-200 rounded-lg p-4">
               <strong className="text-sm">Main assets and good points:</strong>
                   <div className="mt-2"> 
@@ -1025,7 +1051,7 @@ setIsSaving(true);
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  What occupation(s) have you mainly been trained for?
+                  What occupation(s) have you mainly been trained for? {personalInformation.occupationTrained.required && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   name="occupationTrained"
@@ -1048,7 +1074,7 @@ setIsSaving(true);
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Present Occupation</label>
+                <label className="block text-sm font-medium text-gray-700">Present Occupation{personalInformation.occupation.required && <span className="text-red-500">*</span>}</label>
                 <select
                   name="occupation"
                   value={personalInformation.occupation.value}
@@ -1068,7 +1094,7 @@ setIsSaving(true);
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Occupation Status</label>
+                <label className="block text-sm font-medium text-gray-700">Occupation Status{personalInformation.occupationFullTime.required && <span className="text-red-500">*</span>}</label>
                 <div className="flex items-center space-x-4 mt-5">
                   <label className="flex items-center">
                     <input
@@ -1135,7 +1161,7 @@ setIsSaving(true);
             className="flex items-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
             aria-label="Save and go to next tab"
           >
-            Save & Next
+              {isSaving ? 'Saving...': 'Save'}
           </button>
         </div>
       )}

@@ -46,6 +46,7 @@ function PatientInfoEdit({ mode = "view" }) {
     gender: "",
   });
 
+  const [newId,setNewId]=useState('');
 
   const loadBasicInformationData = async () => {
     setIsLoading(true);
@@ -84,6 +85,7 @@ function PatientInfoEdit({ mode = "view" }) {
           <FaUser className="mr-3" size={28} />
           Patient Biographical Information
         </h2>
+        {JSON.stringify(newId)}
       </div>
 
       {/* {JSON.stringify(basicInfomation)} */}
@@ -207,7 +209,8 @@ function PatientInfoEdit({ mode = "view" }) {
         </section>
       </div>}
       
-      <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gray-200 rounded-lg">
+         <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
+
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
             activeTab === "basicInformation"
@@ -289,11 +292,11 @@ function PatientInfoEdit({ mode = "view" }) {
         </button>
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
-        {activeTab === "basicInformation" && <BasicInformationTab id={id} />}
-        {activeTab === "personal" && <PersonalInformationTab id={id} />}
-        {activeTab === "family" && <FamilyTab id={id} />}
-        {activeTab === "medical" && <MedicalTab id={id} />}
-        {activeTab === "education" && <EducationDetailsTab id={id} />}
+        {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
+        {activeTab === "personal" && <PersonalInformationTab id={id || newId} />}
+        {activeTab === "family" && <FamilyTab id={id || newId} />}
+        {activeTab === "medical" && <MedicalTab id={id || newId} />}
+        {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
         {activeTab === "notes" && <NotesTab />}
         {activeTab === "mentalExam" && <MentalStatusExamTab />}
       </form>

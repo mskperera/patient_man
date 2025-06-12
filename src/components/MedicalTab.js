@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { getMedicalInformationData, medicalInformationData, updateMedicalInformationData } from "../data/mockData";
+import { addMedicalInformationData, getMedicalInformationData, medicalInformationData, updateMedicalInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
 
@@ -134,7 +134,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
       setIsLoading(true);
       const result =await getMedicalInformationData(id);
         const patientData=result.data;
-        console.log('patientData',patientData.patientId)
+      
         if (patientData) {
     
         setMedicalInformation({
@@ -223,14 +223,21 @@ const MedicalTab = ({ id, setActiveTab }) => {
             isValid: true,
           },
         });
+
+       setIsLoading(false);
+ setMode("edit");
     }
-      setIsLoading(false);
+    else{
+  setMode("add");
+    setIsLoading(false);
+    }
+   
     }
     
     useEffect(() => {
       if (id) {  
         loadMedicalInformationData();
-           setMode("edit");
+       
       }
     }, [id]);
 
@@ -246,9 +253,19 @@ const MedicalTab = ({ id, setActiveTab }) => {
 
   // Validate individual field
   const validateField = (name, value, required, dataType) => {
-    if (required && (!value || value.toString().trim() === "")) {
+   
+    console.log('ddddata',name,dataType)
+   if(dataType==="string"){
+    if (required && value.trim() === "") {
       return `${name} is required`;
     }
+  }
+
+  if(dataType==="array"){
+    if (required && value.length===0) {
+      return `${name} is required`;
+    }
+  }
 
     if (value && dataType === "number") {
       if (isNaN(value) || Number(value) < 0) {
@@ -328,8 +345,9 @@ const MedicalTab = ({ id, setActiveTab }) => {
     if (isValid) {
       const submitPayload = generateSubmitPayload(medicalInformation);
       console.log("Medical Information Payload:", submitPayload);
+      addMedicalInformationData(submitPayload);
       setMode("edit");
-      setActiveTab("education"); // Navigate to the next tab
+     // setActiveTab("education"); // Navigate to the next tab
     }
   };
 
@@ -479,7 +497,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                List your chief physical ailments, diseases, complaints, or handicaps
+                List your chief physical ailments, diseases, complaints, or handicaps {medicalInformation.physicalAilments.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="physicalAilments"
@@ -496,7 +514,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Briefly list (PRINT) your present main complaints, symptoms, and problems
+                Briefly list (PRINT) your present main complaints, symptoms, and problems{medicalInformation.mainComplaints.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="mainComplaints"
@@ -513,7 +531,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Briefly list any additional past complaints, symptoms, and problems
+                Briefly list any additional past complaints, symptoms, and problems{medicalInformation.pastComplaints.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="pastComplaints"
@@ -530,7 +548,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Under what conditions are your problems worse?
+                Under what conditions are your problems worse?{medicalInformation.worseConditions.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="worseConditions"
@@ -547,7 +565,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Under what conditions are they improved?
+                Under what conditions are they improved?{medicalInformation.improvedConditions.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="improvedConditions"
@@ -642,10 +660,11 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-600">
-                    Hours of individual therapy
+                    Hours of individual therapy{medicalInformation.individualTherapyHours.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="number"
+                    min="0"
                     name="individualTherapyHours"
                     value={medicalInformation.individualTherapyHours.value}
                     onChange={handleChange}
@@ -659,10 +678,11 @@ const MedicalTab = ({ id, setActiveTab }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600">
-                    Spread over years
+                    Spread over years{medicalInformation.individualTherapyYears.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="number"
+                    min="0"
                     name="individualTherapyYears"
                     value={medicalInformation.individualTherapyYears.value}
                     onChange={handleChange}
@@ -676,10 +696,11 @@ const MedicalTab = ({ id, setActiveTab }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600">
-                    Ending years ago
+                    Ending years ago{medicalInformation.individualTherapyEndYears.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="number"
+                    min="0"
                     name="individualTherapyEndYears"
                     value={medicalInformation.individualTherapyEndYears.value}
                     onChange={handleChange}
@@ -695,10 +716,11 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-600">
-                    Hours of group therapy
+                    Hours of group therapy{medicalInformation.groupTherapyHours.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="number"
+                    min="0"
                     name="groupTherapyHours"
                     value={medicalInformation.groupTherapyHours.value}
                     onChange={handleChange}
@@ -712,10 +734,11 @@ const MedicalTab = ({ id, setActiveTab }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600">
-                    Months of psychiatric hospitalization
+                    Months of psychiatric hospitalization{medicalInformation.psychiatricHospitalizationMonths.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="number"
+                    min="0"
                     name="psychiatricHospitalizationMonths"
                     value={medicalInformation.psychiatricHospitalizationMonths.value}
                     onChange={handleChange}
@@ -731,7 +754,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Are you undergoing treatment anywhere else now?
+                Are you undergoing treatment anywhere else now?{medicalInformation.currentTreatment.required && <span className="text-red-500">*</span>}
               </label>
               <div className="flex space-x-4 mt-1">
                 <label className="flex items-center">
@@ -765,10 +788,11 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Number of times during past year you have taken antidepressants
+                Number of times during past year you have taken antidepressants{medicalInformation.antidepressantsCount.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
+                min="0"
                 name="antidepressantsCount"
                 value={medicalInformation.antidepressantsCount.value}
                 onChange={handleChange}
@@ -782,7 +806,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Type of psychotherapy you have mainly had (briefly describe method of treatment—ex., dream analysis, free association, drugs, hypnosis, etc.)
+                Type of psychotherapy you have mainly had{medicalInformation.psychotherapyType.required && <span className="text-red-500">*</span>} (briefly describe method of treatment—ex., dream analysis, free association, drugs, hypnosis, etc.)
               </label>
               <input
                 name="psychotherapyType"
@@ -798,7 +822,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Additional information that you think might be helpful
+                Additional information that you think might be helpful{medicalInformation.additionalInfo.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="additionalInfo"
@@ -883,7 +907,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
             className="flex items-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
             aria-label="Save and go to next tab"
           >
-            Save & Next
+           {isSaving ? 'Saving...': 'Save'}
           </button>
         </div>
       )}

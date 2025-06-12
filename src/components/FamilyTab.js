@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import {  getFamilyInformationData, getOccupations, getRaisedBy, getReligions, getTypesOfPerson, updateFamilyInformationData } from "../data/mockData";
+import {  addFamilyInformationData, getFamilyInformationData, getOccupations, getRaisedBy, getReligions, getTypesOfPerson, updateFamilyInformationData } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
@@ -353,23 +353,19 @@ const loadBasicInformationData=async()=>{
           },
           raisedBy: {
             ...familyInformation.raisedBy,
-            value: patientData.raisedBy ? patientData.raisedBy.split(";;").filter((item) => item.trim()) : [],
+            value:  patientData.raisedBy,
              isTouched: false,
             isValid: true,
           },
           motherDescription: {
             ...familyInformation.motherDescription,
-            value: patientData.motherDescription
-              ? patientData.motherDescription.split(";;").filter((item) => item.trim())
-              : [],
+            value: patientData.motherDescription,
              isTouched: false,
             isValid: true,
           },
           fatherDescription: {
             ...familyInformation.fatherDescription,
-            value: patientData.fatherDescription
-              ? patientData.fatherDescription.split(";;").filter((item) => item.trim())
-              : [],
+            value: patientData.fatherDescription,
              isTouched: false,
             isValid: true,
           },
@@ -476,15 +472,24 @@ const loadBasicInformationData=async()=>{
             isValid: true,
           },
         });
-      }
-      setIsLoading(false);
+
+     setIsLoading(false);
+    setMode("edit"); 
+ }
+ else{
+   // setMode("add");
+    setIsLoading(false);
+ }
+
+
+      
 }
 
   // Load mock data based on id
   useEffect(() => {
     if (id) {
      loadBasicInformationData();
-        setMode("edit"); 
+     
     }
   }, [id]);
 
@@ -499,11 +504,20 @@ const loadBasicInformationData=async()=>{
     }
   };
 
-  // Validate individual field
-  const validateField = (name, value, required, dataType) => {
-    if (required && (dataType === "array" ? value.length === 0 : !value || value.toString().trim() === "")) {
+    const validateField = (name, value, required, dataType) => {
+   
+    console.log('ddddata',name,dataType)
+   if(dataType==="string"){
+    if (required && value.trim() === "") {
       return `${name} is required`;
     }
+  }
+
+  if(dataType==="array"){
+    if (required && value.length===0) {
+      return `${name} is required`;
+    }
+  }
 
     if (value && dataType === "number") {
       if (isNaN(value) || Number(value) < 0) {
@@ -513,6 +527,21 @@ const loadBasicInformationData=async()=>{
 
     return "";
   };
+  
+  // Validate individual field
+  // const validateField = (name, value, required, dataType) => {
+  //   if (required && (dataType === "array" ? value.length === 0 : !value || value.toString().trim() === "")) {
+  //     return `${name} is required`;
+  //   }
+
+  //   if (value && dataType === "number") {
+  //     if (isNaN(value) || Number(value) < 0) {
+  //       return `${name} must be a valid non-negative number`;
+  //     }
+  //   }
+
+  //   return "";
+  // };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -546,7 +575,7 @@ const loadBasicInformationData=async()=>{
       ...prev,
       [fieldName]: {
         ...prev[fieldName],
-        value: dataType === "array" ? value.split(";;").filter((item) => item.trim()) : value,
+        value: value.split(";;").filter((item) => item.trim()),
         isTouched: true,
         isValid: error === "",
       },
@@ -625,8 +654,9 @@ const loadBasicInformationData=async()=>{
     if (isValid) {
       const submitPayload = generateSubmitPayload(familyInformation);
       console.log(submitPayload);
+      addFamilyInformationData(submitPayload);
       setMode("edit");
-      setActiveTab("medical"); // Adjust to the next tab as needed
+    //  setActiveTab("medical");
     }
   };
 
@@ -767,7 +797,7 @@ try{
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Spouse's Occupation
+                  Spouse's Occupation{familyInformation.spouseOccupation.required && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   name="spouseOccupation"
@@ -791,7 +821,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Spouse's Occupation Status
+                  Spouse's Occupation Status{familyInformation.spouseOccupationFullTime.required && <span className="text-red-500">*</span>}
                 </label>
                 <div className="flex items-center space-x-4 mt-5">
                   <label className="flex items-center">
@@ -905,10 +935,11 @@ try{
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Mother's Age
+                  Mother's Age{familyInformation.motherAge.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="motherAge"
                   value={familyInformation.motherAge.value}
                   onChange={handleChange}
@@ -924,10 +955,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  If deceased, how old were you when she died?
+                  If deceased, how old were you when she died?{familyInformation.ageWhenMotherDied.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="ageWhenMotherDied"
                   value={familyInformation.ageWhenMotherDied.value}
                   onChange={handleChange}
@@ -943,10 +975,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Father's Age
+                  Father's Age{familyInformation.fatherAge.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="fatherAge"
                   value={familyInformation.fatherAge.value}
                   onChange={handleChange}
@@ -962,10 +995,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  If deceased, how old were you when he died?
+                  If deceased, how old were you when he died?{familyInformation.ageWhenFatherDied.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="ageWhenFatherDied"
                   value={familyInformation.ageWhenFatherDied.value}
                   onChange={handleChange}
@@ -981,7 +1015,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Mother's Occupation
+                  Mother's Occupation{familyInformation.motherOccupation.required && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   name="motherOccupation"
@@ -1005,7 +1039,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Father's Occupation
+                  Father's Occupation{familyInformation.fatherOccupation.required && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   name="fatherOccupation"
@@ -1029,7 +1063,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Mother's Religion
+                  Mother's Religion{familyInformation.motherReligion.required && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   name="motherReligion"
@@ -1053,7 +1087,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Father's Religion
+                  Father's Religion{familyInformation.fatherReligion.required && <span className="text-red-500">*</span>}
                 </label>
                 <select
                   name="fatherReligion"
@@ -1267,10 +1301,11 @@ try{
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   If your mother and father separated, how old were you at the
-                  time?
+                  time?{familyInformation.parentalSeparationAge.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="parentalSeparationAge"
                   value={familyInformation.parentalSeparationAge.value}
                   onChange={handleChange}
@@ -1287,10 +1322,11 @@ try{
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   If your mother and father divorced, how old were you at the
-                  time?
+                  time?{familyInformation.parentalDivorceAge.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="parentalDivorceAge"
                   value={familyInformation.parentalDivorceAge.value}
                   onChange={handleChange}
@@ -1306,10 +1342,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Total number of times mother divorced
+                  Total number of times mother divorced{familyInformation.motherDivorceCount.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="motherDivorceCount"
                   value={familyInformation.motherDivorceCount.value}
                   onChange={handleChange}
@@ -1325,10 +1362,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Total number of times father divorced
+                  Total number of times father divorced{familyInformation.fatherDivorceCount.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="fatherDivorceCount"
                   value={familyInformation.fatherDivorceCount.value}
                   onChange={handleChange}
@@ -1344,10 +1382,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Number of living brothers
+                  Number of living brothers{familyInformation.livingBrothers.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="livingBrothers"
                   value={familyInformation.livingBrothers.value}
                   onChange={handleChange}
@@ -1363,10 +1402,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Number of living sisters
+                  Number of living sisters{familyInformation.livingSisters.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="livingSisters"
                   value={familyInformation.livingSisters.value}
                   onChange={handleChange}
@@ -1382,7 +1422,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Ages of living brothers
+                  Ages of living brothers{familyInformation.brothersAges.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   name="brothersAges"
@@ -1400,7 +1440,7 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Ages of living sisters
+                  Ages of living sisters{familyInformation.sistersAges.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   name="sistersAges"
@@ -1418,10 +1458,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  I was child number
+                  I was child number{familyInformation.childNumber.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="childNumber"
                   value={familyInformation.childNumber.value}
                   onChange={handleChange}
@@ -1437,10 +1478,11 @@ try{
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  In a family of children
+                  In a family of children{familyInformation.familyChildren.required && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="number"
+                  min="0"
                   name="familyChildren"
                   value={familyInformation.familyChildren.value}
                   onChange={handleChange}
@@ -1457,7 +1499,7 @@ try{
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Were you adopted?
+                Were you adopted?{familyInformation.adopted.required && <span className="text-red-500">*</span>}
               </label>
               <div className="flex space-x-4 mt-1">
                 <label className="flex items-center">
@@ -1494,7 +1536,7 @@ try{
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 If there were unusually disturbing features in your relationship
-                to any of your brothers, briefly describe
+                to any of your brothers, briefly describe{familyInformation.brotherDisturbances.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="brotherDisturbances"
@@ -1514,7 +1556,7 @@ try{
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 If there were unusually disturbing features in your relationship
-                to any of your sisters, briefly describe
+                to any of your sisters, briefly describe{familyInformation.sisterDisturbances.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="sisterDisturbances"
@@ -1672,10 +1714,11 @@ try{
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Number of close male relatives who have been seriously
-                emotionally disturbed
+                emotionally disturbed{familyInformation.maleRelativesDisturbed.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
+                min="0"
                 name="maleRelativesDisturbed"
                 value={familyInformation.maleRelativesDisturbed.value}
                 onChange={handleChange}
@@ -1692,10 +1735,11 @@ try{
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Number that have been hospitalized for psychiatric treatment, or
-                have attempted suicide
+                have attempted suicide{familyInformation.maleRelativesHospitalized.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
+                min="0"
                 name="maleRelativesHospitalized"
                 value={familyInformation.maleRelativesHospitalized.value}
                 onChange={handleChange}
@@ -1712,10 +1756,11 @@ try{
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Number of close female relatives who have been seriously
-                emotionally disturbed
+                emotionally disturbed{familyInformation.femaleRelativesDisturbed.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
+                min="0"
                 name="femaleRelativesDisturbed"
                 value={familyInformation.femaleRelativesDisturbed.value}
                 onChange={handleChange}
@@ -1732,10 +1777,11 @@ try{
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Number that have been hospitalized for psychiatric treatment, or
-                have attempted suicide
+                have attempted suicide{familyInformation.femaleRelativesHospitalized.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
+                min="0"
                 name="femaleRelativesHospitalized"
                 value={familyInformation.femaleRelativesHospitalized.value}
                 onChange={handleChange}
@@ -1802,7 +1848,7 @@ try{
             className="flex items-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
             aria-label="Save and go to next tab"
           >
-            Save & Next
+             {isSaving ? 'Saving...': 'Save'}
           </button>
         </div>
       )}

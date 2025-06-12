@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { getBasicInformationData, updateBasicInformationData } from "../data/mockData";
+import { addBasicInformationData, getBasicInformationData, updateBasicInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
 
-const BasicInformationTab = ({ id }) => {
+const BasicInformationTab = ({ id,setNewId }) => {
 
 
   const [basicInformationErrors, setBasicInformationErrors] = useState({});
@@ -418,15 +418,36 @@ setIsSaving(true);
     return payload;
   };
 
-  const handleSubmitBasicInformation = (e) => {
+  const handleSubmitBasicInformation =async (e) => {
     e.preventDefault();
+       setIsSaving(true);
     const isValid = validateBasicInformation();
     console.log("isValid", isValid);
-    if (isValid) {
+
+if(!isValid){
+  setIsSaving(false);
+  return;
+}
+
       const submitPayload = generateSubmitPayload(basicInformation);
+      try{
+      
+    const res=await addBasicInformationData(submitPayload);
+setNewId(res.newId);
       console.log(submitPayload);
       setMode("edit");
-    }
+       setIsSaving(false);
+      }
+      catch(err){
+         console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+      setIsSaving(false);
+      }
+    
   };
 
   return (
@@ -474,26 +495,27 @@ setIsSaving(true);
         {editingSection === "basic" || mode === "add" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Last Name
-              </label>
-              <input
-                name="lastName"
-                value={basicInformation.lastName.value}
-                onChange={handleChangeBasicInfo}
-                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                placeholder="Enter last name"
-                aria-label="Last name"
-              />
-              {basicInformationErrors.lastName && (
-                <p className="mt-1 text-sm text-red-600">
-                  {basicInformationErrors.lastName}
-                </p>
-              )}
-            </div>
+  <label className="block text-sm font-medium text-gray-700">
+    Last Name {basicInformation.lastName.required && <span className="text-red-500">*</span>}
+  </label>
+  <input
+    name="lastName"
+    value={basicInformation.lastName.value}
+    onChange={handleChangeBasicInfo}
+    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+    placeholder="Enter last name"
+    aria-label="Last name"
+    required
+  />
+  {basicInformationErrors.lastName && (
+    <p className="mt-1 text-sm text-red-600">
+      {basicInformationErrors.lastName}
+    </p>
+  )}
+</div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                First Name
+                First Name {basicInformation.firstName.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 name="firstName"
@@ -511,7 +533,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Middle Name
+                Middle Name  {basicInformation.middleName.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 name="middleName"
@@ -529,7 +551,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Date of Birth
+                Date of Birth {basicInformation.dob.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="date"
@@ -547,7 +569,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Age
+                Age  {basicInformation.age.required && <span className="text-red-500">*</span>}
               </label>
               <div className="flex items-center gap-2 p-3 border text-sm border-gray-300 rounded-md bg-gray-50">
                 <span className="text-gray-900 text-base font-medium">
@@ -558,7 +580,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Sex
+                Sex{basicInformation.gender.required && <span className="text-red-500">*</span>}
               </label>
               <div className="flex space-x-4 mt-1">
                 <label className="flex items-center">
@@ -594,7 +616,7 @@ setIsSaving(true);
             </div>
             <div className="md:col-span-3">
               <label className="block text-sm font-medium text-gray-700">
-                Permanent Address
+                Permanent Address{basicInformation.permanentAddress.required && <span className="text-red-500">*</span>}
               </label>
               <textarea
                 name="permanentAddress"
@@ -613,7 +635,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Home Phone
+                Home Phone{basicInformation.homePhone.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 name="homePhone"
@@ -631,7 +653,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Business Phone
+                Business Phone{basicInformation.businessPhone.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 name="businessPhone"
@@ -649,7 +671,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Email
+                Email{basicInformation.email.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 name="email"
@@ -670,7 +692,7 @@ setIsSaving(true);
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700">
-                    Who referred you to the Institute?
+                    Who referred you to the Institute?{basicInformation.referralSource.required && <span className="text-red-500">*</span>}
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
                     {[
@@ -721,7 +743,7 @@ setIsSaving(true);
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Has this party been here?
+                    Has this party been here?{basicInformation.referralPartyPresent.required && <span className="text-red-500">*</span>}
                   </label>
                   <div className="flex space-x-4 mt-1">
                     <label className="flex items-center">
@@ -864,8 +886,9 @@ setIsSaving(true);
             }}
             className="flex items-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
             aria-label="Save and go to next tab"
+            disabled={isSaving}
           >
-            Save & Next
+           {isSaving ? 'Saving...': 'Save'}
           </button>
         </div>
       )}
