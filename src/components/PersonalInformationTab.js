@@ -5,6 +5,7 @@ import { addPersonalInformationData, getBadPointsOptions, getGoodPointsOptionsDa
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
+import { getPatientPersonalInfo } from "../functions/patient";
 
 
  const maritalStatusOptions = [
@@ -161,8 +162,24 @@ const PersonalInformation = ({ id, setActiveTab }) => {
 
   const loadPersonalInformationData=async()=>{
   setIsLoading(true);
-  const result =await getPersonalInformationData(id);
-    const patientData=result.data;
+  //const result =await getPersonalInformationData(id);
+    const result =await getPatientPersonalInfo(id);
+  const patientData=result.data;
+  
+  if(patientData.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
+
+    if(patientData){
+ setMode("edit"); 
+}
+
+  
   if (patientData) {
         setPersonalInformation({
           maritalStatus: {
@@ -266,7 +283,6 @@ const PersonalInformation = ({ id, setActiveTab }) => {
 
  
  setIsLoading(false);
- setMode("edit");
   }
   else{
    // setMode("add");

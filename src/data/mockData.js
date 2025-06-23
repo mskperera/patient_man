@@ -2,21 +2,21 @@ export const getOccupations =async()=>{
 
        await new Promise(resolve => setTimeout(resolve, 500));
 const data= [
-  { id: 1, name: 'Software Engineer' },
-  { id: 2, name: 'Teacher' },
-  { id: 3, name: 'Doctor' },
-  { id: 4, name: 'Nurse' },
-  { id: 5, name: 'Accountant' },
-  { id: 6, name: 'Engineer' },
-  { id: 7, name: 'Lawyer' },
-  { id: 8, name: 'Business Analyst' },
-  { id: 9, name: 'Marketing Manager' },
-  { id: 10, name: 'Sales Representative' },
-  { id: 11, name: 'Graphic Designer' },
-  { id: 12, name: 'Construction Worker' },
-  { id: 13, name: 'Chef' },
-  { id: 14, name: 'Retail Manager' },
-  { id: 15, name: 'Other' }
+  { value: 1, name: 'Software Engineer' },
+  { value: 2, name: 'Teacher' },
+  { value: 3, name: 'Doctor' },
+  { value: 4, name: 'Nurse' },
+  { value: 5, name: 'Accountant' },
+  { value: 6, name: 'Engineer' },
+  { value: 7, name: 'Lawyer' },
+  { value: 8, name: 'Business Analyst' },
+  { value: 9, name: 'Marketing Manager' },
+  { value: 10, name: 'Sales Representative' },
+  { value: 11, name: 'Graphic Designer' },
+  { value: 12, name: 'Construction Worker' },
+  { value: 13, name: 'Chef' },
+  { value: 14, name: 'Retail Manager' },
+  { value: 15, name: 'Other' }
 ];
 
 return {data};
@@ -28,15 +28,15 @@ export const getReligions =async()=>{
       await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
-  { id: 1, name: 'Buddhism' },
-  { id: 2, name: 'Christianity' },
-  { id: 3, name: 'Hinduism' },
-  { id: 4, name: 'Islam' },
-  { id: 5, name: 'Sikhism' },
-  { id: 6, name: 'Judaism' },
-  { id: 7, name: 'Atheism' },
-  { id: 8, name: 'Agnosticism' },
-  { id: 9, name: 'Other' }
+  { value: 1, name: 'Buddhism' },
+  { value: 2, name: 'Christianity' },
+  { value: 3, name: 'Hinduism' },
+  { value: 4, name: 'Islam' },
+  { value: 5, name: 'Sikhism' },
+  { value: 6, name: 'Judaism' },
+  { value: 7, name: 'Atheism' },
+  { value: 8, name: 'Agnosticism' },
+  { value: 9, name: 'Other' }
 ];
 
 return {data};
@@ -47,8 +47,8 @@ return {data};
 
 export const basicInformationData = [
   {
-    id: "1",
-    patientId: "PT-0001",
+    patientId: "1",
+    patientNo: "PT-0001",
     firstName: "John",
     lastName: "Perera",
     middleName: "Peter",
@@ -65,8 +65,8 @@ export const basicInformationData = [
     lastModified: "2024-06-02T10:15:30"
   },
   {
-    id: "2",
-    patientId: "PT-0002",
+    patientId: "2",
+    patientNo: "PT-0002",
     firstName: "Ama",
     lastName: "Silva",
     middleName: "",
@@ -83,8 +83,8 @@ export const basicInformationData = [
     lastModified: "2024-06-01T08:45:10"
   },
   {
-    id: "3",
-    patientId: "PT-0003",
+    patientId: "3",
+    patientNo: "PT-0003",
     firstName: "Nimal",
     lastName: "Fernando",
     middleName: "Kumar",
@@ -101,8 +101,8 @@ export const basicInformationData = [
     lastModified: "2024-05-28T13:30:55"
   },
   {
-    id: "4",
-    patientId: "PT-0004",
+    patientId: "4",
+    patientNo: "PT-0004",
     firstName: "Sita",
     lastName: "Wijesinghe",
     middleName: "Rani",
@@ -119,8 +119,8 @@ export const basicInformationData = [
     lastModified: "2024-04-01T17:20:00"
   },
   {
-    id: "5",
-    patientId: "PT-0005",
+    patientId: "5",
+    patientNo: "PT-0005",
     firstName: "Tharushi",
     lastName: "Jayasinghe",
     middleName: "",
@@ -150,8 +150,8 @@ export const getPatientList = async () => {
 
     // Map basicInformationData to the required patient list format
     const patients = basicInformationData.map(patient => ({
-        id: patient.id,
         patientId: patient.patientId,
+        patientNo: patient.patientNo,
         name: formatName(patient),
         gender: patient.gender,
         phone: patient.homePhone,
@@ -161,9 +161,9 @@ export const getPatientList = async () => {
     return { data: patients };
 };
 
-export const getBasicInformationData = async (id) => {
+export const getBasicInformationData = async (patientId) => {
      await new Promise(resolve => setTimeout(resolve, 500));
-  const data = basicInformationData.find((p) => p.id === id);
+  const data = basicInformationData.find((p) => p.patientId === patientId);
   return { data: data || null };
 };
 
@@ -174,12 +174,12 @@ export const addBasicInformationData = async (newData) => {
 
     // Generate a new unique ID
     const newId = (basicInformationData.length + 1).toString();
-    const newPatientId = `PT-${String(basicInformationData.length + 1).padStart(4, '0')}`;
+    const newPatientNo= `P${String(basicInformationData.length + 1).padStart(4, '0')}`;
 
     // Create new patient record
     const newRecord = {
-        id: newId,
-        patientId: newPatientId,
+        patientId: newId,
+        patientNo: newPatientNo,
         firstName: newData.firstName || '',
         lastName: newData.lastName || '',
         middleName: newData.middleName || '',
@@ -202,18 +202,18 @@ export const addBasicInformationData = async (newData) => {
     return { success: true, data: newRecord,newId };
 };
 
-export const updateBasicInformationData = async (id, updatedData) => {
+export const updateBasicInformationData = async (patientId, updatedData) => {
       await new Promise(resolve => setTimeout(resolve, 500));
-  const index = basicInformationData.findIndex((p) => p.id === id);
+  const index = basicInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   basicInformationData[index] = { ...basicInformationData[index], ...updatedData, lastModified: new Date().toISOString() };
  //throw new Error("update basic error")
   return { success: true, data: basicInformationData[index] };
 };
 
-export const deleteBasicInformationData = async (id) => {
+export const deleteBasicInformationData = async (patientId) => {
      await new Promise(resolve => setTimeout(resolve, 500));
-  const index = basicInformationData.findIndex((p) => p.id === id);
+  const index = basicInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = basicInformationData.splice(index, 1)[0];
   return { success: true, data: deleted };
@@ -221,8 +221,8 @@ export const deleteBasicInformationData = async (id) => {
 
 export const personalInformationData = [
   {
-    id: "1",
-    patientId: "PT-0001",
+    patientId: "1",
+    patientNo: "PT-0001",
     maritalStatus: "married_first_time",
     yearsMarried: "10",
     maleChildrenAges: "5, 8",
@@ -241,8 +241,8 @@ export const personalInformationData = [
     occupationFullTime: "full-time",
   },
   {
-    id: "2",
-    patientId: "PT-0002",
+    patientId: "2",
+    patientNo: "PT-0002",
     maritalStatus: "divorced_not_remarried",
     yearsMarried: "",
     maleChildrenAges: "",
@@ -261,8 +261,8 @@ export const personalInformationData = [
     occupationFullTime: "full-time",
   },
   {
-    id: "3",
-    patientId: "PT-0003",
+    patientId: "3",
+    patientNo: "PT-0003",
     maritalStatus: "never_married",
     yearsMarried: "",
     maleChildrenAges: "",
@@ -281,8 +281,8 @@ export const personalInformationData = [
     occupationFullTime: "part-time",
   },
   {
-    id: "4",
-    patientId: "PT-0004",
+    patientId: "4",
+    patientNo: "PT-0004",
     maritalStatus: "widowed_not_remarried",
     yearsMarried: "",
     maleChildrenAges: "25",
@@ -301,8 +301,8 @@ export const personalInformationData = [
     occupationFullTime: "full-time",
   },
   {
-    id: "5",
-    patientId: "PT-0005",
+    patientId: "5",
+    patientNo: "PT-0005",
     maritalStatus: "never_married",
     yearsMarried: "",
     maleChildrenAges: "",
@@ -323,15 +323,6 @@ export const personalInformationData = [
 ];
 
 
-export const getPersonalInformationData = async (id) => {
-    // Simulate a delay of 1 second (1000 milliseconds)
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    const data = personalInformationData.find((p) => p.id === id);
-    return { data };
-}
-
-
 export const addPersonalInformationData = async (newData) => {
     // Simulate a delay of 500 milliseconds
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -341,7 +332,7 @@ export const addPersonalInformationData = async (newData) => {
 
     // Create new personal information record
     const newRecord = {
-        id: newId,
+        patientId: newId,
         maritalStatus: newData.maritalStatus || '',
         yearsMarried: newData.yearsMarried || '',
         maleChildrenAges: newData.maleChildrenAges || '',
@@ -395,35 +386,45 @@ export const addPersonalInformationData = async (newData) => {
 };
 
 
-export const updatePersonalInformationData = async (id, updatedData) => {
+export const getPersonalInformationData = async (patientId) => {
+    // Simulate a delay of 1 second (1000 milliseconds)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const data = personalInformationData.find((p) => p.patientId === patientId);
+    return { data };
+}
+
+
+
+
+export const updatePersonalInformationData = async (patientId, updatedData) => {
      await new Promise(resolve => setTimeout(resolve, 500));
-  const index = personalInformationData.findIndex((p) => p.id === id);
+  const index = personalInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   personalInformationData[index] = { ...personalInformationData[index], ...updatedData };
   //throw new Error("errrrrrr")
   return { success: true, data: personalInformationData[index] };
 };
 
-export const deletePersonalInformationData = async (id) => {
+export const deletePersonalInformationData = async (patientId) => {
       await new Promise(resolve => setTimeout(resolve, 500));
-  const index = personalInformationData.findIndex((p) => p.id === id);
+  const index = personalInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = personalInformationData.splice(index, 1)[0];
   return { success: true, data: deleted };
 };
 
-export const getFamilyInformationData = async (id) => {
+export const getFamilyInformationData = async (patientId) => {
     // Simulate a delay of 1 second (1000 milliseconds)
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const data = familyInformationData.find((p) => p.id === id);
+    const data = familyInformationData.find((p) => p.patientId === patientId);
     return { data };
 }
 
 export const familyInformationData = [
   {
-    id: "1",
-    patientId: "P001",
+    patientId: "1",
     spouseOccupation: "Teacher",
     spouseOccupationFullTime: "full-time",
     motherAge: "55",
@@ -456,8 +457,7 @@ export const familyInformationData = [
     femaleRelativesHospitalized: "0",
   },
   {
-    id: "2",
-    patientId: "P002",
+    patientId: "2",
     spouseOccupation: "",
     spouseOccupationFullTime: "",
     motherAge: "60",
@@ -490,8 +490,7 @@ export const familyInformationData = [
     femaleRelativesHospitalized: "0",
   },
   {
-    id: "3",
-    patientId: "P003",
+    patientId: "3",
     spouseOccupation: "Engineer",
     spouseOccupationFullTime: "part-time",
     motherAge: "",
@@ -524,8 +523,7 @@ export const familyInformationData = [
     femaleRelativesHospitalized: "0",
   },
   {
-    id: "4",
-    patientId: "P004",
+    patientId: "4",
     spouseOccupation: "",
     spouseOccupationFullTime: "",
     motherAge: "50",
@@ -558,8 +556,7 @@ export const familyInformationData = [
     femaleRelativesHospitalized: "0",
   },
   {
-    id: "5",
-    patientId: "P005",
+    patientId: "5",
     spouseOccupation: "Doctor",
     spouseOccupationFullTime: "full-time",
     motherAge: "",
@@ -602,7 +599,7 @@ export const addFamilyInformationData = async (newData) => {
 
     // Create new family information record
     const newRecord = {
-        id: newId,
+        patientId: newId,
         spouseOccupation: newData.spouseOccupation || '',
         spouseOccupationFullTime: newData.spouseOccupationFullTime || '',
         motherAge: newData.motherAge || '',
@@ -684,18 +681,18 @@ export const addFamilyInformationData = async (newData) => {
     return { success: true, data: newRecord };
 };
 
-export const updateFamilyInformationData = async (id, updatedData) => {
+export const updateFamilyInformationData = async (patientId, updatedData) => {
       await new Promise(resolve => setTimeout(resolve, 500));
-  const index = familyInformationData.findIndex((p) => p.id === id);
+  const index = familyInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   familyInformationData[index] = { ...familyInformationData[index], ...updatedData };
   //throw new Error("fdfsfkldfjsdfjsldjfsjkl")
   return { success: true, data: familyInformationData[index] };
 };
 
-export const deleteFamilyInformationData = async (id) => {
+export const deleteFamilyInformationData = async (patientId) => {
       await new Promise(resolve => setTimeout(resolve, 500));
-  const index = familyInformationData.findIndex((p) => p.id === id);
+  const index = familyInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = familyInformationData.splice(index, 1)[0];
   return { success: true, data: deleted };
@@ -708,19 +705,19 @@ export const getTypesOfPerson =async()=>{
       await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
-  { id: "201", name: "Supportive" },
-    { id: "202", name: "Strict" },
-    { id: "203", name: "Caring" },
-    { id: "204", name: "Distant" },
-    { id: "205", name: "Encouraging" },
-    { id: "206", name: "Critical" },
-    { id: "207", name: "Loving" },
-    { id: "208", name: "Overprotective" },
-    { id: "209", name: "Traditional" },
-    { id: "210", name: "Warm" },
-    { id: "211", name: "Disciplined" },
-    { id: "212", name: "Anxious" },
-    { id: "213", name: "Other" },
+  { patientId: "201", name: "Supportive" },
+    { patientId: "202", name: "Strict" },
+    { patientId: "203", name: "Caring" },
+    { patientId: "204", name: "Distant" },
+    { patientId: "205", name: "Encouraging" },
+    { patientId: "206", name: "Critical" },
+    { patientId: "207", name: "Loving" },
+    { patientId: "208", name: "Overprotective" },
+    { patientId: "209", name: "Traditional" },
+    { patientId: "210", name: "Warm" },
+    { patientId: "211", name: "Disciplined" },
+    { patientId: "212", name: "Anxious" },
+    { patientId: "213", name: "Other" },
 ];
 
 return {data};
@@ -733,17 +730,17 @@ export const getRaisedBy =async()=>{
       await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
-    { id: "301", name: "Parents" },
-    { id: "302", name: "Grandparents" },
-    { id: "303", name: "Aunt" },
-    { id: "304", name: "Uncle" },
-    { id: "305", name: "Older Sibling" },
-    { id: "306", name: "Foster Parents" },
-    { id: "307", name: "Adoptive Parents" },
-    { id: "308", name: "Guardian" },
-    { id: "309", name: "Single Mother" },
-    { id: "310", name: "Single Father" },
-    { id: "311", name: "Other" },
+    { patientId: "301", name: "Parents" },
+    { patientId: "302", name: "Grandparents" },
+    { patientId: "303", name: "Aunt" },
+    { patientId: "304", name: "Uncle" },
+    { patientId: "305", name: "Older Sibling" },
+    { patientId: "306", name: "Foster Parents" },
+    { patientId: "307", name: "Adoptive Parents" },
+    { patientId: "308", name: "Guardian" },
+    { patientId: "309", name: "Single Mother" },
+    { patientId: "310", name: "Single Father" },
+    { patientId: "311", name: "Other" },
 ];
 
 return {data};
@@ -751,18 +748,18 @@ return {data};
 }
 
 
-export const getMedicalInformationData = async (id) => {
+export const getMedicalInformationData = async (patientId) => {
     // Simulate a delay of 1 second (1000 milliseconds)
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const data = medicalInformationData.find((p) => p.id === id);
+    const data = medicalInformationData.find((p) => p.patientId === patientId);
     return { data };
 }
 
 export const medicalInformationData = [
   {
-    id: "1",
-    patientId: "PT-0001",
+    patientId: "1",
+    patientNo: "PT-0001",
     physicalAilments: "Chronic back pain, hypertension",
     mainComplaints: "Persistent lower back pain, occasional headaches",
     pastComplaints: "Sprained ankle (2020), seasonal allergies",
@@ -779,8 +776,8 @@ export const medicalInformationData = [
     additionalInfo: "Family history of hypertension",
   },
   {
-    id: "2",
-    patientId: "PT-0002",
+    patientId: "2",
+    patientNo: "PT-0002",
     physicalAilments: "Type 2 diabetes",
     mainComplaints: "Fatigue, difficulty managing blood sugar levels",
     pastComplaints: "Migraines (2018-2020)",
@@ -797,8 +794,8 @@ export const medicalInformationData = [
     additionalInfo: "Recently started a new exercise regimen",
   },
   {
-    id: "3",
-    patientId: "PT-0003",
+    patientId: "3",
+    patientNo: "PT-0003",
     physicalAilments: "None",
     mainComplaints: "Anxiety and difficulty sleeping",
     pastComplaints: "Minor depression (2021)",
@@ -815,8 +812,8 @@ export const medicalInformationData = [
     additionalInfo: "Interested in exploring meditation further",
   },
   {
-    id: "4",
-    patientId: "PT-0004",
+    patientId: "4",
+    patientNo: "PT-0004",
     physicalAilments: "Arthritis, high cholesterol",
     mainComplaints: "Joint pain, fatigue",
     pastComplaints: "Broken wrist (2015)",
@@ -833,8 +830,8 @@ export const medicalInformationData = [
     additionalInfo: "Regular checkups with rheumatologist",
   },
   {
-    id: "5",
-    patientId: "PT-0005",
+    patientId: "5",
+    patientNo: "PT-0005",
     physicalAilments: "Asthma",
     mainComplaints: "Shortness of breath during physical activity",
     pastComplaints: "Childhood eczema",
@@ -861,7 +858,7 @@ export const addMedicalInformationData = async (newData) => {
 
     // Create new medical information record
     const newRecord = {
-        id: newId,
+        patientId: newId,
         physicalAilments: newData.physicalAilments || '',
         mainComplaints: newData.mainComplaints || '',
         pastComplaints: newData.pastComplaints || '',
@@ -919,18 +916,18 @@ export const addMedicalInformationData = async (newData) => {
     return { success: true, data: newRecord };
 };
 
-export const updateMedicalInformationData = async (id, updatedData) => {
+export const updateMedicalInformationData = async (patientId, updatedData) => {
        await new Promise(resolve => setTimeout(resolve, 500));
-  const index = medicalInformationData.findIndex((p) => p.id === id);
+  const index = medicalInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   medicalInformationData[index] = { ...medicalInformationData[index], ...updatedData };
   //throw new Error("dfsjfloooooooooooooooo")
   return { success: true, data: medicalInformationData[index] };
 };
 
-export const deleteMedicalInformationData = async (id) => {
+export const deleteMedicalInformationData = async (patientId) => {
       await new Promise(resolve => setTimeout(resolve, 500));
-  const index = medicalInformationData.findIndex((p) => p.id === id);
+  const index = medicalInformationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = medicalInformationData.splice(index, 1)[0];
   return { success: true, data: deleted };
@@ -941,22 +938,22 @@ export const deleteMedicalInformationData = async (id) => {
 
 
 
-export const getEducationData = async (id) => {
+export const getEducationData = async (patientId) => {
     // Simulate a delay of 1 second (1000 milliseconds)
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const data = educationData.find((p) => p.id === id);
+    const data = educationData.find((p) => p.patientId === patientId);
     return { data };
 }
 
 
-export const addEducationData = async (id, newData) => {
+export const addEducationData = async (patientId, newData) => {
     // Simulate a delay of 500 milliseconds
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Create new education record
     const newRecord = {
-        id: id,
+        patientId: patientId,
         educationYears: newData.educationYears || '',
         scholarship: {
             enabled: newData.scholarship?.enabled !== false,
@@ -1078,9 +1075,9 @@ export const addEducationData = async (id, newData) => {
         return { success: false, error: `Error saving data: ${error.message}` };
     }
 };
-export const updateEducationData = async (id, updatedData) => {
+export const updateEducationData = async (patientId, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
   return { success: true, data: educationData[index] };
@@ -1088,18 +1085,18 @@ export const updateEducationData = async (id, updatedData) => {
 
 
 
-export const updateEducationYearsData = async (id, updatedData) => {
+export const updateEducationYearsData = async (patientId, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
      // throw new Error("error updateEducationYearsData")
   return { success: true, data: educationData[index] };
 };
 
-export const updateScholarshipData = async (id, updatedData) => {
+export const updateScholarshipData = async (patientId, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
      // throw new Error("error updateScholarshipData")
@@ -1107,36 +1104,36 @@ export const updateScholarshipData = async (id, updatedData) => {
 };
 
 
-export const updateOLData = async (id, updatedData) => {
+export const updateOLData = async (patientId, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
    // throw new Error("error updateOLData")
   return { success: true, data: educationData[index] };
 };
 
-export const updateALData = async (id, updatedData) => {
+export const updateALData = async (patientId, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
    // throw new Error("error updateALData")
   return { success: true, data: educationData[index] };
 };
 
-export const updateUniversityData = async (id, updatedData) => {
+export const updateUniversityData = async (patientId, updatedData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   educationData[index] = { ...educationData[index], ...updatedData };
    //   throw new Error("error updateUniversityData")
   return { success: true, data: educationData[index] };
 };
 
-export const deleteEducationData = async (id) => {
+export const deleteEducationData = async (patientId) => {
        await new Promise(resolve => setTimeout(resolve, 500));
-  const index = educationData.findIndex((p) => p.id === id);
+  const index = educationData.findIndex((p) => p.patientId === patientId);
   if (index === -1) return { success: false, message: "Record not found" };
   const deleted = educationData.splice(index, 1)[0];
   return { success: true, data: deleted };
@@ -1146,34 +1143,34 @@ export const deleteEducationData = async (id) => {
 
 
 
-export const getEducationYearsData = async (id) => {
+export const getEducationYearsData = async (patientId) => {
   await new Promise(resolve => setTimeout(resolve, 100));
-  const record = educationData.find((p) => p.id === id);
+  const record = educationData.find((p) => p.patientId === patientId);
   return { data: record ? record.educationYears : null };
 };
 
-export const getScholarshipData = async (id) => {
+export const getScholarshipData = async (patientId) => {
     await new Promise(resolve => setTimeout(resolve, 100));
-  const record = educationData.find((p) => p.id === id);
+  const record = educationData.find((p) => p.patientId === patientId);
   return { data: record ?  record.scholarship : null };
 };
 
-export const getOLData = async (id) => {
+export const getOLData = async (patientId) => {
   await new Promise(resolve => setTimeout(resolve, 100));
-  const record = educationData.find((p) => p.id === id);
+  const record = educationData.find((p) => p.patientId === patientId);
   return { data: record ? record.ol : null };
 };
 
-export const getALData = async (id) => {
+export const getALData = async (patientId) => {
     await new Promise(resolve => setTimeout(resolve, 100));
-  const record = educationData.find((p) => p.id === id);
+  const record = educationData.find((p) => p.patientId === patientId);
   console.log("edudata record getALData",record)
   return { data: record ? record.al : null };
 };
 
-export const getUniversityData = async (id) => {
+export const getUniversityData = async (patientId) => {
   await new Promise(resolve => setTimeout(resolve, 200));
-  const record = educationData.find((p) => p.id === id);
+  const record = educationData.find((p) => p.patientId === patientId);
      console.log("edudata record",record)
   return { data: record ? record.university:null};
 };
@@ -1182,7 +1179,7 @@ export const getUniversityData = async (id) => {
 
 export const educationData = [
   {
-    id: "1",
+    patientId: "1",
     educationYears: "12",
     scholarship: {
       enabled: true,
@@ -1233,8 +1230,8 @@ export const educationData = [
     // universityRemark: "Graduated with honors",
   },
   {
-    id: "2",
-    patientId: "PT-0002",
+    patientId: "2",
+    patientNo: "PT-0002",
     educationYears: "10",
     scholarship: {
       enabled: false,
@@ -1268,8 +1265,8 @@ export const educationData = [
     
   },
   {
-    id: "3",
-    patientId: "PT-0003",
+    patientId: "3",
+    patientNo: "PT-0003",
     educationYears: "13",
     scholarship: {
       enabled: true,
@@ -1310,8 +1307,8 @@ export const educationData = [
 
   },
   {
-    id: "4",
-    patientId: "PT-0004",
+    patientId: "4",
+    patientNo: "PT-0004",
     educationYears: "15",
     scholarship: {
       enabled: true,
@@ -1353,8 +1350,8 @@ export const educationData = [
 
   },
   {
-    id: "5",
-    patientId: "PT-0005",
+    patientId: "5",
+    patientNo: "PT-0005",
     educationYears: "11",
     scholarship: {
       enabled: false,
@@ -1396,33 +1393,33 @@ export const educationData = [
 
 // Mock occupations data
 export const occupations = [
-  { id: 1, name: "Engineer" },
-  { id: 2, name: "Teacher" },
-  { id: 3, name: "Doctor" },
-  { id: 4, name: "Other" },
+  { patientId: 1, name: "Engineer" },
+  { patientId: 2, name: "Teacher" },
+  { patientId: 3, name: "Doctor" },
+  { patientId: 4, name: "Other" },
 ];
 
 // Mock options for DescriptionInput
 export const getGoodPointsOptionsData =async()=>{
 const data=  [
-  { id: "1", name: "Problem-solver – I enjoy analyzing issues and finding effective solutions." },
-  { id: "2", name: "Quick learner – I can pick up new tools and frameworks rapidly." },
-  { id: "3", name: "Strong work ethic – I am committed to meeting deadlines and taking responsibility." },
-  { id: "4", name: "Adaptable – I can adjust to new environments, teams, or technologies easily." },
-  { id: "5", name: "Team player – I communicate well and collaborate effectively with others." },
-  { id: "6", name: "Detail-oriented – I notice small issues before they grow into big problems." },
-  { id: "7", name: "Other" },
+  { patientId: "1", name: "Problem-solver – I enjoy analyzing issues and finding effective solutions." },
+  { patientId: "2", name: "Quick learner – I can pick up new tools and frameworks rapidly." },
+  { patientId: "3", name: "Strong work ethic – I am committed to meeting deadlines and taking responsibility." },
+  { patientId: "4", name: "Adaptable – I can adjust to new environments, teams, or technologies easily." },
+  { patientId: "5", name: "Team player – I communicate well and collaborate effectively with others." },
+  { patientId: "6", name: "Detail-oriented – I notice small issues before they grow into big problems." },
+  { patientId: "7", name: "Other" },
 ]
 return {data};
 };
 
 export const getBadPointsOptions = async()=>{
   const data=  [
-  { id: "101", name: "Procrastination" },
-  { id: "102", name: "Shyness" },
-  { id: "103", name: "Impatience" },
-  { id: "104", name: "Perfectionism" },
-  { id: "105", name: "Other" },
+  { patientId: "101", name: "Procrastination" },
+  { patientId: "102", name: "Shyness" },
+  { patientId: "103", name: "Impatience" },
+  { patientId: "104", name: "Perfectionism" },
+  { patientId: "105", name: "Other" },
 ]
 return {data};
 };
@@ -1436,15 +1433,15 @@ export const getOLSubjects =async()=>{
       await new Promise(resolve => setTimeout(resolve, 100));
 
  const data= [
- { id: 'first-language', name: 'First Language (Sinhala/Tamil)' },
-  { id: 'mathematics', name: 'Mathematics' },
-  { id: 'english', name: 'English' },
-  { id: 'science', name: 'Science' },
-  { id: 'religion', name: 'Religion' },
-  { id: 'history', name: 'History' },
-  { id: 'art', name: 'Art' },
-  { id: 'literature', name: 'Literature' },
-  { id: 'commerce', name: 'Commerce' },
+ { value: 'first-language', name: 'First Language (Sinhala/Tamil)' },
+  { value: 'mathematics', name: 'Mathematics' },
+  { value: 'english', name: 'English' },
+  { value: 'science', name: 'Science' },
+  { value: 'religion', name: 'Religion' },
+  { value: 'history', name: 'History' },
+  { value: 'art', name: 'Art' },
+  { value: 'literature', name: 'Literature' },
+  { value: 'commerce', name: 'Commerce' },
 ];
 
 return {data};
@@ -1457,15 +1454,15 @@ export const getALSubjects =async()=>{
       await new Promise(resolve => setTimeout(resolve, 100));
 
  const data= [
-   { id: 'combined-mathematics', name: 'Combined Mathematics' },
-  { id: 'physics', name: 'Physics' },
-  { id: 'chemistry', name: 'Chemistry' },
-  { id: 'biology', name: 'Biology' },
-  { id: 'economics', name: 'Economics' },
-  { id: 'business-studies', name: 'Business Studies' },
-  { id: 'accounting', name: 'Accounting' },
-  { id: 'geography', name: 'Geography' },
-  { id: 'political-science', name: 'Political Science' },
+   { value: 'combined-mathematics', name: 'Combined Mathematics' },
+  { value: 'physics', name: 'Physics' },
+  { value: 'chemistry', name: 'Chemistry' },
+  { value: 'biology', name: 'Biology' },
+  { value: 'economics', name: 'Economics' },
+  { value: 'business-studies', name: 'Business Studies' },
+  { value: 'accounting', name: 'Accounting' },
+  { value: 'geography', name: 'Geography' },
+  { value: 'political-science', name: 'Political Science' },
 ];
 
 return {data};
@@ -1477,10 +1474,10 @@ export const getALStreams =async()=>{
       await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
- { id: 'science', name: 'Science' },
-  { id: 'commerce', name: 'Commerce' },
-  { id: 'arts', name: 'Arts' },
-  { id: 'technology', name: 'Technology' },
+ { value: 'science', name: 'Science' },
+  { value: 'commerce', name: 'Commerce' },
+  { value: 'arts', name: 'Arts' },
+  { value: 'technology', name: 'Technology' },
 ];
 
 return {data};
@@ -1494,19 +1491,198 @@ export const getDegrees =async()=>{
       await new Promise(resolve => setTimeout(resolve, 500));
 
  const data= [
-  { id: 'bsc-computer-science', name: 'BSc Computer Science' },
-  { id: 'bsc-engineering', name: 'BSc Engineering' },
-  { id: 'ba-economics', name: 'BA Economics' },
-  { id: 'bcom', name: 'BCom' },
-  { id: 'llb', name: 'LLB' },
-  { id: 'mbbs', name: 'MBBS' },
-  { id: 'bba', name: 'BBA' },
-  { id: 'bsc-physics', name: 'BSc Physics' },
-  { id: 'ba-english', name: 'BA English' },
-  { id: 'bsc-mathematics', name: 'BSc Mathematics' },
+  { value: 'bsc-computer-science', name: 'BSc Computer Science' },
+  { value: 'bsc-engineering', name: 'BSc Engineering' },
+  { value: 'ba-economics', name: 'BA Economics' },
+  { value: 'bcom', name: 'BCom' },
+  { value: 'llb', name: 'LLB' },
+  { value: 'mbbs', name: 'MBBS' },
+  { value: 'bba', name: 'BBA' },
+  { value: 'bsc-physics', name: 'BSc Physics' },
+  { value: 'ba-english', name: 'BA English' },
+  { value: 'bsc-mathematics', name: 'BSc Mathematics' },
 ];
 
 return {data};
 
 }
 
+
+
+
+
+const mockPatients = [
+  {
+    patientNo: "P001",
+    firstName: "John",
+    lastName: "Doe",
+  },
+  {
+    patientNo: "P002",
+    firstName: "Jane",
+    lastName: "Smith",
+  },
+  {
+    patientNo: "P003",
+    firstName: "Alice",
+    lastName: "Johnson",
+  },
+  {
+    patientNo: "P004",
+    firstName: "Bob",
+    lastName: "Williams",
+  },
+  {
+    patientNo: "P005",
+    firstName: "Emma",
+    lastName: "Brown",
+  },
+  {
+    patientNo: "P006",
+    firstName: "Michael",
+    lastName: "Davis",
+  },
+];
+
+let mockAppointments = [
+  {
+    appointmentId: "appt1",
+    patientNo: "PT-0001",
+    firstName: "John",
+    lastName: "Perera",
+    mobileNo:"0774458545",
+    appointmentDate: "2025-06-01T10:00:00Z",
+    status: "Scheduled",
+  },
+  {
+    appointmentId: "appt2",
+    patientNo: "PT-0002",
+    firstName: "Ama",
+    lastName: "Silva",
+    mobileNo:"0744448545",
+    appointmentDate: "2025-06-01T14:30:00Z",
+    status: "Completed",
+  },
+  {
+    appointmentId: "appt3",
+    patientNo: "PT-0003",
+    firstName: "Nimal",
+    lastName: "Fernando",
+    mobileNo:"0714489522",
+    appointmentDate: "2025-06-05T09:15:00Z",
+    status: "Scheduled",
+  },
+  {
+    appointmentId: "appt4",
+    patientNo: "PT-0004",
+    firstName: "Sita",
+    lastName: "Wijesinghe",
+        mobileNo:"0714489522",
+    appointmentDate: "2025-06-10T11:00:00Z",
+    status: "Cancelled",
+  },
+  {
+    appointmentId: "appt5",
+    patientNo: "PT-0001",
+    firstName: "John",
+    lastName: "Perera",
+        mobileNo:"0714489522",
+    appointmentDate: "2025-06-15T16:00:00Z",
+    status: "Scheduled",
+  },
+  {
+    appointmentId: "appt6",
+    patientNo: "PT-0005",
+    firstName: "Tharushi",
+    lastName: "Jayasinghe",
+    appointmentDate: "2025-06-20T13:45:00Z",
+    status: "Completed",
+  },
+  {
+    appointmentId: "appt7",
+    patientNo: "PT-0003",
+    firstName: "Nimal",
+    lastName: "Fernando",
+        mobileNo:"0714489522",
+    appointmentDate: "2025-06-25T10:30:00Z",
+    status: "Scheduled",
+  },
+  {
+    appointmentId: "appt8",
+    patientNo: "PT-0002",
+    firstName: "Ama",
+    lastName: "Silva",
+        mobileNo:"0714489522",
+    appointmentDate: "2025-06-30T15:00:00Z",
+    status: "Scheduled",
+  },
+];
+// Simulate network delay
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getPatientAppointments = async (payload) => {
+  const { startDate, endDate, status } = payload;
+
+  await delay(500);
+
+  try {
+    let filteredAppointments = mockAppointments.filter((appt) => {
+      const apptDate = appt.appointmentDate.split('T')[0];
+      return apptDate >= startDate && apptDate <= endDate;
+    });
+
+    if (status) {
+      filteredAppointments = filteredAppointments.filter(
+        (appt) => appt.status.toLowerCase() === status.toLowerCase()
+      );
+    }
+
+    return {
+      data: {
+        results: filteredAppointments,
+        outputValues: {
+          totalRows: filteredAppointments.length,
+        },
+      },
+    };
+  } catch (err) {
+    throw new Error('Failed to fetch appointments');
+  }
+};
+
+export const addPatientAppointment = async (payload) => {
+  await delay(500);
+
+  try {
+    const patient = basicInformationData.find((p) => p.patientNo === payload.patientNo);
+    if (!patient) {
+      throw new Error('Invalid patient selected');
+    }
+    const newAppointment = {
+      appointmentId: `appt${mockAppointments.length + 1}`,
+      patientNo: payload.patientNo,
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      appointmentDate: payload.appointmentDate,
+      status: payload.status,
+    };
+    mockAppointments.push(newAppointment);
+    return { data: { result: newAppointment } };
+  } catch (err) {
+    throw new Error(err.message || 'Failed to add appointment');
+  }
+};
+
+export const getPatients = async () => {
+  await delay(500);
+  try {
+    return {
+      data: {
+        results: basicInformationData,
+        outputValues: { totalRows: basicInformationData.length },
+      },
+    };
+  } catch (err) {
+    throw new Error('Failed to fetch patients');
+  }
+};

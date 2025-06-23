@@ -3,6 +3,8 @@ import { FaEdit } from "react-icons/fa";
 import { addBasicInformationData, getBasicInformationData, updateBasicInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
+import { getPatientBasicInfo } from "../functions/patient";
+import moment from "moment";
 
 const BasicInformationTab = ({ id,setNewId }) => {
 
@@ -10,13 +12,13 @@ const BasicInformationTab = ({ id,setNewId }) => {
   const [basicInformationErrors, setBasicInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
    const [isSaving, setIsSaving] = useState(false);
   const [initialBasicInformation, setInitialBasicInformation] = useState(null); // Store initial state for cancel
  const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
 
   const [basicInformation, setBasicInformation] = useState({
-    patientId: {
+    patientNo: {
       label: "Patient ID",
       value: "NEW",
       isTouched: false,
@@ -122,16 +124,30 @@ const BasicInformationTab = ({ id,setNewId }) => {
     },
   });
 
+
+
   const loadBasicInformationData = async () => {
     setIsLoading(true);
-    const result = await getBasicInformationData(id);
+   // const result = await getBasicInformationData(id);
+    const result = await getPatientBasicInfo(id);
+
     const patientData = result.data;
-    //console.log('patientData', patientData.patientId);
+
+      if(patientData.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
+  
+    //console.log('patientData', patientData.patientNo);
     if (patientData) {
       setBasicInformation({
-        patientId: {
-          ...basicInformation.patientId,
-          value: patientData.patientId || '',
+        patientNo: {
+          ...basicInformation.patientNo,
+          value: patientData.patientNo || '',
           isTouched: false,
           isValid: true,
         },
@@ -289,7 +305,7 @@ setIsSaving(true);
       setIsSaving(false);
       return false;
     }
-    // const savedPatientId = mode === "add" ? Date.now().toString() : "patientId";
+    // const savedPatientId = mode === "add" ? Date.now().toString() : "patientNo";
     // if (mode === "add") {
     //   navigate(`/patients/${savedPatientId}`);
     // }
@@ -810,7 +826,7 @@ setNewId(res.newId);
               </div>
               <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/3">Date of Birth</span>
-                <span className="text-gray-800 w-2/3 text-right">{basicInformation.dob?.value || "N/A"}</span>
+                <span className="text-gray-800 w-2/3 text-right">{moment(basicInformation.dob?.value).format("yyyy MMM DD") || "N/A"}</span>
               </div>
               <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/3">Age</span>

@@ -4,6 +4,7 @@ import {  addFamilyInformationData, getFamilyInformationData, getOccupations, ge
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
+import { getPatientFamilyInfo } from "../functions/patient";
 
 const Family = ({ id, setActiveTab }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
@@ -285,9 +286,26 @@ const Family = ({ id, setActiveTab }) => {
 
 
 const loadBasicInformationData=async()=>{
+  
   setIsLoading(true);
-  const result =await getFamilyInformationData(id);
-    const patientData=result.data;
+  //const result =await getFamilyInformationData(id);
+  const result =await getPatientFamilyInfo(id);
+  const patientData=result.data;
+
+  if(patientData.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
+
+console.log('getPatientFamilyInfo',result)
+if(patientData){
+ setMode("edit"); 
+}
+  
 
  if (patientData) {
         setFamilyInformation({
@@ -474,7 +492,7 @@ const loadBasicInformationData=async()=>{
         });
 
      setIsLoading(false);
-    setMode("edit"); 
+   
  }
  else{
    // setMode("add");

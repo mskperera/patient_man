@@ -3,10 +3,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'; // Explicit imp
 import TopNav from './components/TopNav';
 import Sidebar from './components/Sidebar';
 import BottomBar from './components/BottomBar';
-import PatientList from './components/PatientList';
+import PatientList from './pages/patientList';
 import Home from './components/Home';
 import PatientReport from './components/PatientReport';
 import PatientInfoEdit from './components/PatientInfoEdit';
+import AppointmentCalendar from './components/AppointmentCalendar';
+import PatientTypeSelection from './pages/PatientTypeSelection';
 
 function App() {
   return (
@@ -21,13 +23,16 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/patients" element={<PatientList />} />
-                <Route path="/patients/:id" element={<PatientInfoEdit />} />
+                 <Route path="/patientType" element={<PatientTypeSelection />} />
+                <Route path="/patient" element={<PatientInfoEdit />} />
                 {/* <Route path="/add-patient" element={<PatientInfo mode="add" />} /> */}
                 {/* <Route path="/add-note" element={<Notes />} /> */}
                 {/* <Route path="/edit-patient/:id" element={<PatientInfoEdit />} /> */}
                 <Route path="/add-patient" element={<PatientInfoEdit mode="add" />} />
                 {/* <Route path="/notes" element={<Notes />} /> */}
                 <Route path="/patients/report/:id" element={<PatientReport />} />
+                <Route path="/appointments" element={<AppointmentCalendar />} />
+               
               </Routes>
             </div>
           </main>

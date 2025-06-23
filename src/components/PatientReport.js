@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function PatientReport() {
   const navigate = useNavigate();
-  const { id: patientId } = useParams();
+  const { id: patientNo } = useParams();
 
   const defaultOLSubjects = [
     { name: 'First Language (Sinhala/Tamil)', followed: false, marks: '' },
@@ -27,7 +27,7 @@ function PatientReport() {
   const mockPatients = [
     {
       id: '1',
-      patientId: 'PT-0001',
+      patientNo: 'PT-0001',
       firstName: 'John',
       middleName: 'Peter',
       lastName: 'Perera',
@@ -131,19 +131,19 @@ function PatientReport() {
   const [patient, setPatient] = useState(null);
 
   useEffect(() => {
-    const foundPatient = mockPatients.find((p) => p.id === patientId);
+    const foundPatient = mockPatients.find((p) => p.id === patientNo);
     if (foundPatient) {
       setPatient(foundPatient);
     } else {
       setPatient({});
     }
-  }, [patientId]);
+  }, [patientNo]);
 
   if (!patient) {
     return <div className="p-6 text-center text-gray-600">Loading...</div>;
   }
 
-  if (!patient.patientId) {
+  if (!patient.patientNo) {
     return <div className="p-6 text-center text-red-600">Patient not found</div>;
   }
 
@@ -155,7 +155,7 @@ function PatientReport() {
           Patient Biographical Information (Page View)
         </h2>
         <button
-          onClick={() => navigate(`/patients/${patientId}`)}
+          onClick={() => navigate(`/patients/${patientNo}`)}
           className="flex items-center bg-sky-600 text-white px-5 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
           aria-label="Back to patient profile"
         >
@@ -168,7 +168,7 @@ function PatientReport() {
         <section className="mb-8">
           <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Basic Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><strong>Patient ID:</strong> {patient.patientId}</div>
+            <div><strong>Patient ID:</strong> {patient.patientNo}</div>
             <div><strong>Form Date:</strong> {patient.formDate}</div>
             <div><strong>Last Name:</strong> {patient.lastName}</div>
             <div><strong>First Name:</strong> {patient.firstName}</div>

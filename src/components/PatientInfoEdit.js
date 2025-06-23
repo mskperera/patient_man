@@ -11,9 +11,10 @@ import {
   FaUsers,
   FaInfoCircle,
   FaPrint,
+  FaChild,
 } from "react-icons/fa";
 import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import NotesTab from "./NotesTab";
 import MentalStatusExamTab from "./MentalStatusExamTab";
 import {  getBasicInformationData } from "../data/mockData";
@@ -25,19 +26,25 @@ import FamilyTab from "./FamilyTab";
 import MedicalTab from "./MedicalTab";
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
-import profileImageUrl from '../assets/doctor1.webp';
+import { getPatientBasicInfo } from "../functions/patient";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("basicInformation");
-  const { id } = useParams(); // Get patientId from URL params
+  //const { id } = useParams(); // Get patientNo from URL params
+  const [searchParams] = useSearchParams(); // Get query parameters
+  const patientType = searchParams.get('type'); // Get 'type' query param, default to 'individual'
+  const modeFromQuery = searchParams.get('mode'); // Get 'mode' query param, fallback to prop
+
+  const id= searchParams.get('id');
+
   const [isLoading, setIsLoading] = useState(false);
   // Default A/L subjects (Science stream as default, will allow stream selection)
  
 
   const [basicInformation, setBasicInformation] = useState({
-    patientId: "",
+    patientNo: "",
     firstName: "",
     lastName: "",
     middleName: "",
@@ -50,14 +57,13 @@ function PatientInfoEdit({ mode = "view" }) {
 
   const loadBasicInformationData = async () => {
     setIsLoading(true);
-    const result = await getBasicInformationData(id);
+    const result = await getPatientBasicInfo(id);
     const patientData = result.data;
     console.log('patientData', patientData);
  if (patientData) {
 
    setBasicInformation({
-          ...basicInformation,
-          patientId: patientData.patientId || "",
+          patientNo: patientData.patientNo || "",
           firstName: patientData.firstName,
           lastName: patientData?.lastName,
           dob: patientData.dateOfBirth,
@@ -81,19 +87,27 @@ function PatientInfoEdit({ mode = "view" }) {
   return (   
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="flex items-center text-2xl font-bold text-gray-800  pb-2">
-          <FaUser className="mr-3" size={28} />
-          Patient Biographical Information
-        </h2>
-        {JSON.stringify(newId)}
-      </div>
+       {patientType==="1"  && 
+       <h2 className="flex items-center text-2xl font-bold text-gray-800  pb-2">
+          <FaUser className="mr-3" size={28} />Patient Biographical Information - Individual</h2>}
 
+              {patientType==="2"  && 
+       <h2 className="flex items-center text-2xl font-bold text-gray-800  pb-2">
+          <FaChild className="mr-3" size={28} />Patient Biographical Information - Child</h2>}
+
+              {patientType==="3"  && 
+       <h2 className="flex items-center text-2xl font-bold text-gray-800  pb-2">
+          <FaUsers className="mr-3" size={28} />Patient Biographical Information - Family</h2>}
+      </div>
+   {/* {JSON.stringify(patientType)} */}
       {/* {JSON.stringify(basicInfomation)} */}
      {mode!=="add" && <div>
         <section className="mb-2">
           { (
-             !isLoading ? (
+             !isLoading && basicInformation.firstName ? (
           <div className="mx-4">
+           
+            {/* {JSON.stringify(basicInformation)} */}
       <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
        
@@ -139,10 +153,10 @@ function PatientInfoEdit({ mode = "view" }) {
              <div className="col-span-2 md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
               <strong className="text-gray-700 font-semibold">
-                Patient ID:
+                Patient No:
               </strong>
               <span className="text-gray-800">
-                {basicInformation.patientId || "N/A"}
+                {basicInformation.patientNo || "N/A"}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -150,7 +164,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 Created Date:
               </strong>
               <span className="text-sky-600">
-                {basicInformation.formDate || "N/A"}
+                {moment(basicInformation.formDate).format("yyyy MMM DD hh:mm a") || "N/A"}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -159,9 +173,7 @@ function PatientInfoEdit({ mode = "view" }) {
               </strong>
               <span className="text-sky-600 rounded-md">
                 {basicInformation.lastModified
-                  ? moment(basicInformation.lastModified).format(
-                      "YYYY-MM-DD HH:mm:ss"
-                    )
+                  ? moment(basicInformation.lastModified).format("yyyy MMM DD hh:mm a")
                   : "N/A"}
               </span>
             </div>
@@ -183,11 +195,11 @@ function PatientInfoEdit({ mode = "view" }) {
              
             </div>
 
-             <img
+             {/* <img
                 src={profileImageUrl}
                 alt="Profile"
                 className="w-12 h-12 rounded-full object-cover border-2 border-sky-300 shadow-sm"
-              />
+              /> */}
             
           </div>
               
@@ -208,7 +220,104 @@ function PatientInfoEdit({ mode = "view" }) {
           )}
         </section>
       </div>}
-      
+{patientType==="1" &&
+    <>
+         <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
+
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "basicInformation"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("basicInformation")}
+        >
+          <FaInfoCircle className="mr-2" size={16} />
+          Basic Information
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "personal"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("personal")}
+        >
+          <FaUser className="mr-2" size={16} />
+          Personal
+        </button>
+        {/* <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "family"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("family")}
+        >
+          <FaUsers className="mr-2" size={16} />
+          Family
+        </button> */}
+
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "medical"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("medical")}
+        >
+          <FaHeartPulse className="mr-2" size={16} />
+          Mental Health
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "education"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("education")}
+        >
+          <FaGraduationCap className="mr-2" size={16} />
+          Education
+        </button>
+
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "mentalExam"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("mentalExam")}
+        >
+          <FaBrain className="mr-2" size={16} />
+          Mental Status Exam
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "notes"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("notes")}
+        >
+          <FaBookMedical className="mr-2" size={16} />
+          Management and Notes
+        </button>
+      </div>
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
+        {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
+        {activeTab === "personal" && <PersonalInformationTab id={id || newId} />}
+        {/* {activeTab === "family" && <FamilyTab id={id || newId} />} */}
+        {activeTab === "medical" && <MedicalTab id={id || newId} />}
+        {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
+        {activeTab === "notes" && <NotesTab />}
+        {activeTab === "mentalExam" && <MentalStatusExamTab />}
+      </form>
+      </>  }
+
+
+      {patientType==="2" &&
+    <>
          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
 
         <button
@@ -300,6 +409,104 @@ function PatientInfoEdit({ mode = "view" }) {
         {activeTab === "notes" && <NotesTab />}
         {activeTab === "mentalExam" && <MentalStatusExamTab />}
       </form>
+      </>  }
+
+
+      {patientType==="3" &&
+    <>
+         <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
+
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "basicInformation"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("basicInformation")}
+        >
+          <FaInfoCircle className="mr-2" size={16} />
+          Basic Information
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "personal"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("personal")}
+        >
+          <FaUser className="mr-2" size={16} />
+          Personal
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "family"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("family")}
+        >
+          <FaUsers className="mr-2" size={16} />
+          Family
+        </button>
+
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "medical"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("medical")}
+        >
+          <FaHeartPulse className="mr-2" size={16} />
+          Mental Health
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "education"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("education")}
+        >
+          <FaGraduationCap className="mr-2" size={16} />
+          Education
+        </button>
+
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "mentalExam"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("mentalExam")}
+        >
+          <FaBrain className="mr-2" size={16} />
+          Mental Status Exam
+        </button>
+        <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "notes"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("notes")}
+        >
+          <FaBookMedical className="mr-2" size={16} />
+          Management and Notes
+        </button>
+      </div>
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
+        {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
+        {activeTab === "personal" && <PersonalInformationTab id={id || newId} />}
+        {activeTab === "family" && <FamilyTab id={id || newId} />}
+        {activeTab === "medical" && <MedicalTab id={id || newId} />}
+        {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
+        {activeTab === "notes" && <NotesTab />}
+        {activeTab === "mentalExam" && <MentalStatusExamTab />}
+      </form>
+      </>  }
+
     </div>
    
   );

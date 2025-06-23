@@ -3,6 +3,7 @@ import { FaEdit } from "react-icons/fa";
 import { addMedicalInformationData, getMedicalInformationData, medicalInformationData, updateMedicalInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
+import { getPatientMedicalInfo } from "../functions/patient";
 
 
 const MedicalTab = ({ id, setActiveTab }) => {
@@ -132,9 +133,18 @@ const MedicalTab = ({ id, setActiveTab }) => {
   
     const loadMedicalInformationData=async()=>{
       setIsLoading(true);
-      const result =await getMedicalInformationData(id);
+      // const result =await getMedicalInformationData(id);
+       const result =await getPatientMedicalInfo(id);
         const patientData=result.data;
-      
+        if(patientData.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
+
         if (patientData) {
     
         setMedicalInformation({

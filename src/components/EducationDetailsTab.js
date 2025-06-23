@@ -4,6 +4,7 @@ import { addEducationData, getALData, getALStreams, getALSubjects, getDegrees, g
 import TypeableDropdown from './TypeableDropdown';
 import LoadingSpinner from './LoadingSpinner';
 import MessageModel from './MessageModel';
+import { getAl, getEducationYears, getOl, getScholarship } from '../functions/patient';
 
 const EducationDetails = ({ id }) => {
   const currentYear = 2025;
@@ -49,13 +50,23 @@ const EducationDetails = ({ id }) => {
   };
 
   const loadEducationYearsData = async () => {
-    const result = await getEducationYearsData(id);
+   //const result = await getEducationYearsData(id);
+   const result=await getEducationYears(id);
+      
     const patientData = result.data;
-    console.log('pppppaaa',patientData)
+      if(patientData.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
+    console.log('loadEducationYearsData',patientData)
     if (patientData) {
       setEducation(prev => ({
         ...prev,
-        educationYears: patientData || '',
+        educationYears: patientData.educationYears || '',
       }));
       setMode("edit");
     } else {
@@ -64,8 +75,18 @@ const EducationDetails = ({ id }) => {
   };
 
   const loadScholarshipData = async () => {
-    const result = await getScholarshipData(id);
+   // const result = await getScholarshipData(id);
+    const result = await getScholarship(id);
+     console.log('getScholarshipData',result)
     const patientData = result.data;
+      if(patientData.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
     if (patientData) {
       setEducation(prev => ({
         ...prev,
@@ -75,16 +96,35 @@ const EducationDetails = ({ id }) => {
   };
 
   const loadOLData = async () => {
-    const result = await getOLData(id);
+    //const result = await getOLData(id);
+    const result = await getOl(id);
+         console.log('getOLData',result)
     const patientData = result.data;
+      if(patientData?.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
     if (patientData) {
       setEducation(prev => ({ ...prev, ol: patientData }));
     }
   };
 
   const loadALData = async () => {
-    const result = await getALData(id);
+    //const result = await getALData(id);
+    const result = await getAl(id);
     const patientData = result.data;
+      if(patientData?.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
     if (patientData) {
       setEducation(prev => ({ ...prev, al: patientData }));
     }
@@ -93,6 +133,14 @@ const EducationDetails = ({ id }) => {
   const loadUniversityData = async () => {
     const result = await getUniversityData(id);
     const patientData = result.data;
+      if(patientData?.error){
+    console.log('patientData.error',patientData.error)
+     setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+  }
     if (patientData) {
       setEducation(prev => ({ ...prev, university: patientData }));
     }
@@ -670,6 +718,7 @@ const handleTextInputChange = (e) => {
 
   const handleSubjectChange = (level, index, selectedOption) => {
     const value = selectedOption ? selectedOption.value : '';
+    console.log('handleSubjectChange',selectedOption)
     setEducation((prev) => {
       if (level === 'ol') {
         const updatedSubjects = [...prev.ol.subjects];
@@ -794,7 +843,7 @@ const handleTextInputChange = (e) => {
       {!isLoading ? (
         <div className="px-8">
           {/* Educational Background */}
-          {JSON.stringify(education)}
+           {/*{JSON.stringify(education)}*/}
           <section className="mb-12">
     
             <div className="flex justify-between items-center mb-2 pb-2">
@@ -1010,7 +1059,6 @@ const handleTextInputChange = (e) => {
               </div>
             )}
           </section>
-
           {/* G.C.E Ordinary Level (O/L) Qualifications */}
           <section className="mb-14">
             <div className="flex justify-between items-center mb-2 pb-2">
@@ -1055,13 +1103,14 @@ const handleTextInputChange = (e) => {
             </div>
             {editingSection === 'ol' || mode === 'add' ? (
               <div className="space-y-4">
+                {JSON.stringify(education)}
                 {education.ol.subjects.map((subject, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <div className="w-1/3">
                       <label className="block text-sm font-medium text-gray-700">Subject{ <span className="text-red-500">*</span>}</label>
                       <TypeableDropdown
                         options={olsubjectsOptions}
-                        value={subject.name ? { value: subject.name, label: subject.name } : null}
+                        value={subject.name ? { value: subject.name, name: subject.name } : null}
                         onChange={(option) => handleSubjectChange('ol', index, option)}
                         placeholder="Select or type subject"
                         isDisabled={education.ol.enabled === false}
