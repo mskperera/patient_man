@@ -2,7 +2,7 @@ export const getOccupations =async()=>{
 
        await new Promise(resolve => setTimeout(resolve, 500));
 const data= [
-  { value: 1, name: 'Software Engineer' },
+  { value: 15, name: 'Software Engineer' },
   { value: 2, name: 'Teacher' },
   { value: 3, name: 'Doctor' },
   { value: 4, name: 'Nurse' },
@@ -16,7 +16,7 @@ const data= [
   { value: 12, name: 'Construction Worker' },
   { value: 13, name: 'Chef' },
   { value: 14, name: 'Retail Manager' },
-  { value: 15, name: 'Other' }
+  { value: 1, name: 'Other' }
 ];
 
 return {data};

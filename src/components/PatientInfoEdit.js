@@ -16,11 +16,14 @@ import {
 import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import NotesTab from "./NotesTab";
-import MentalStatusExamTab from "./MentalStatusExamTab";
-import {  getBasicInformationData } from "../data/mockData";
+import TabMentalStatusExam from "./TabMentalStatusExam";
 import EducationDetailsTab from "./EducationDetailsTab";
 
-import PersonalInformationTab from "./PersonalInformationTab";
+import TabPersonalInformation from "./TabPersonalInformation";
+import TabPersonalInformationChild from "./TabPersonalInformationChild";
+import TabPersonalInformationIndividual from "./TabPersonalInformationIndividual";
+
+
 import BasicInformationTab from "./BasicInformationTab";
 import FamilyTab from "./FamilyTab";
 import MedicalTab from "./MedicalTab";
@@ -292,6 +295,17 @@ function PatientInfoEdit({ mode = "view" }) {
           <FaBrain className="mr-2" size={16} />
           Mental Status Exam
         </button>
+         {/* <button
+          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+            activeTab === "selfEsteemTest"
+              ? "bg-sky-600 text-white shadow-sm"
+              : "bg-transparent text-gray-700 hover:bg-gray-300"
+          }`}
+          onClick={() => setActiveTab("selfEsteemTest")}
+        >
+          <FaBrain className="mr-2" size={16} />
+          Self-Esteem Test 
+        </button> */}
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
             activeTab === "notes"
@@ -306,12 +320,13 @@ function PatientInfoEdit({ mode = "view" }) {
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
         {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
-        {activeTab === "personal" && <PersonalInformationTab id={id || newId} />}
+        {activeTab === "personal" && <TabPersonalInformationIndividual id={id || newId} />}
         {/* {activeTab === "family" && <FamilyTab id={id || newId} />} */}
         {activeTab === "medical" && <MedicalTab id={id || newId} />}
         {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
-        {activeTab === "notes" && <NotesTab />}
-        {activeTab === "mentalExam" && <MentalStatusExamTab />}
+           {activeTab === "notes" && <NotesTab />}
+        {/* {activeTab === "selfEsteemTest" && <NotesTab />} */}
+        {activeTab === "mentalExam" && <TabMentalStatusExam />}
       </form>
       </>  }
 
@@ -402,12 +417,12 @@ function PatientInfoEdit({ mode = "view" }) {
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
         {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
-        {activeTab === "personal" && <PersonalInformationTab id={id || newId} />}
+        {activeTab === "personal" && <TabPersonalInformationChild id={id || newId} />}
         {activeTab === "family" && <FamilyTab id={id || newId} />}
         {activeTab === "medical" && <MedicalTab id={id || newId} />}
         {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
         {activeTab === "notes" && <NotesTab />}
-        {activeTab === "mentalExam" && <MentalStatusExamTab />}
+        {activeTab === "mentalExam" && <TabMentalStatusExam />}
       </form>
       </>  }
 
@@ -498,12 +513,12 @@ function PatientInfoEdit({ mode = "view" }) {
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
         {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
-        {activeTab === "personal" && <PersonalInformationTab id={id || newId} />}
+        {activeTab === "personal" && <TabPersonalInformation id={id || newId} />}
         {activeTab === "family" && <FamilyTab id={id || newId} />}
         {activeTab === "medical" && <MedicalTab id={id || newId} />}
         {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
         {activeTab === "notes" && <NotesTab />}
-        {activeTab === "mentalExam" && <MentalStatusExamTab />}
+        {activeTab === "mentalExam" && <TabMentalStatusExam />}
       </form>
       </>  }
 
