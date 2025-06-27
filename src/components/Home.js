@@ -93,8 +93,9 @@ function Home() {
           <p className="text-sm text-gray-600 mb-2">
             New unregistered patient?
           </p>
+
           <button
-            onClick={() => navigate('/add-patient', { state: { mode: 'add' } })}
+            onClick={() => navigate('/patientType?mode=add', { state: { mode: 'add' } })}
             className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
             aria-label="Add new patient"
           >
