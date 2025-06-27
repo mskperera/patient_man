@@ -7,8 +7,9 @@ import PatientList from './pages/patientList';
 import Home from './components/Home';
 import PatientReport from './components/PatientReport';
 import PatientInfoEdit from './components/PatientInfoEdit';
-import AppointmentCalendar from './components/AppointmentCalendar';
+import AppointmentCalendar from './components/appoinments/AppointmentCalendar';
 import PatientTypeSelection from './pages/PatientTypeSelection';
+import AddAppointment from './components/appoinments/AddAppointment';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
                 {/* <Route path="/notes" element={<Notes />} /> */}
                 <Route path="/patients/report/:id" element={<PatientReport />} />
                 <Route path="/appointments" element={<AppointmentCalendar />} />
+                <Route path="/add-appointment" element={<AddAppointment />} />
                
               </Routes>
             </div>

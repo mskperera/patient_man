@@ -13,7 +13,7 @@ const Pagination = ({
   const isPaginationDisabled = totalRecords <= rowsPerPage;
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg shadow-md border border-gray-200">
+    <div className="flex flex-col sm:flex-row justify-between items-center mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg  border border-gray-200">
       {/* Rows per Page Dropdown */}
       <div className="flex items-center mb-4 sm:mb-0">
         <label htmlFor="rowsPerPage" className="mr-2 text-sm font-medium text-gray-700">

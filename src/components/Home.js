@@ -37,30 +37,30 @@ function Home() {
         </h2>
       </div>
         <form onSubmit={handleSearch} className="space-y-4">
-          <div className="flex flex-wrap gap-4 justify-center">
-            {[
-              { value: 'patientNo', label: 'Patient No' },
-              { value: 'firstName', label: 'First Name' },
-               { value: 'lastName', label: 'Last Name' },
-              { value: 'email', label: 'Email' },
-              { value: 'mobile', label: 'Mobile' },
-            ].map((option) => (
-              <label key={option.value} className="flex items-center gap-2 text-gray-700">
-                <input
-                  type="radio"
-                  value={option.value}
-                  checked={filterType === option.value}
-                  onChange={(e) => {
-                    setFilterType(e.target.value);
-                    setError('');
-                  }}
-                  className="form-radio text-sky-600 focus:ring-sky-500"
-                  aria-label={`Search by ${option.label}`}
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
+               <div className="flex flex-wrap gap-4 justify-center mb-4">
+                {[
+                  { value: 'patientNo', label: 'Patient No' },
+                  { value: 'firstName', label: 'First Name' },
+                  { value: 'lastName', label: 'Last Name' },
+                  { value: 'email', label: 'Email' },
+                  { value: 'mobile', label: 'Mobile' },
+                ].map((option) => (
+                  <label key={option.value} className="flex items-center gap-2 text-gray-700 text-sm sm:text-base">
+                    <input
+                      type="radio"
+                      value={option.value}
+                      checked={filterType === option.value}
+                      onChange={(e) => {
+                        setFilterType(e.target.value);
+                        setError('');
+                      }}
+                      className="form-radio text-sky-600 focus:ring-sky-500 h-4 w-4 sm:h-5 sm:w-5"
+                      aria-label={`Search by ${option.label}`}
+                    />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
           <div className="relative">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
@@ -104,7 +104,7 @@ function Home() {
         </div>
       </div>
       {triggerSearch > 0 && (
-        <div className="w-full max-w-4xl mt-8">
+        <div className="w-full mt-8">
           <PatientList
             searchQuery={searchQuery}
             filterType={filterType}
