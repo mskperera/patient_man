@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { FaSearch, FaArrowLeft } from 'react-icons/fa';
 import moment from 'moment';
-
-import { addPatientAppointment } from '../../data/mockData';
 import MessageModel from '../MessageModel';
 import PatientList from '../PatientList';
+import { addAppointment } from '../../functions/patient';
 
 const AddAppointment = () => {
   const navigate = useNavigate();
@@ -80,16 +79,25 @@ const AddAppointment = () => {
     if (!validateForm()) return;
 
     const payload = {
-      patientNo: newAppointment.patientNo,
-      firstName: selectedPatient?.firstName || '',
-      lastName: selectedPatient?.lastName || '',
+      patientId: selectedPatient.patientId,
       appointmentDate: `${newAppointment.appointmentDate}T${newAppointment.appointmentTime}:00Z`,
-      status: newAppointment.status,
+     statusId:1,
+      //status: newAppointment.status,
     };
 
+    console.log('selectedPatient',selectedPatient)
     try {
       setIsLoading(true);
-      await addPatientAppointment(payload);
+   const res=   await addAppointment(payload);
+      console.log('addAppointment',res)
+      if(res.data.error){
+          setModal({
+        isOpen: true,
+        message: res.data.error.message,
+        type: 'error',
+      });
+      return;
+      }
       setModal({
         isOpen: true,
         message: 'Appointment added successfully!',
@@ -141,7 +149,7 @@ const AddAppointment = () => {
               <FaArrowLeft size={20} />
               Back
             </button>
-            <h2 className="text-2xl font-bold text-gray-800">Add New Appointment</h2>
+            <h2 className="text-xl font-bold text-gray-800">Add New Appointment</h2>
           </div>
 
           {/* Patient Search Section */}

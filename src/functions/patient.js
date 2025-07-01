@@ -252,6 +252,56 @@ export const getUniversity = async (patientId) => {
   }
 };
 
+
+
+
+export const getPatientAppointments = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patientAppointments/get`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const addAppointment = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/appointment`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
 // export const addContact = async (data) => {
 //   try {
 //     const tenantId = getTenantId();

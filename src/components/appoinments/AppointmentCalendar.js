@@ -6,7 +6,8 @@ import moment from 'moment';
 import LoadingSpinner from '../LoadingSpinner';
 import MessageModel from '../MessageModel';
 import { FaCalendarAlt, FaFilter, FaPlus } from 'react-icons/fa';
-import { getPatientAppointments } from '../../data/mockData';
+import { getPatientAppointments } from '../../functions/patient';
+//import { getPatientAppointments } from '../../data/mockData';
 
 const AppointmentCalendar = () => {
   const navigate = useNavigate();
@@ -31,7 +32,8 @@ const AppointmentCalendar = () => {
 
     try {
       const response = await getPatientAppointments(payload);
-      const results = response.data.results || [];
+      console.log('getPatientAppointments',response)
+      const results = response.data.results[0] || [];
       setAppointments(results);
     } catch (err) {
       setModal({
@@ -129,7 +131,7 @@ const AppointmentCalendar = () => {
           </div>
           <div className="flex flex-col lg:flex-row">
             {/* Calendar Section */}
-            <div className="lg:w-1/2 p-6 border-r border-gray-100">
+            <div className="lg:w-2/5 p-6 border-r border-gray-100">
               {isLoading ? (
                 <div className="flex justify-center items-center h-96">
                   <LoadingSpinner />
@@ -145,8 +147,8 @@ const AppointmentCalendar = () => {
               )}
             </div>
             {/* Daily Appointments Section */}
-            <div className="lg:w-1/2 p-6 bg-gray-50">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <div className="lg:w-3/5 py-6 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 px-6">
                 Appointments on {moment(selectedDate).format('MMMM D, YYYY')}
               </h3>
               {isLoading ? (
@@ -164,12 +166,16 @@ const AppointmentCalendar = () => {
                   <table className="min-w-full bg-white rounded-lg shadow-sm">
                     <thead className="bg-gray-100 sticky top-0">
                       <tr>
+                            <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">
+                          Appoinment #
+                        </th>
                         <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">
-                          Patient ID
+                          Patient No
                         </th>
                         <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">
                           Patient Name
                         </th>
+                      
                         <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">
                           Mobile No
                         </th>
@@ -187,12 +193,17 @@ const AppointmentCalendar = () => {
                           key={appt.appointmentId}
                           className="hover:bg-blue-50 transition-all duration-200 transform hover:-translate-y-0.5"
                         >
+                                   <td className="py-3 px-4 border-b text-gray-800 text-sm">
+                            {appt.appoinmentNo}
+                          </td>
                           <td className="py-3 px-4 border-b text-gray-800 text-sm">
                             {appt.patientNo}
                           </td>
+                      
                           <td className="py-3 px-4 border-b text-gray-800 text-sm">
                             {`${appt.firstName} ${appt.lastName}`}
                           </td>
+                        
                           <td className="py-3 px-4 border-b text-gray-800 text-sm">
                             {appt.mobileNo}
                           </td>
