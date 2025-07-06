@@ -6,7 +6,7 @@ import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
 import { getPatientPersonalInfo } from "../functions/patient";
-
+import VoiceToText from "./VoiceToText";
 
 
 
@@ -21,6 +21,9 @@ const PersonalInformation = ({ id, setActiveTab }) => {
     const [isSaving, setIsSaving] = useState(false);
   const [initialPersonalInformation, setInitialPersonalInformation] = useState(null); // Store initial state for cancel
   const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
+
+
+  const [text, setText] = useState('');
 
   const [personalInformation, setPersonalInformation] = useState({
     maritalStatus: {
@@ -443,6 +446,24 @@ setIsSaving(true);
     }
   };
 
+
+  const handleVoiceToTextChange = (name, value) => {
+  
+    setPersonalInformation((prev) => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        value,
+        isTouched: true,
+        isValid:true,
+      },
+    }));
+
+  };
+
+
+
+
   // Handle DescriptionInput changes
   const handleDescriptionChange = (fieldName, value) => {
     const { required, dataType } = personalInformation[fieldName];
@@ -598,9 +619,9 @@ setIsSaving(true);
     <div className="px-8">
 
       {/* Personal Details */}
-      <section className="mb-12">
+      {/* <section className="mb-12">
         <div className="flex justify-between items-center mb-2  pb-2">
-          <h3 className="text-2xl font-semibold text-gray-700">Personal Details</h3>
+           <h3 className="text-2xl font-semibold text-gray-700">Personal Details</h3>
           {mode !== "add" && (
           
                  <div className="flex space-x-4">
@@ -629,7 +650,7 @@ setIsSaving(true);
                         )}
                       </div>
 
-          )}
+          )} 
         </div>
         {editingSection === "personalDetails" || mode === "add" ? (
           <div className="space-y-6">
@@ -692,7 +713,7 @@ setIsSaving(true);
       </div>
     </div>
         )}
-      </section>
+      </section> */}
 
       {/* Personal Insights */}
       <section className="mb-12">
@@ -728,21 +749,24 @@ setIsSaving(true);
             
           )}
         </div>
+
         {editingSection === "insights" || mode === "add" ? (
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 List the things you like to do most, kinds of things and persons that give you pleasure {personalInformation.thingsLiked.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
-                name="thingsLiked"
+        
+      <VoiceToText
+              name="thingsLiked"
                 value={personalInformation.thingsLiked.value}
                 onChange={handleChangePersonalInfo}
                 className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe your interests and pleasures"
                 aria-label="Things liked"
-              />
+          />
+
               {personalInformationErrors.thingsLiked && (
                 <p className="mt-1 text-sm text-red-600">{personalInformationErrors.thingsLiked}</p>
               )}
@@ -793,7 +817,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List your main social difficulties{personalInformation.socialDifficulties.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+              <VoiceToText
                 name="socialDifficulties"
                 value={personalInformation.socialDifficulties.value}
                 onChange={handleChangePersonalInfo}
@@ -811,7 +835,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List your main school difficulties{personalInformation.schoolWorkDifficulties.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+              <VoiceToText
                 name="schoolWorkDifficulties"
                 value={personalInformation.schoolWorkDifficulties.value}
                 onChange={handleChangePersonalInfo}
@@ -826,7 +850,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">List your main life goals{personalInformation.lifeGoals.required && <span className="text-red-500">*</span>}</label>
-              <textarea
+              <VoiceToText
                 name="lifeGoals"
                 value={personalInformation.lifeGoals.value}
                 onChange={handleChangePersonalInfo}
@@ -843,7 +867,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List the things about yourself you would most like to change{personalInformation.thingsToChange.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+              <VoiceToText
                 name="thingsToChange"
                 value={personalInformation.thingsToChange.value}
                 onChange={handleChangePersonalInfo}

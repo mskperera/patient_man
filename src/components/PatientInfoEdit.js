@@ -27,9 +27,14 @@ import TabPersonalInformationIndividual from "./TabPersonalInformationIndividual
 import BasicInformationTab from "./BasicInformationTab";
 import FamilyTab from "./FamilyTab";
 import MedicalTab from "./MedicalTab";
+import TabMedicalChild from "./TabMedicalChild";
+
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
 import { getPatientBasicInfo } from "../functions/patient";
+import TabBasicInformationChild from "./TabBasicInformationChild";
+import TabFamilyChild from "./TabFamilyChild";
+import TabEducationDetailsChild from "./TabEducationDetailsChild";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
@@ -416,11 +421,11 @@ function PatientInfoEdit({ mode = "view" }) {
         </button>
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
-        {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
+        {activeTab === "basicInformation" && <TabBasicInformationChild id={id || newId} setNewId={setNewId} />}
         {activeTab === "personal" && <TabPersonalInformationChild id={id || newId} />}
-        {activeTab === "family" && <FamilyTab id={id || newId} />}
-        {activeTab === "medical" && <MedicalTab id={id || newId} />}
-        {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
+        {activeTab === "family" && <TabFamilyChild id={id || newId} />}
+        {activeTab === "medical" && <TabMedicalChild id={id || newId} />}
+        {activeTab === "education" && <TabEducationDetailsChild id={id || newId} />}
         {activeTab === "notes" && <NotesTab />}
         {activeTab === "mentalExam" && <TabMentalStatusExam />}
       </form>
