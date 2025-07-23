@@ -253,6 +253,28 @@ export const getUniversity = async (patientId) => {
 };
 
 
+export const getProfileTabDetails = async (id) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/patient/profileTabDetails/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
 
 
 export const getPatientAppointments = async (data) => {
@@ -301,6 +323,379 @@ export const addAppointment = async (data) => {
   }
 };
 
+
+export const addBasicInformation = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/patientRegistration`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updateBasicInformation = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/patientRegistration/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const addPersonalInformation = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/personalInformation`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updatePersonalInformation = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/personalInformation/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const addFamilyInformation = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/familyInformation`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateFamilyInformation = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/familyInformation/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const addMedicalInformation = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/medicalInformation`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateMedicalInformation = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/medicalInformation/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+
+export const addEducation = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/education`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updateEducation = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/education/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+
+}
+
+
+
+
+export const drpUniversitySubjects = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/universitySubjects`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const drpOLSubjects = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/olSubjects`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const drpALStreams = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/alStreams`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const drpALSubjects = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/alSubjects`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const drpInstitutions = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/institutions`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+
+
+
+export const addSubject = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/subject`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
 
 // export const addContact = async (data) => {
 //   try {

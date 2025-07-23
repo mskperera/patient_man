@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { addPersonalInformationData, getBadPointsOptions, getGoodPointsOptionsData, getOccupations, getPersonalInformationData, goodPointsOptionsData, personalInformationData, updatePersonalInformationData } from "../data/mockData";
+import {  getBadPointsOptions, getGoodPointsOptionsData, getOccupations } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
 import { getPatientPersonalInfo } from "../functions/patient";
 import VoiceToText from "./VoiceToText";
+import { addPersonalInformation,updatePersonalInformation } from "../functions/patient";
 
 
 
 
-
-const PersonalInformation = ({ id, setActiveTab }) => {
+const PersonalInformation = ({ id,refreshTabDetails, setActiveTab }) => {
   const navigate = useNavigate();
   const [personalInformationErrors, setPersonalInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
@@ -23,49 +23,8 @@ const PersonalInformation = ({ id, setActiveTab }) => {
   const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
 
 
-  const [text, setText] = useState('');
-
   const [personalInformation, setPersonalInformation] = useState({
-    maritalStatus: {
-      label: "Present Marital Status",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
-    yearsMarried: {
-      label: "Number of Years Married to Present Spouse",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "number",
-    },
-    maleChildrenAges: {
-      label: "Ages of Male Children",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
-    femaleChildrenAges: {
-      label: "Ages of Female Children",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
-    religiosity: {
-      label: "Religiosity",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: true,
-      dataType: "number",
-    },
+ 
     thingsLiked: {
       label: "Things You Like to Do Most",
       value: "",
@@ -98,14 +57,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
       required: true,
       dataType: "string",
     },
-    loveSexDifficulties: {
-      label: "Main Love and Sex Difficulties",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: true,
-      dataType: "string",
-    },
+  
     schoolWorkDifficulties: {
       label: "Main School or Work Difficulties",
       value: "",
@@ -130,30 +82,7 @@ const PersonalInformation = ({ id, setActiveTab }) => {
       required: true,
       dataType: "string",
     },
-    occupationTrained: {
-      label: "Occupation(s) Trained For",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
-    occupation: {
-      label: "Present Occupation",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
-    occupationFullTime: {
-      label: "Occupation Status",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
+  
   });
 
   const loadPersonalInformationData=async()=>{
@@ -217,13 +146,13 @@ const PersonalInformation = ({ id, setActiveTab }) => {
           },
           assets: {
             ...personalInformation.assets,
-            value: patientData.assets || "",
+            value: patientData.assets.split(";;") || "",
             isTouched: false,
             isValid: true,
           },
           badPoints: {
             ...personalInformation.badPoints,
-            value: patientData.badPoints || "",
+            value: patientData.badPoints.split(";;") || "",
             isTouched: false,
             isValid: true,
           },
@@ -350,19 +279,62 @@ setIsSaving(true);
 
 
     const payload = {
+   // patientId:id,
+  // maritalStatus: personalInformation.maritalStatus.value,
+  // yearsMarried: personalInformation.yearsMarried.value,
+  // maleChildrenAges: personalInformation.maleChildrenAges.value,
+  // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+  // religiosity: personalInformation.religiosity.value,
+  thingsLiked: personalInformation.thingsLiked.value,
+  assets: personalInformation.assets.value.map(item => ({ name: item })),
+  badPoints: personalInformation.badPoints.value.map(item => ({ name: item })),
+  socialDifficulties: personalInformation.socialDifficulties.value,
+  //loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+  schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
+  lifeGoals: personalInformation.lifeGoals.value,
+  thingsToChange: personalInformation.thingsToChange.value,
+  // occupationTrained: personalInformation.occupationTrained.value,
+  // occupation: personalInformation.occupation.value,
+  // occupationFullTime: personalInformation.occupationFullTime.value,
+  pageName: "PatientBackgroundForm",
+  isConfirm: true
     };
-    Object.entries(personalInformation).forEach(([key, field]) => {
-     // console.log("field.",field);
-      if (field.isTouched) {
-        payload[key] = field.value;
-      }
-    });
+
 
     console.log("Save Payload:", payload);
+
+ 
     try{
-      const res=await updatePersonalInformationData(id,payload);
+      const res=await updatePersonalInformation(id,payload);
         //await loadPersonalInformationData();
           console.log("update result:", res);
+
+ if(res.data.responseStatus === "failed") {
+        
+              setModal({
+          isOpen: true,
+          message: res.data.outputMessage,
+          type: "warning",
+        });
+  
+           setIsSaving(false);
+  
+              return;
+            }
+  
+            if(res.data.error){
+                    setModal({
+          isOpen: true,
+          message: res.data.error.message,
+          type: "warning",
+        });
+  
+         setIsSaving(false);
+  
+              return;
+  
+            }
+
           setIsSaving(false);
           return true;
     }
@@ -512,15 +484,19 @@ setIsSaving(true);
     const updatedInfo = { ...personalInformation };
 
     Object.entries(personalInformation).forEach(([key, field]) => {
-      if (!field || typeof field !== "object" || !("value" in field)) return;
+      if (field===null || field===undefined ||field==="" || typeof field !== "object" || !("value" in field)) return;
 
-      const { value, required, dataType } = field;
+      const { value, required, dataType, isValid } = field;
       let errorMessage = validateField(field.label, value, required, dataType);
 
       if (key === "yearsMarried" && (["married_first_time", "married_second_time"].includes(personalInformation.maritalStatus.value))) {
         if (!value || value.trim() === "") {
           errorMessage = "Number of Years Married is required for current marriage";
         }
+      }
+
+         if(isValid===false){
+      console.log('invalidated field',key)
       }
 
       if (errorMessage) {
@@ -558,14 +534,83 @@ setIsSaving(true);
     const isValid = validatePersonalInformation();
     console.log("isValid", isValid);
     if (isValid) {
-      const submitPayload = generateSubmitPayload(personalInformation);
-      console.log(submitPayload);
-      await addPersonalInformationData(submitPayload)
-      setMode("edit");
-     // setActiveTab("family");
+        const payload = {
+    patientId:id,
+  // maritalStatus: personalInformation.maritalStatus.value,
+  // yearsMarried: personalInformation.yearsMarried.value,
+  // maleChildrenAges: personalInformation.maleChildrenAges.value,
+  // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+  // religiosity: personalInformation.religiosity.value,
+  thingsLiked: personalInformation.thingsLiked.value,
+  assets: personalInformation.assets.value.map(item => ({ name: item })),
+  badPoints: personalInformation.badPoints.value.map(item => ({ name: item })),
+  socialDifficulties: personalInformation.socialDifficulties.value,
+  //loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+  schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
+  lifeGoals: personalInformation.lifeGoals.value,
+  thingsToChange: personalInformation.thingsToChange.value,
+  // occupationTrained: personalInformation.occupationTrained.value,
+  // occupation: personalInformation.occupation.value,
+  // occupationFullTime: personalInformation.occupationFullTime.value,
+  pageName: "PatientBackgroundForm",
+  isConfirm: true
+    };
+  
+
+
+      const submitPayloadWithPatientId = {
+        ...payload,
+        patientId: id,
+      };
+ 
+  try{
+       const res=  await addPersonalInformation(submitPayloadWithPatientId)
+      console.log("Save res:", res);
+       //await loadPersonalInformationData();
+          console.log("update result:", res);
+          if(res.data.responseStatus === "failed") {
+      
+            setModal({
+        isOpen: true,
+        message: res.data.outputMessage,
+        type: "warning",
+      });
+
+         setIsSaving(false);
+
+            return;
+          }
+
+          if(res.data.error){
+                  setModal({
+        isOpen: true,
+        message: res.data.error.message,
+        type: "warning",
+      });
+
+       setIsSaving(false);
+
+            return;
+
+          }
+
+              setMode("edit");
+          setIsSaving(false);
+          refreshTabDetails(Math.random())
+          
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+     setIsSaving(false);
     }
 
       setIsSaving(false);
+  }
   };
 
 
@@ -749,7 +794,7 @@ setIsSaving(true);
             
           )}
         </div>
-
+{/* {JSON.stringify(personalInformation.assets.value)} */}
         {editingSection === "insights" || mode === "add" ? (
           <div className="space-y-6">
             <div>

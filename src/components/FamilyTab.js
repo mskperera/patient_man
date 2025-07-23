@@ -4,9 +4,9 @@ import {  addFamilyInformationData, getFamilyInformationData, getOccupations, ge
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
-import { getPatientFamilyInfo } from "../functions/patient";
+import { addFamilyInformation, getPatientFamilyInfo, updateFamilyInformation } from "../functions/patient";
 
-const Family = ({ id, setActiveTab }) => {
+const Family = ({ id,refreshTabDetails, setActiveTab }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
@@ -371,19 +371,19 @@ if(patientData){
           },
           raisedBy: {
             ...familyInformation.raisedBy,
-            value:  patientData.raisedBy,
+            value:  patientData.raisedBy.split(";;") || "",
              isTouched: false,
             isValid: true,
           },
           motherDescription: {
             ...familyInformation.motherDescription,
-            value: patientData.motherDescription,
+            value: patientData.motherDescription.split(";;") || "",
              isTouched: false,
             isValid: true,
           },
           fatherDescription: {
             ...familyInformation.fatherDescription,
-            value: patientData.fatherDescription,
+            value: patientData.fatherDescription.split(";;") || "",
              isTouched: false,
             isValid: true,
           },
@@ -665,62 +665,206 @@ if(patientData){
   };
 
   // Handle form submission
-  const handleSubmitFamilyInformation = async (e) => {
-    e.preventDefault();
-    const isValid = validateFamilyInformation();
-    console.log("isValid", isValid);
-    if (isValid) {
-      const submitPayload = generateSubmitPayload(familyInformation);
-      console.log(submitPayload);
-      addFamilyInformationData(submitPayload);
-      setMode("edit");
-    //  setActiveTab("medical");
-    }
-  };
-
-  // Section-specific save logic
-  const handleSubmitp =async (section) => {
-
-    setIsSaving(true);
-    const isValid = validateFamilyInformation();
-    if (!isValid) {
- console.log("Validation failed, not saving.");
-   setIsSaving(false);
-      return false;
-    }
-
- const payload = {
-    };
-    Object.entries(familyInformation).forEach(([key, field]) => {
-     // console.log("field.",field);
-      if (field.isTouched) {
-        payload[key] = field.value;
-      }
-    });
-
-    console.log("Save Payload:", payload);
-
-try{
+ const handleSubmitFamilyInformation = async (e) => {
+      e.preventDefault();
+      setIsSaving(true);
+      const isValid = validateFamilyInformation();
+      console.log("isValid", isValid);
+      if (isValid) {
+          const payload = {
+      patientId:id,
+  spouseOccupation: familyInformation.spouseOccupation.value,
+  spouseOccupationFullTime: familyInformation.spouseOccupationFullTime.value,
+  motherAge: familyInformation.motherAge.value,
+  ageWhenMotherDied: familyInformation.ageWhenMotherDied.value,
+  fatherAge: familyInformation.fatherAge.value,
+  ageWhenFatherDied: familyInformation.ageWhenFatherDied.value,
+  motherOccupation: familyInformation.motherOccupation.value,
+  fatherOccupation: familyInformation.fatherOccupation.value,
+  motherReligion: familyInformation.motherReligion.value,
+  fatherReligion: familyInformation.fatherReligion.value,
+  raisedBy: familyInformation.raisedBy.value.map(item => ({ name: item })),
+  motherDescription: familyInformation.motherDescription.value.map(item => ({ name: item })),
+  fatherDescription: familyInformation.fatherDescription.value.map(item => ({ name: item })),
+  parentalSeparationAge: familyInformation.parentalSeparationAge.value,
+  parentalDivorceAge: familyInformation.parentalDivorceAge.value,
+  motherDivorceCount: familyInformation.motherDivorceCount.value,
+  fatherDivorceCount: familyInformation.fatherDivorceCount.value,
+  livingBrothers: familyInformation.livingBrothers.value,
+  livingSisters: familyInformation.livingSisters.value,
+  brothersAges: familyInformation.brothersAges.value,
+  sistersAges: familyInformation.sistersAges.value,
+  childNumber: familyInformation.childNumber.value,
+  familyChildren: familyInformation.familyChildren.value,
+  adopted: familyInformation.adopted.value,
+  brotherDisturbances: familyInformation.brotherDisturbances.value,
+  sisterDisturbances: familyInformation.sisterDisturbances.value,
+  maleRelativesDisturbed: familyInformation.maleRelativesDisturbed.value,
+  maleRelativesHospitalized: familyInformation.maleRelativesHospitalized.value,
+  femaleRelativesDisturbed: familyInformation.femaleRelativesDisturbed.value,
+  femaleRelativesHospitalized: familyInformation.femaleRelativesHospitalized.value,
+  pageName: "family",
+  isConfirm: true
+};
     
-        const res=await updateFamilyInformationData(id,payload);
-      console.log("update result:", res);
-          setIsSaving(false);
-          return true;
-
-   }
-     catch (err) {
-       console.log("Save Payload: err", err.message);
-      setModal({
-        isOpen: true,
-        message: err.message,
-        type: "error",
-      });
-      setFamilyInformation(initialFamilyInformation);
-      setIsSaving(false);
-      return false;
+  
+  
+        const submitPayloadWithPatientId = {
+          ...payload,
+          patientId: id,
+        };
+   
+    try{
+         const res=  await addFamilyInformation(submitPayloadWithPatientId)
+        console.log("Save res:", res);
+         //await loadPersonalInformationData();
+            console.log("update result:", res);
+            if(res.data.responseStatus === "failed") {
+        
+              setModal({
+          isOpen: true,
+          message: res.data.outputMessage,
+          type: "warning",
+        });
+  
+           setIsSaving(false);
+  
+              return;
+            }
+  
+            if(res.data.error){
+                    setModal({
+          isOpen: true,
+          message: res.data.error.message,
+          type: "warning",
+        });
+  
+         setIsSaving(false);
+  
+              return;
+  
+            }
+  
+                setMode("edit");
+            setIsSaving(false);
+            refreshTabDetails(Math.random())
+            
+      }
+       catch (err) {
+         console.log("Save Payload: err", err.message);
+        setModal({
+          isOpen: true,
+          message: err.message,
+          type: "error",
+        });
+       setIsSaving(false);
+      }
+  
+        setIsSaving(false);
     }
+    };
 
-  };
+    const handleSubmitp =async (section) => {
+    
+  setIsSaving(true);
+      const isValid = validateFamilyInformation();
+      if (!isValid) {
+        console.log("Validation failed, not saving.");
+         setIsSaving(false);
+        return false;
+      }
+  
+  
+      const payload = {
+  spouseOccupation: familyInformation.spouseOccupation.value,
+  spouseOccupationFullTime: familyInformation.spouseOccupationFullTime.value,
+  motherAge: familyInformation.motherAge.value,
+  ageWhenMotherDied: familyInformation.ageWhenMotherDied.value,
+  fatherAge: familyInformation.fatherAge.value,
+  ageWhenFatherDied: familyInformation.ageWhenFatherDied.value,
+  motherOccupation: familyInformation.motherOccupation.value,
+  fatherOccupation: familyInformation.fatherOccupation.value,
+  motherReligion: familyInformation.motherReligion.value,
+  fatherReligion: familyInformation.fatherReligion.value,
+  raisedBy: familyInformation.raisedBy.value.map(item => ({ name: item })),
+  motherDescription: familyInformation.motherDescription.value.map(item => ({ name: item })),
+  fatherDescription: familyInformation.fatherDescription.value.map(item => ({ name: item })),
+  parentalSeparationAge: familyInformation.parentalSeparationAge.value,
+  parentalDivorceAge: familyInformation.parentalDivorceAge.value,
+  motherDivorceCount: familyInformation.motherDivorceCount.value,
+  fatherDivorceCount: familyInformation.fatherDivorceCount.value,
+  livingBrothers: familyInformation.livingBrothers.value,
+  livingSisters: familyInformation.livingSisters.value,
+  brothersAges: familyInformation.brothersAges.value,
+  sistersAges: familyInformation.sistersAges.value,
+  childNumber: familyInformation.childNumber.value,
+  familyChildren: familyInformation.familyChildren.value,
+  adopted: familyInformation.adopted.value,
+  brotherDisturbances: familyInformation.brotherDisturbances.value,
+  sisterDisturbances: familyInformation.sisterDisturbances.value,
+  maleRelativesDisturbed: familyInformation.maleRelativesDisturbed.value,
+  maleRelativesHospitalized: familyInformation.maleRelativesHospitalized.value,
+  femaleRelativesDisturbed: familyInformation.femaleRelativesDisturbed.value,
+  femaleRelativesHospitalized: familyInformation.femaleRelativesHospitalized.value,
+  pageName: "family",
+  isConfirm: true
+      };
+  
+  
+      console.log("Save Payload:", payload);
+  
+   
+      try{
+        const res=await updateFamilyInformation(id,payload);
+          //await loadPersonalInformationData();
+            console.log("update result:", res);
+
+
+
+ if(res.data.responseStatus === "failed") {
+        
+              setModal({
+          isOpen: true,
+          message: res.data.outputMessage,
+          type: "warning",
+        });
+  
+           setIsSaving(false);
+  
+              return;
+            }
+  
+            if(res.data.error){
+                    setModal({
+          isOpen: true,
+          message: res.data.error.message,
+          type: "warning",
+        });
+  
+         setIsSaving(false);
+  
+              return;
+  
+            }
+
+
+            setIsSaving(false);
+            return true;
+      }
+       catch (err) {
+         console.log("Save Payload: err", err.message);
+        setModal({
+          isOpen: true,
+          message: err.message,
+          type: "error",
+        });
+        //setPersonalInformation(initialPersonalInformation);
+        setIsSaving(false);
+        return false;
+      }
+  
+  
+    };
 
   // Helper function to render list items
   const renderListItems = (value) => {

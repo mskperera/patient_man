@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit } from 'react-icons/fa';
-import { addEducationData, getALData, getALStreams, getALSubjects, getDegrees, getEducationYearsData, getOLData, getOLSubjects, getScholarshipData, getUniversityData, updateALData, updateEducationYearsData, updateOLData, updateScholarshipData, updateUniversityData } from '../data/mockData';
+import { updateALData, updateEducationYearsData, updateOLData, updateScholarshipData, updateUniversityData } from '../data/mockData';
 import TypeableDropdown from './TypeableDropdown';
 import LoadingSpinner from './LoadingSpinner';
 import MessageModel from './MessageModel';
-import { getAl, getEducationYears, getOl, getScholarship } from '../functions/patient';
+import { addEducation, addSubject, drpALStreams, drpALSubjects, drpInstitutions, drpOLSubjects, drpUniversitySubjects, getAl, getEducationYears, getOl, getScholarship, getUniversity, updateEducation } from '../functions/patient';
 
-const EducationDetails = ({ id }) => {
+const EducationDetails = ({ id, refreshTabDetails }) => {
   const currentYear = 2025;
   const yearOptions = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
@@ -16,8 +16,8 @@ const EducationDetails = ({ id }) => {
     educationYears: '',
     scholarship: { enabled: true, marks: '', schoolAdmitted: '', result: '', remark: '' },
     ol: { enabled: true, subjects: [], remark: '' },
-    al: { enabled: true, stream: '', subjects: [], remark: '' },
-    university: { enabled: true, subjects: [], remark: '' },
+    al: { enabled: true, alStreamId: '', alStreamName: '', subjects: [], remark: '' },
+    university: { enabled: true, subjects: [], remark: '',institutionId: '', institutionName: '' },
   });
 
   const [educationYearsErrors, setEducationYearsErrors] = useState({});
@@ -29,24 +29,53 @@ const EducationDetails = ({ id }) => {
   const [alStremsOptions, setAlStremsOptions] = useState([]);
   const [alSubjectsOptions, setAlSubjectsOptions] = useState([]);
   const [degreeOptions, setDegreeOptions] = useState([]);
+  const [institutionsOptions, setInstitutionsOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [initialEducationInformation, setInitialEducationInformation] = useState(null);
   const [modal, setModal] = useState({ isOpen: false, message: "", type: "error" });
 
+
+
+
+   const [olSubjectListError,setOLSubjectListError]=useState('');
+ const [alSubjectListError,setALSubjectListError]=useState('');
+  const [universitySubjectListError,setUniversitySubjectListError]=useState('');
+
   useEffect(() => {
     loadDropdowns();
   }, []);
 
-  const loadDropdowns = async () => {
-    const olsubjectsOptions = await getOLSubjects();
-    setOlsubjectsOptions(olsubjectsOptions.data);
-    const alStrems = await getALStreams();
-    setAlStremsOptions(alStrems.data);
-    const alSubjects = await getALSubjects();
-    setAlSubjectsOptions(alSubjects.data);
-    const degreeOptions = await getDegrees();
-    setDegreeOptions(degreeOptions.data);
+    const loadDrpALStreams = async () => {
+      const alStrems = await drpALStreams();
+      setAlStremsOptions(alStrems.data.results[0]);
+    }
+    const loadDrpALSubjects = async () => {
+       const alSubjects = await drpALSubjects();
+    setAlSubjectsOptions(alSubjects.data.results[0]);
+    }
+
+    const loadDrpUniversitySubjects=async ()=>{
+          const degreeOptions = await drpUniversitySubjects();
+    setDegreeOptions(degreeOptions.data.results[0]);
+    }
+
+    const loadDrpOLSubjects=async ()=>{
+      const olsubjectsOptions =await  drpOLSubjects();
+    setOlsubjectsOptions(olsubjectsOptions.data.results[0]);
+    }
+
+       const loadDrpInstitutions=async ()=>{
+      const institutionsOptions =await  drpInstitutions();
+    setInstitutionsOptions(institutionsOptions.data.results[0]);
+    }
+
+  const loadDropdowns =  () => {
+    loadDrpOLSubjects();
+     loadDrpALStreams();
+     loadDrpALSubjects();
+     loadDrpUniversitySubjects();
+     loadDrpInstitutions();
   };
 
   const loadEducationYearsData = async () => {
@@ -131,8 +160,10 @@ const EducationDetails = ({ id }) => {
   };
 
   const loadUniversityData = async () => {
-    const result = await getUniversityData(id);
+          console.log('loadUniversityData id:',id)
+    const result = await getUniversity(id);
     const patientData = result.data;
+      console.log('loadUniversityData ',result)
       if(patientData?.error){
     console.log('patientData.error',patientData.error)
      setModal({
@@ -162,103 +193,199 @@ const EducationDetails = ({ id }) => {
     }
   }, [id]);
 
-  const handleSubmitp = async (section) => {
-    setIsSaving(true);
-    let isValid = false;
-    if (section === 'educationYears') {
-      isValid = _validateEducationYears();
-      if (!isValid) {
-        console.log("Validation failed, not saving.");
+  // const handleSubmitp = async (section) => {
+  //   setIsSaving(true);
+  //   let isValid = false;
+  //   if (section === 'educationYears') {
+  //     isValid = _validateEducationYears();
+  //     if (!isValid) {
+  //       console.log("Validation failed, not saving.");
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //     try {
+  //       const res = await updateEducationYearsData(id, education.educationYears);
+  //       console.log("update result:", res);
+  //       setIsSaving(false);
+  //       return true;
+  //     } catch (err) {
+  //       console.log("Save Payload: err", err.message);
+  //       setModal({ isOpen: true, message: err.message, type: "error" });
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //   } else if (section === 'scholarship') {
+  //     isValid = _validateScholarship();
+  //     if (!isValid) {
+  //       console.log("Validation failed, not saving.");
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //     try {
+  //       const res = await updateScholarshipData(id, education.scholarship);
+  //       console.log("update result:", res);
+  //       setIsSaving(false);
+  //       return true;
+  //     } catch (err) {
+  //       console.log("Save Payload: err", err.message);
+  //       setModal({ isOpen: true, message: err.message, type: "error" });
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //   } else if (section === 'ol') {
+  //     isValid = _validateOLSubject();
+  //     if (!isValid) {
+  //       console.log("Validation failed, not saving.");
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //     try {
+  //       const res = await updateOLData(id, education.ol);
+  //       console.log("update result:", res);
+  //       setIsSaving(false);
+  //       return true;
+  //     } catch (err) {
+  //       console.log("Save Payload: err", err.message);
+  //       setModal({ isOpen: true, message: err.message, type: "error" });
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //   } else if (section === 'al') {
+  //     isValid = _validateALSubject();
+  //     if (!isValid) {
+  //       console.log("Validation failed, not saving.");
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //     try {
+  //       const res = await updateALData(id, education.al);
+  //       console.log("update result:", res);
+  //       setIsSaving(false);
+  //       return true;
+  //     } catch (err) {
+  //       console.log("Save Payload: err", err.message);
+  //       setModal({ isOpen: true, message: err.message, type: "error" });
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //   } else if (section === 'university') {
+  //     isValid = _validateUniversity();
+  //     if (!isValid) {
+  //       console.log("Validation failed, not saving.");
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //     try {
+  //       const res = await updateUniversityData(id, education.university);
+  //       console.log("update result:", res);
+  //       setIsSaving(false);
+  //       return true;
+  //     } catch (err) {
+  //       console.log("Save Payload: err", err.message);
+  //       setModal({ isOpen: true, message: err.message, type: "error" });
+  //       setIsSaving(false);
+  //       return false;
+  //     }
+  //   }
+  //   setIsSaving(false);
+  //   return isValid;
+  // };
+
+ const handleSubmitp = async (section) => {
+     setIsSaving(true);
+  const validations = validateAllFields();
+     console.log('Original validations:', validations);
+    const isAllValidated = validations.every((v) => v !== false);
+           console.log('Original isAllValidated:', isAllValidated);
+    if (isAllValidated && isFormValid()) {
+        console.log('Original Payload:', education);
+
+        // Transform the education payload to match the Postman structure
+        const transformedPayload = {
+            patientId: id, // Hardcoded or replace with dynamic value if available
+            educationYears: education.educationYears || 0,
+            isScholarship: education.scholarship.enabled || false,
+            scholarshipMarks: education.scholarship.marks || 0,
+            schoolAdmitted: education.scholarship.schoolAdmitted || '',
+            scholarshipResult: education.scholarship.result === 'Pass' ? 1 : 0, // Convert 'Pass'/'Fail' to 1/0
+            scholarshipRemark: education.scholarship.remark || '',
+            isOL: education.ol.enabled || false,
+            olSubjects: education.ol.subjects.map(subject => ({
+                name: subject.name,
+                marks: subject.marks,
+                year: subject.year
+            })) || [],
+            olRemark: education.ol.remark || '',
+            isAL: education.al.enabled || false,
+            alStreamName: education.al.alStreamName || '',
+            alSubjects: education.al.subjects.map(subject => ({
+                name: subject.name || 'N/A',
+                marks: subject.marks,
+                year: subject.year,
+            })) || [],
+            alRemark: education.al.remark || '',
+            isUniversity: education.university.enabled || false,
+            universitySubjects: education.university.subjects.map(subject => ({
+                name: subject.name || 'N/A',
+                institution: subject.institutionName || 'N/A',
+                marks: subject.marks,
+                year: subject.year,
+            })) || [],
+            universityRemark: education.university.remark || '',
+            isConfirm: true // As per Postman payload
+        };
+
+        console.log('Transformed Payload:', transformedPayload);
+        const res = await updateEducation(id, transformedPayload);
+
+        if(res.data.outputValues.responseStatus === "failed") {
+
+            setModal({ isOpen: true, message: res.data.outputValues.outputMessage, type: "warning" });
+            setIsSaving(false);
+            return;
+        }
+
+        if(section==="ol"){
+         await loadDrpOLSubjects();
+         await loadOLData();
+     
+        }
+        if(section==="al"){
+          await loadDrpALStreams();
+          await loadDrpALSubjects();
+          await loadALData();
+
+        }
+        if(section==="university"){
+              await loadDrpUniversitySubjects();
+              await loadDrpInstitutions();
+         await loadUniversityData();
+      
+        }
+        await loadEducationYearsData();
+
+            setModal({ isOpen: true, message: res.data.outputValues.outputMessage, type: "success" });
         setIsSaving(false);
-        return false;
-      }
-      try {
-        const res = await updateEducationYearsData(id, education.educationYears);
-        console.log("update result:", res);
-        setIsSaving(false);
-        return true;
-      } catch (err) {
-        console.log("Save Payload: err", err.message);
-        setModal({ isOpen: true, message: err.message, type: "error" });
-        setIsSaving(false);
-        return false;
-      }
-    } else if (section === 'scholarship') {
-      isValid = _validateScholarship();
-      if (!isValid) {
-        console.log("Validation failed, not saving.");
-        setIsSaving(false);
-        return false;
-      }
-      try {
-        const res = await updateScholarshipData(id, education.scholarship);
-        console.log("update result:", res);
-        setIsSaving(false);
-        return true;
-      } catch (err) {
-        console.log("Save Payload: err", err.message);
-        setModal({ isOpen: true, message: err.message, type: "error" });
-        setIsSaving(false);
-        return false;
-      }
-    } else if (section === 'ol') {
-      isValid = _validateOLSubject();
-      if (!isValid) {
-        console.log("Validation failed, not saving.");
-        setIsSaving(false);
-        return false;
-      }
-      try {
-        const res = await updateOLData(id, education.ol);
-        console.log("update result:", res);
-        setIsSaving(false);
-        return true;
-      } catch (err) {
-        console.log("Save Payload: err", err.message);
-        setModal({ isOpen: true, message: err.message, type: "error" });
-        setIsSaving(false);
-        return false;
-      }
-    } else if (section === 'al') {
-      isValid = _validateALSubject();
-      if (!isValid) {
-        console.log("Validation failed, not saving.");
-        setIsSaving(false);
-        return false;
-      }
-      try {
-        const res = await updateALData(id, education.al);
-        console.log("update result:", res);
-        setIsSaving(false);
-        return true;
-      } catch (err) {
-        console.log("Save Payload: err", err.message);
-        setModal({ isOpen: true, message: err.message, type: "error" });
-        setIsSaving(false);
-        return false;
-      }
-    } else if (section === 'university') {
-      isValid = _validateUniversity();
-      if (!isValid) {
-        console.log("Validation failed, not saving.");
-        setIsSaving(false);
-        return false;
-      }
-      try {
-        const res = await updateUniversityData(id, education.university);
-        console.log("update result:", res);
-        setIsSaving(false);
-        return true;
-      } catch (err) {
-        console.log("Save Payload: err", err.message);
-        setModal({ isOpen: true, message: err.message, type: "error" });
-        setIsSaving(false);
-        return false;
-      }
+
+            refreshTabDetails(Math.random())
+
+        console.log('Response:', res);
+        if (res.error) {
+            setModal({ isOpen: true, message: res.error, type: "error" });
+            setIsSaving(false);
+            return;
+        }
+        setMode("edit");
+    } else {
+         setModal({ isOpen: true, message: 'Please correct the errors in the form before saving.', type: "warning" });
+            setIsSaving(false);
+        // alert('Please correct the errors in the form before saving.');
     }
-    setIsSaving(false);
-    return isValid;
-  };
+     setIsSaving(false);
+     return isAllValidated;
+   };
+
+
 
   const toggleSectionEdit = async (section) => {
     if (editingSection === section) {
@@ -306,11 +433,11 @@ const EducationDetails = ({ id }) => {
     setScholarshipErrors((prev) => {
       const newErrors = { ...prev };
       if (field === 'marks' || field === undefined) {
-        if (!value?.trim()) {
-          newErrors.marks = 'Marks are required.';
-        } else {
-          delete newErrors.marks;
-        }
+      if (value === undefined || value === null || (typeof value === 'string' && !value.trim()) || (typeof value === 'number' && !value.toString().trim())) {
+      newErrors.marks = 'Marks are required.';
+      } else {
+        delete newErrors.marks;
+      }
       }
       if (field === 'schoolAdmitted' || field === undefined) {
         if (!value?.trim()) {
@@ -362,7 +489,7 @@ const EducationDetails = ({ id }) => {
         }
       }
       if (field === 'marks' || field === undefined) {
-        if (!value?.trim()) {
+        if (value === undefined || value === null || (typeof value === 'string' && !value.trim()) || (typeof value === 'number' && !value.toString().trim())) {
           newErrors[`subject_${index}_marks`] = 'Grade is required.';
         } else {
           delete newErrors[`subject_${index}_marks`];
@@ -374,6 +501,8 @@ const EducationDetails = ({ id }) => {
   };
 
   const validateALStream = (field, value) => {
+
+    console.log('validateALStream called with field:', field, 'value:', value);
     if (!education.al.enabled) {
       setALErrors({});
       return true;
@@ -381,7 +510,7 @@ const EducationDetails = ({ id }) => {
     setALErrors((prev) => {
       const newErrors = { ...prev };
       if (field === 'stream' || field === undefined) {
-        if (!value) {
+        if (!value?.trim()) {
           newErrors.stream = 'Stream is required.';
         } else {
           delete newErrors.stream;
@@ -423,7 +552,7 @@ const EducationDetails = ({ id }) => {
         }
       }
       if (field === 'marks' || field === undefined) {
-        if (!value?.trim()) {
+        if (value === undefined || value === null || (typeof value === 'string' && !value.trim()) || (typeof value === 'number' && !value.toString().trim())) {
           newErrors[`subject_${index}_marks`] = 'Grade is required.';
         } else {
           delete newErrors[`subject_${index}_marks`];
@@ -442,22 +571,22 @@ const EducationDetails = ({ id }) => {
     setUniversityErrors((prev) => {
       const newErrors = { ...prev };
       const qualification = education.university.subjects[index] || {};
-      if (field === 'name' || field === undefined) {
+      if (field === 'degree') {
         if (!value?.trim()) {
           newErrors[`qualification_${index}_name`] = 'Degree is required.';
         } else {
           delete newErrors[`qualification_${index}_name`];
         }
       }
-      if (field === 'institution' || field === undefined) {
+      if (field === 'institution') {
         if (!value?.trim()) {
           newErrors[`qualification_${index}_institution`] = 'Institution is required.';
         } else {
           delete newErrors[`qualification_${index}_institution`];
         }
       }
-      if (field === 'marks' || field === undefined) {
-        if (!value?.trim()) {
+      if (field === 'marks') {
+        if (value === undefined || value === null || (typeof value === 'string' && !value.trim()) || (typeof value === 'number' && !value.toString().trim())) {
           newErrors[`qualification_${index}_marks`] = 'Marks/Grade is required.';
         } else {
           delete newErrors[`qualification_${index}_marks`];
@@ -482,6 +611,13 @@ const EducationDetails = ({ id }) => {
 
   const _validateOLSubject = () => {
     const validations = [];
+   if(education.ol.subjects.length===0 && education.ol.enabled){
+    setOLSubjectListError("At least one subject is required.")
+    return false;
+   }
+
+      setOLSubjectListError("")
+
     education.ol.subjects.forEach((s, index) => {
       validations.push(validateOLSubject(index, 'name', s.name));
       validations.push(validateOLSubject(index, 'marks', s.marks));
@@ -492,8 +628,15 @@ const EducationDetails = ({ id }) => {
 
   const _validateALSubject = () => {
     const validations = [];
+      if(education.al.subjects.length===0 && education.al.enabled){
+    setALSubjectListError("At least one subject is required.");
+    return false;
+   }
+
+     setALSubjectListError("")
+
     validations.push(validateEducationYears(education.educationYears));
-    validations.push(validateALStream(undefined, education.al.stream));
+    validations.push(validateALStream(undefined, education.al.alStreamName));
     education.al.subjects.forEach((s, index) => {
       validations.push(validateALSubject(index, 'name', s.name));
       validations.push(validateALSubject(index, 'marks', s.marks));
@@ -504,9 +647,17 @@ const EducationDetails = ({ id }) => {
 
   const _validateUniversity = () => {
     const validations = [];
+      if(education.university.subjects.length===0 && education.university.enabled){
+    setUniversitySubjectListError("At least one subject is required.")
+    return false;
+   }
+
+     setUniversitySubjectListError("")
+
     education.university.subjects.forEach((s, index) => {
-      validations.push(validateUniversity(index, 'name', s.name));
-      validations.push(validateUniversity(index, 'institution', s.institution));
+      console.log('_validateUniversity',s,index)
+      validations.push(validateUniversity(index, 'degree', s.name));
+      validations.push(validateUniversity(index, 'institution', s.institutionName));
       validations.push(validateUniversity(index, 'marks', s.marks));
     });
     return validations.every(v => v === true);
@@ -669,7 +820,7 @@ const handleTextInputChange = (e) => {
           al: { ...prev.al, enabled: checked },
         }));
         if (checked) {
-          validateALStream('stream', education.al.stream);
+          validateALStream('stream', education.al.streamName);
           education.al.subjects.forEach((s, index) => {
             validateALSubject(index, 'name', s.name);
             validateALSubject(index, 'marks', s.marks);
@@ -684,7 +835,7 @@ const handleTextInputChange = (e) => {
         if (checked) {
           education.university.subjects.forEach((s, index) => {
             validateUniversity(index, 'name', s.name);
-            validateUniversity(index, 'institution', s.institution);
+            validateUniversity(index, 'institution', s.institutionName);
             validateUniversity(index, 'marks', s.marks);
           });
         }
@@ -716,27 +867,43 @@ const handleTextInputChange = (e) => {
     }
   };
 
-  const handleSubjectChange = (level, index, selectedOption) => {
+  const handleSubjectChange =async (level, index, selectedOption,field) => {
     const value = selectedOption ? selectedOption.value : '';
-    console.log('handleSubjectChange',selectedOption)
+    console.log('handleSubjectChange',selectedOption);
+    console.log('handleSubjectChange level',level);
+        console.log('handleSubjectChange field',field);
+    let outputSubjectId = '';
+
+
     setEducation((prev) => {
       if (level === 'ol') {
+
         const updatedSubjects = [...prev.ol.subjects];
-        updatedSubjects[index] = { ...updatedSubjects[index], name: value };
+        updatedSubjects[index] = { ...updatedSubjects[index], value: value,name:selectedOption.name };
         return { ...prev, ol: { ...prev.ol, subjects: updatedSubjects } };
+        
+
+
       } else if (level === 'al') {
         const updatedSubjects = [...prev.al.subjects];
-        updatedSubjects[index] = { ...updatedSubjects[index], name: value };
+        updatedSubjects[index] = { ...updatedSubjects[index], value: value,name:selectedOption.name };
         return { ...prev, al: { ...prev.al, subjects: updatedSubjects } };
       } else if (level === 'stream') {
-        return { ...prev, al: { ...prev.al, stream: value } };
+        return { ...prev, al: { ...prev.al, alStreamId: value, alStreamName: selectedOption.name } };
       } else if (level === 'university') {
         const updatedSubjects = [...prev.university.subjects];
-        updatedSubjects[index] = { ...updatedSubjects[index], name: value };
+
+      if(field==='institution')
+              updatedSubjects[index] = { ...updatedSubjects[index], institutionId: value,institutionName:selectedOption.name };
+      else
+          updatedSubjects[index] = { ...updatedSubjects[index], value: value,name:selectedOption.name };
+
         return { ...prev, university: { ...prev.university, subjects: updatedSubjects } };
       }
+
       return prev;
     });
+
     if (level === 'ol') {
       validateOLSubject(index, 'name', value);
     } else if (level === 'al') {
@@ -744,12 +911,16 @@ const handleTextInputChange = (e) => {
     } else if (level === 'stream') {
       validateALStream('stream', value);
     } else if (level === 'university') {
-      validateUniversity(index, 'name', value);
+      validateUniversity(index, 'degree', value);
+     validateUniversity(index, 'institution', value);
+    validateUniversity(index, 'marks', value);
+     
     }
+  
   };
 
   const addCustomSubject = (level) => {
-    const newSubject = { name: '', marks: '', year: currentYear };
+    const newSubject = { value: '', marks: '', year: currentYear, isNew: true };
     setEducation((prev) => {
       if (level === 'ol') {
         const newSubjects = [...prev.ol.subjects, newSubject];
@@ -757,7 +928,7 @@ const handleTextInputChange = (e) => {
         return { ...prev, ol: { ...prev.ol, subjects: newSubjects } };
       } else if (level === 'al') {
         const newSubjects = [...prev.al.subjects, newSubject];
-        validateALStream('stream', education.al.stream);
+        validateALStream('stream', education.al.alStreamName);
         validateALSubject(newSubjects.length - 1, undefined, '');
         return { ...prev, al: { ...prev.al, subjects: newSubjects } };
       }
@@ -766,7 +937,7 @@ const handleTextInputChange = (e) => {
   };
 
   const addUniversityQualification = () => {
-    const newQualification = { name: '', institution: '', marks: '' };
+    const newQualification = { value: '', institution: '', institutionName: '',institutionId:'', marks: '', year: currentYear, isNew: true };
     setEducation((prev) => {
       const newSubjects = [...prev.university.subjects, newQualification];
       validateUniversity(newSubjects.length - 1, undefined, '');
@@ -814,23 +985,99 @@ const handleTextInputChange = (e) => {
     });
   };
 
+  // const handleSave = async () => {
+  //   const validations = validateAllFields();
+  //   const isAllValidated = validations.every((v) => v !== false);
+  //   if (isAllValidated && isFormValid()) {
+  //     console.log('Payload:', education);
+  //     const res = await addEducationData(id, education);
+  //     console.log('ddddsa', res);
+  //     if (res.error) {
+  //       setModal({ isOpen: true, message: res.error, type: "error" });
+  //       setIsSaving(false);
+  //       return;
+  //     }
+  //     setMode("edit");
+  //   } else {
+  //    // alert('Please correct the errors in the form before saving.');
+  //   }
+  // };
+
+
+  
   const handleSave = async () => {
     const validations = validateAllFields();
     const isAllValidated = validations.every((v) => v !== false);
     if (isAllValidated && isFormValid()) {
-      console.log('Payload:', education);
-      const res = await addEducationData(id, education);
-      console.log('ddddsa', res);
-      if (res.error) {
-        setModal({ isOpen: true, message: res.error, type: "error" });
+        console.log('Original Payload:', education);
+
+        // Transform the education payload to match the Postman structure
+        const transformedPayload = {
+            patientId: id, // Hardcoded or replace with dynamic value if available
+            educationYears: education.educationYears || 0,
+            isScholarship: education.scholarship.enabled || false,
+            scholarshipMarks: education.scholarship.marks || 0,
+            schoolAdmitted: education.scholarship.schoolAdmitted || '',
+            scholarshipResult: education.scholarship.result === 'Pass' ? 1 : 0, // Convert 'Pass'/'Fail' to 1/0
+            scholarshipRemark: education.scholarship.remark || '',
+            isOL: education.ol.enabled || false,
+            olSubjects: education.ol.subjects.map(subject => ({
+                name: subject.name,
+                marks: subject.marks,
+                year: subject.year
+            })) || [],
+            olRemark: education.ol.remark || '',
+            isAL: education.al.enabled || false,
+            alStreamName: education.al.alStreamName || '',
+            alSubjects: education.al.subjects.map(subject => ({
+                name: subject.name || 'N/A',
+                marks: subject.marks,
+                year: subject.year,
+            })) || [],
+            alRemark: education.al.remark || '',
+            isUniversity: education.university.enabled || false,
+            universitySubjects: education.university.subjects.map(subject => ({
+                name: subject.name || 'N/A',
+                institution: subject.institution || 'N/A',
+                marks: subject.marks,
+                year: subject.year,
+            })) || [],
+            universityRemark: education.university.remark || '',
+            isConfirm: true // As per Postman payload
+        };
+
+        console.log('Transformed Payload:', transformedPayload);
+        const res = await addEducation(transformedPayload);
+
+        if(res.data.outputValues.responseStatus === "failed") {
+
+            setModal({ isOpen: true, message: res.data.outputValues.outputMessage, type: "warning" });
+            setIsSaving(false);
+            return;
+        }
+
+    
+       loadDropdowns();
+          loadAllEducationData();
+
+            setModal({ isOpen: true, message: res.data.outputValues.outputMessage, type: "success" });
         setIsSaving(false);
-        return;
-      }
-      setMode("edit");
+
+            refreshTabDetails(Math.random())
+
+        console.log('Response:', res);
+        if (res.error) {
+            setModal({ isOpen: true, message: res.error, type: "error" });
+            setIsSaving(false);
+            return;
+        }
+        setMode("edit");
     } else {
-     // alert('Please correct the errors in the form before saving.');
+         setModal({ isOpen: true, message: 'Please correct the errors in the form before saving.', type: "warning" });
+            setIsSaving(false);
+        // alert('Please correct the errors in the form before saving.');
     }
-  };
+};
 
   return (
     <>
@@ -843,7 +1090,6 @@ const handleTextInputChange = (e) => {
       {!isLoading ? (
         <div className="px-8">
           {/* Educational Background */}
-           {/*{JSON.stringify(education)}*/}
           <section className="mb-12">
     
             <div className="flex justify-between items-center mb-2 pb-2">
@@ -919,7 +1165,7 @@ const handleTextInputChange = (e) => {
                   <input
                     type="checkbox"
                     name="scholarship.enabled"
-                    checked={education.scholarship.enabled !== false}
+                    checked={education.scholarship.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                     disabled={editingSection !== 'scholarship' && mode !== 'add'}
@@ -1060,6 +1306,7 @@ const handleTextInputChange = (e) => {
             )}
           </section>
           {/* G.C.E Ordinary Level (O/L) Qualifications */}
+             
           <section className="mb-14">
             <div className="flex justify-between items-center mb-2 pb-2">
               <div className="flex items-center space-x-3">
@@ -1067,7 +1314,7 @@ const handleTextInputChange = (e) => {
                   <input
                     type="checkbox"
                     name="ol.enabled"
-                    checked={education.ol.enabled !== false}
+                    checked={education.ol.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                     disabled={editingSection !== 'ol' && mode !== 'add'}
@@ -1103,17 +1350,19 @@ const handleTextInputChange = (e) => {
             </div>
             {editingSection === 'ol' || mode === 'add' ? (
               <div className="space-y-4">
-                {JSON.stringify(education)}
+              
+                   {olSubjectListError && <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">{olSubjectListError}</p>}
+
                 {education.ol.subjects.map((subject, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <div className="w-1/3">
                       <label className="block text-sm font-medium text-gray-700">Subject{ <span className="text-red-500">*</span>}</label>
                       <TypeableDropdown
                         options={olsubjectsOptions}
-                        value={subject.name ? { value: subject.name, name: subject.name } : null}
+                        value={{ value: subject.value,name:subject.name }}
                         onChange={(option) => handleSubjectChange('ol', index, option)}
                         placeholder="Select or type subject"
-                        isDisabled={education.ol.enabled === false}
+                        isDisabled={!subject.isNew === true}
                         className="mt-1"
                         classNamePrefix="select"
                         aria-label={`O/L Subject ${index + 1}`}
@@ -1131,7 +1380,7 @@ const handleTextInputChange = (e) => {
                         value={subject.year || currentYear}
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        disabled={education.ol.enabled === false}
+                        disabled={!subject.isNew === true}
                         aria-label={`O/L Subject ${index + 1} year`}
                       >
                         {yearOptions.map((year) => (
@@ -1149,7 +1398,7 @@ const handleTextInputChange = (e) => {
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Grade (e.g., A, B, C, S, W)"
-                        disabled={education.ol.enabled === false}
+                        disabled={!subject.isNew === true}
                         aria-label={`O/L Subject ${index + 1} marks`}
                         required
                       />
@@ -1181,6 +1430,7 @@ const handleTextInputChange = (e) => {
                     </button>
                   </div>
                 ))}
+
                 <button
                   type="button"
                   onClick={() => addCustomSubject('ol')}
@@ -1245,14 +1495,16 @@ const handleTextInputChange = (e) => {
           </section>
 
           {/* G.C.E Advanced Level (A/L) Qualifications */}
+       
           <section className="mb-14">
+            {/* {JSON.stringify(education.al.enabled)} */}
             <div className="flex justify-between items-center mb-2 pb-2">
               <div className="flex items-center space-x-3">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     name="al.enabled"
-                    checked={education.al.enabled !== false}
+                    checked={education.al.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                     disabled={editingSection !== 'al' && mode !== 'add'}
@@ -1288,11 +1540,13 @@ const handleTextInputChange = (e) => {
             </div>
             {editingSection === 'al' || mode === 'add' ? (
               <div className="space-y-4">
+                  
+                {/* {JSON.stringify(alStremsOptions)} */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Stream{ <span className="text-red-500">*</span>}</label>
                   <TypeableDropdown
                     options={alStremsOptions}
-                    value={education.al.stream ? { value: education.al.stream, label: education.al.stream } : null}
+                    value={{ value: education.al.alStreamId,name:education.al.alStreamName}}
                     onChange={(option) => handleSubjectChange('stream', null, option)}
                     placeholder="Select or type stream"
                     isDisabled={education.al.enabled === false}
@@ -1302,16 +1556,18 @@ const handleTextInputChange = (e) => {
                   />
                   {alErrors.stream && <p className="mt-1 text-sm text-red-600">{alErrors.stream}</p>}
                 </div>
+   {alSubjectListError && <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">{alSubjectListError}</p>}
+                
                 {education.al.subjects.map((subject, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <div className="w-1/3">
                       <label className="block text-sm font-medium text-gray-700">Subject{ <span className="text-red-500">*</span>}</label>
                       <TypeableDropdown
                         options={alSubjectsOptions}
-                        value={subject.name ? { value: subject.name, label: subject.name } : null}
-                        onChange={(option) => handleSubjectChange('al', index, option)}
+                        value={{value: subject.value,name:subject.name }}
+                        onChange={(option) => handleSubjectChange('al', index, option,'subject')}
                         placeholder="Select or type subject"
-                        isDisabled={education.al.enabled === false}
+                        isDisabled={!subject.isNew === true}
                         className="mt-1"
                         classNamePrefix="select"
                         aria-label={`A/L Subject ${index + 1}`}
@@ -1329,7 +1585,7 @@ const handleTextInputChange = (e) => {
                         value={subject.year || currentYear}
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        disabled={education.al.enabled === false}
+                        disabled={!subject.isNew === true}
                         aria-label={`A/L Subject ${index + 1} year`}
                       >
                         {yearOptions.map((year) => (
@@ -1347,7 +1603,7 @@ const handleTextInputChange = (e) => {
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Grade (e.g., A, B, C, S, W)"
-                        disabled={education.al.enabled === false}
+                        disabled={!subject.isNew === true}
                         aria-label={`A/L Subject ${index + 1} marks`}
                         required
                       />
@@ -1411,7 +1667,7 @@ const handleTextInputChange = (e) => {
                 {education.al.enabled !== false && (
                   <>
                     <div>
-                      <strong>Stream:</strong> {education.al.stream || 'N/A'}
+                      <strong>Stream:</strong> {education.al.alStreamName || 'N/A'}
                     </div>
                     {education.al.subjects.length > 0 ? (
                       <div>
@@ -1457,7 +1713,7 @@ const handleTextInputChange = (e) => {
                   <input
                     type="checkbox"
                     name="university.enabled"
-                    checked={education.university.enabled !== false}
+                    checked={education.university.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                     disabled={editingSection !== 'university' && mode !== 'add'}
@@ -1493,17 +1749,24 @@ const handleTextInputChange = (e) => {
             </div>
             {editingSection === 'university' || mode === 'add' ? (
               <div className="space-y-4">
+                      {universitySubjectListError && <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">{universitySubjectListError}</p>}
+
                 {education.university.subjects.map((qualification, index) => (
+                  <>
+                 
                   <div key={index} className="flex items-center space-x-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
-                      <div>
+                       
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1">
+                    
+                      <div className='col-span-2'>
                         <label className="block text-sm font-medium text-gray-700">Degree{ <span className="text-red-500">*</span>}</label>
+           
                         <TypeableDropdown
                           options={degreeOptions}
-                          value={qualification.name ? { value: qualification.name, label: qualification.name } : null}
-                          onChange={(option) => handleSubjectChange('university', index, option)}
+                          value={{ value: qualification.value,name:qualification.name}}
+                          onChange={(option) => handleSubjectChange('university', index, option,'degree')}
                           placeholder="Select or type degree"
-                          isDisabled={education.university.enabled === false}
+                          isDisabled={!qualification.isNew === true}
                           className="mt-1"
                           classNamePrefix="select"
                           aria-label={`Degree ${index + 1}`}
@@ -1512,20 +1775,70 @@ const handleTextInputChange = (e) => {
                           <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_name`]}</p>
                         )}
                       </div>
-                      <div>
+                      <div className='col-span-2'>
                         <label className="block text-sm font-medium text-gray-700">Institution{ <span className="text-red-500">*</span>}</label>
-                        <input
+                       <TypeableDropdown
+                          options={institutionsOptions}
+                          value={{ value: qualification.institutionId,name:qualification.institutionName}}
+                          onChange={(option) => handleSubjectChange('university', index, option,'institution')}
+                          placeholder="e.g., University of Colombo"
+                          isDisabled={!qualification.isNew === true}
+                          className="mt-1"
+                          classNamePrefix="select"
+                             aria-label={`Institution ${index + 1}`}
+                        />
+                        {/* <input
                           name={`education.university.subjects.${index}.institution`}
                           value={qualification.institution || ''}
                           onChange={handleTextInputChange}
                           className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                           placeholder="e.g., University of Colombo"
-                          disabled={education.university.enabled === false}
+                          disabled={!qualification.isNew === true}
                           aria-label={`Institution ${index + 1}`}
                           required
-                        />
+                        /> */}
                         {universityErrors[`qualification_${index}_institution`] && (
                           <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_institution`]}</p>
+                        )}
+                      </div>
+                               <div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <label className="block text-sm font-medium text-gray-700">Year{ <span className="text-red-500">*</span>}</label>
+                       
+                                 <select
+                        name={`education.university.subjects.${index}.year`}
+                        value={qualification.year || currentYear}
+                        onChange={handleTextInputChange}
+                        className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                        disabled={!qualification.isNew === true}
+                        aria-label={`University Subject ${index + 1} year`}
+                      >
+                        {yearOptions.map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                       
+                  
+                        {universityErrors[`qualification_${index}_year`] && (
+                          <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_year`]}</p>
                         )}
                       </div>
                       <div>
@@ -1536,7 +1849,7 @@ const handleTextInputChange = (e) => {
                           onChange={handleTextInputChange}
                           className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                           placeholder="e.g., First Class"
-                          disabled={education.university.enabled === false}
+                          disabled={!qualification.isNew === true}
                           aria-label={`Marks ${index + 1}`}
                           required
                         />
@@ -1568,6 +1881,7 @@ const handleTextInputChange = (e) => {
                       </svg>
                     </button>
                   </div>
+                   </>
                 ))}
                 <button
                   type="button"
@@ -1606,6 +1920,7 @@ const handleTextInputChange = (e) => {
                         <tr className="bg-gray-200">
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Degree</th>
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Institution</th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Marks/Grade</th>
                         </tr>
                       </thead>
@@ -1613,7 +1928,8 @@ const handleTextInputChange = (e) => {
                         {education.university.subjects.map((qualification, index) => (
                           <tr key={index}>
                             <td className="border border-gray-300 p-2">{qualification.name || 'N/A'}</td>
-                            <td className="border border-gray-300 p-2">{qualification.institution || 'N/A'}</td>
+                            <td className="border border-gray-300 p-2">{qualification.institutionName || 'N/A'}</td>
+                              <td className="border border-gray-300 p-2">{qualification.year || 'N/A'}</td>
                             <td className="border border-gray-300 p-2">{qualification.marks || 'N/A'}</td>
                           </tr>
                         ))}

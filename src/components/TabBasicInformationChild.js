@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import { addBasicInformationData, getBasicInformationData, updateBasicInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
-import { getPatientBasicInfo } from "../functions/patient";
+import { addBasicInformation, getPatientBasicInfo, updateBasicInformation } from "../functions/patient";
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 
-const TabBasicInformationChild = ({ id,setNewId }) => {
+const TabBasicInformationChild = ({ id, refreshTabDetails, setNewId }) => {
 
-
+const navigate =useNavigate();
   const [basicInformationErrors, setBasicInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
@@ -50,7 +50,7 @@ const TabBasicInformationChild = ({ id,setNewId }) => {
       required: false,
       dataType: "string",
     },
-    dob: {
+    dateOfBirth: {
       label: "Date of Birth",
       value: "",
       isTouched: false,
@@ -132,7 +132,7 @@ const TabBasicInformationChild = ({ id,setNewId }) => {
     const result = await getPatientBasicInfo(id);
 
     const patientData = result.data;
-
+   console.log('patientData',patientData)
       if(patientData.error){
     console.log('patientData.error',patientData.error)
      setModal({
@@ -169,9 +169,9 @@ const TabBasicInformationChild = ({ id,setNewId }) => {
           isTouched: false,
           isValid: true,
         },
-        dob: {
-          ...basicInformation.dob,
-          value: patientData.dateOfBirth,
+        dateOfBirth: {
+          ...basicInformation.dateOfBirth,
+          value: moment(patientData.dateOfBirth).format("yyyy-MM-DD"),
           isTouched: false,
           isValid: true,
         },
@@ -277,15 +277,18 @@ setIsSaving(true);
     const payload = {};
     Object.entries(basicInformation).forEach(([key, field]) => {
      // console.log("field.",field);
-      if (field.isTouched) {
+      //if (field.isTouched) {
         payload[key] = field.value;
-      }
+      //}
     });
 
+  
     console.log("Save Payload:", payload);
 
     try{
-   const res=await updateBasicInformationData(id,payload);
+
+  // const res=await updateBasicInformationData(id,payload);
+       const res=await updateBasicInformation(id,payload);
    await loadBasicInformationData();
      console.log("update result:", res);
      setIsSaving(false);
@@ -334,7 +337,7 @@ setIsSaving(true);
       },
     };
 
-    if (name === "dob") {
+    if (name === "dateOfBirth") {
       const birthDate = new Date(value);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -366,10 +369,15 @@ setIsSaving(true);
     Object.entries(basicInformation).forEach(([key, field]) => {
       if (!field || typeof field !== "object" || !("value" in field)) return;
 
-      const { value, required, dataType } = field;
+      const { value, required, dataType,isValid } = field;
+
+      if(isValid===false){
+      console.log('invalidated field',key)
+      }
+
       let errorMessage = "";
 
-      if (required && (!value || value.toString().trim() === "")) {
+      if (required && (value===null || value===undefined || value.toString().trim() === "")) {
         errorMessage = `${field.label} is required.`;
       }
 
@@ -447,12 +455,54 @@ if(!isValid){
 
       const submitPayload = generateSubmitPayload(basicInformation);
       try{
-      
-    const res=await addBasicInformationData(submitPayload);
-setNewId(res.newId);
+      const payload={
+  lastName: basicInformation.lastName.value,
+  firstName: basicInformation.firstName.value,
+    middleName: basicInformation.middleName.value,
+  dateOfBirth: basicInformation.dateOfBirth.value,
+  age: basicInformation.age.value,
+  gender: basicInformation.gender.value,
+  email: basicInformation.email.value,
+  homePhone: basicInformation.homePhone.value,
+  businessPhone: basicInformation.businessPhone.value,
+  permanentAddress: basicInformation.permanentAddress.value,
+  referralSource: basicInformation.referralSource.value,
+  referralPartyPresent: false,
+  utcOffset: "+05:30",
+  pageName: "PatientRegistration",
+  patientTypeId:2,
+  isConfirm: true
+
+}
+
+      const res=await  addBasicInformation(payload);
+ console.log("Save Payload res", res);
+    //const res=await addBasicInformationData(submitPayload);
       console.log(submitPayload);
+
+      if(res.data.outputValues.responseStatus==="failed"){
+   setModal({
+        isOpen: true,
+        message: res.data.outputValues.outputMessage,
+        type: "warning",
+      });
+ setIsSaving(false);
+      return;
+    }
+
+        setModal({
+        isOpen: true,
+        message: res.data.outputValues.outputMessage,
+        type: "success",
+      });
+
+      setNewId(res.data.outputValues.patientId);
+
       setMode("edit");
        setIsSaving(false);
+       // /patient?id=${patient.patientId}&type=${patient.patientTypeId}
+       navigate(`/patient?id=${res.data.outputValues.patientId}&type=2`)
+      // refreshTabDetails(Math.random());
       }
       catch(err){
          console.log("Save Payload: err", err.message);
@@ -567,19 +617,19 @@ setNewId(res.newId);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Date of Birth {basicInformation.dob.required && <span className="text-red-500">*</span>}
+                Date of Birth {basicInformation.dateOfBirth.required && <span className="text-red-500">*</span>}
               </label>
               <input
                 type="date"
-                name="dob"
-                value={basicInformation.dob.value}
+                name="dateOfBirth"
+                value={basicInformation.dateOfBirth.value}
                 onChange={handleChangeBasicInfo}
                 className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 aria-label="Date of birth"
               />
-              {basicInformationErrors.dob && (
+              {basicInformationErrors.dateOfBirth && (
                 <p className="mt-1 text-sm text-red-600">
-                  {basicInformationErrors.dob}
+                  {basicInformationErrors.dateOfBirth}
                 </p>
               )}
             </div>
@@ -589,7 +639,7 @@ setNewId(res.newId);
               </label>
               <div className="flex items-center gap-2 p-3 border text-sm border-gray-300 rounded-md bg-gray-50">
                 <span className="text-gray-900 text-base font-medium">
-                  {basicInformation.age.value || "--"}
+                  {basicInformation.age.value}
                 </span>
                 <span className="text-gray-600 text-sm">Years</span>
               </div>
@@ -809,11 +859,11 @@ setNewId(res.newId);
               </div>
               <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/3">Date of Birth</span>
-                <span className="text-gray-800 w-2/3 text-right">{moment(basicInformation.dob?.value).format("yyyy MMM DD") || "N/A"}</span>
+                <span className="text-gray-800 w-2/3 text-right">{moment(basicInformation.dateOfBirth?.value).format("yyyy MMM DD") || "N/A"}</span>
               </div>
               <div className="flex justify-between items-center mr-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/3">Age</span>
-                <span className="text-gray-800 w-2/3 text-right">{basicInformation.age?.value || "N/A"}</span>
+                <span className="text-gray-800 w-2/3 text-right">{basicInformation.age?.value}</span>
               </div>
               <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-blue-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/3">Gender</span>
@@ -835,10 +885,7 @@ setNewId(res.newId);
                 <span className="font-semibold text-gray-700 w-1/3">Home Phone</span>
                 <span className="text-gray-800 w-2/3 text-right">{basicInformation.homePhone?.value || "N/A"}</span>
               </div>
-              <div className="flex justify-between items-center ml-5 p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-green-500 transition-colors">
-                <span className="font-semibold text-gray-700 w-1/3">Business Phone</span>
-                <span className="text-gray-800 w-2/3 text-right">{basicInformation.businessPhone?.value || "N/A"}</span>
-              </div>
+          
               <div className="col-span-2 flex justify-between items-center p-3 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-green-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/3">Permanent Address</span>
                 <span className="text-gray-800 w-2/3 text-right">{basicInformation.permanentAddress?.value || "N/A"}</span>
@@ -865,7 +912,7 @@ setNewId(res.newId);
               </div>
               <div className="flex justify-between items-center p-3 ml-5 bg-gray-100 rounded-lg border-l-4 border-blue-400 hover:bg-gray-100 hover:border-purple-500 transition-colors">
                 <span className="font-semibold text-gray-700 w-1/2">Referral Party Present</span>
-                <span className="text-gray-800 w-1/2 text-right">{basicInformation.referralPartyPresent?.value || "N/A"}</span>
+                <span className="text-gray-800 w-1/2 text-right">{(basicInformation.referralPartyPresent?.value==="1"?"Yes":"No") || "N/A"}</span>
               </div>
             </div>
           </div>

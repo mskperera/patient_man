@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { addPersonalInformationData, getBadPointsOptions, getGoodPointsOptionsData, getOccupations, getPersonalInformationData, goodPointsOptionsData, personalInformationData, updatePersonalInformationData } from "../data/mockData";
+import {  getBadPointsOptions, getGoodPointsOptionsData, getOccupations } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
-import { getPatientPersonalInfo } from "../functions/patient";
+import { addPersonalInformation, getPatientPersonalInfo, updatePersonalInformation } from "../functions/patient";
+import VoiceToText from "./VoiceToText";
 
 
  const maritalStatusOptions = [
@@ -19,7 +20,7 @@ import { getPatientPersonalInfo } from "../functions/patient";
 
 
 
-const PersonalInformation = ({ id, setActiveTab }) => {
+const PersonalInformation = ({ id,refreshTabDetails, setActiveTab }) => {
   const navigate = useNavigate();
   const [personalInformationErrors, setPersonalInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
@@ -219,15 +220,15 @@ const PersonalInformation = ({ id, setActiveTab }) => {
             isTouched: false,
             isValid: true,
           },
-          assets: {
+         assets: {
             ...personalInformation.assets,
-            value: patientData.assets || "",
+            value: patientData.assets.split(";;") || "",
             isTouched: false,
             isValid: true,
           },
           badPoints: {
             ...personalInformation.badPoints,
-            value: patientData.badPoints || "",
+            value: patientData.badPoints.split(";;") || "",
             isTouched: false,
             isValid: true,
           },
@@ -354,17 +355,33 @@ setIsSaving(true);
 
 
     const payload = {
+    patientId:id,
+  maritalStatus: personalInformation.maritalStatus.value,
+  yearsMarried: personalInformation.yearsMarried.value,
+  maleChildrenAges: personalInformation.maleChildrenAges.value,
+  femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+  religiosity: personalInformation.religiosity.value,
+  thingsLiked: personalInformation.thingsLiked.value,
+  assets: personalInformation.assets.value.map(item => ({ name: item })),
+  badPoints: personalInformation.badPoints.value.map(item => ({ name: item })),
+  socialDifficulties: personalInformation.socialDifficulties.value,
+  loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+  schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
+  lifeGoals: personalInformation.lifeGoals.value,
+  thingsToChange: personalInformation.thingsToChange.value,
+  occupationTrained: personalInformation.occupationTrained.value,
+  occupation: personalInformation.occupation.value,
+  occupationFullTime: personalInformation.occupationFullTime.value,
+  pageName: "PatientBackgroundForm",
+  isConfirm: true
     };
-    Object.entries(personalInformation).forEach(([key, field]) => {
-     // console.log("field.",field);
-      if (field.isTouched) {
-        payload[key] = field.value;
-      }
-    });
+
 
     console.log("Save Payload:", payload);
+
+ 
     try{
-      const res=await updatePersonalInformationData(id,payload);
+      const res=await updatePersonalInformation(id,payload);
         //await loadPersonalInformationData();
           console.log("update result:", res);
           setIsSaving(false);
@@ -544,14 +561,83 @@ setIsSaving(true);
     const isValid = validatePersonalInformation();
     console.log("isValid", isValid);
     if (isValid) {
-      const submitPayload = generateSubmitPayload(personalInformation);
-      console.log(submitPayload);
-      await addPersonalInformationData(submitPayload)
-      setMode("edit");
-     // setActiveTab("family");
+        const payload = {
+    patientId:id,
+  // maritalStatus: personalInformation.maritalStatus.value,
+  // yearsMarried: personalInformation.yearsMarried.value,
+  // maleChildrenAges: personalInformation.maleChildrenAges.value,
+  // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+  // religiosity: personalInformation.religiosity.value,
+  thingsLiked: personalInformation.thingsLiked.value,
+  assets: personalInformation.assets.value.map(item => ({ name: item })),
+  badPoints: personalInformation.badPoints.value.map(item => ({ name: item })),
+  socialDifficulties: personalInformation.socialDifficulties.value,
+  //loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+  schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
+  lifeGoals: personalInformation.lifeGoals.value,
+  thingsToChange: personalInformation.thingsToChange.value,
+  // occupationTrained: personalInformation.occupationTrained.value,
+  // occupation: personalInformation.occupation.value,
+  // occupationFullTime: personalInformation.occupationFullTime.value,
+  pageName: "PatientBackgroundForm",
+  isConfirm: true
+    };
+  
+
+
+      const submitPayloadWithPatientId = {
+        ...payload,
+        patientId: id,
+      };
+ 
+  try{
+       const res=  await addPersonalInformation(submitPayloadWithPatientId)
+      console.log("Save res:", res);
+       //await loadPersonalInformationData();
+          console.log("update result:", res);
+          if(res.data.responseStatus === "failed") {
+      
+            setModal({
+        isOpen: true,
+        message: res.data.outputMessage,
+        type: "warning",
+      });
+
+         setIsSaving(false);
+
+            return;
+          }
+
+          if(res.data.error){
+                  setModal({
+        isOpen: true,
+        message: res.data.error.message,
+        type: "warning",
+      });
+
+       setIsSaving(false);
+
+            return;
+
+          }
+
+              setMode("edit");
+          setIsSaving(false);
+          refreshTabDetails(Math.random());
+          
+    }
+     catch (err) {
+       console.log("Save Payload: err", err.message);
+      setModal({
+        isOpen: true,
+        message: err.message,
+        type: "error",
+      });
+     setIsSaving(false);
     }
 
       setIsSaving(false);
+  }
   };
 
 
@@ -834,15 +920,15 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List the things you like to do most, kinds of things and persons that give you pleasure {personalInformation.thingsLiked.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
-                name="thingsLiked"
+                <VoiceToText
+              name="thingsLiked"
                 value={personalInformation.thingsLiked.value}
                 onChange={handleChangePersonalInfo}
                 className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe your interests and pleasures"
                 aria-label="Things liked"
-              />
+          />
               {personalInformationErrors.thingsLiked && (
                 <p className="mt-1 text-sm text-red-600">{personalInformationErrors.thingsLiked}</p>
               )}
@@ -893,7 +979,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List your main social difficulties{personalInformation.socialDifficulties.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                <VoiceToText
                 name="socialDifficulties"
                 value={personalInformation.socialDifficulties.value}
                 onChange={handleChangePersonalInfo}
@@ -910,7 +996,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List your main love and sex difficulties{personalInformation.loveSexDifficulties.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                <VoiceToText
                 name="loveSexDifficulties"
                 value={personalInformation.loveSexDifficulties.value}
                 onChange={handleChangePersonalInfo}
@@ -927,7 +1013,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List your main school or work difficulties{personalInformation.schoolWorkDifficulties.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                <VoiceToText
                 name="schoolWorkDifficulties"
                 value={personalInformation.schoolWorkDifficulties.value}
                 onChange={handleChangePersonalInfo}
@@ -942,7 +1028,7 @@ setIsSaving(true);
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">List your main life goals{personalInformation.lifeGoals.required && <span className="text-red-500">*</span>}</label>
-              <textarea
+              <VoiceToText
                 name="lifeGoals"
                 value={personalInformation.lifeGoals.value}
                 onChange={handleChangePersonalInfo}
@@ -959,7 +1045,7 @@ setIsSaving(true);
               <label className="block text-sm font-medium text-gray-700">
                 List the things about yourself you would most like to change{personalInformation.thingsToChange.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+         <VoiceToText
                 name="thingsToChange"
                 value={personalInformation.thingsToChange.value}
                 onChange={handleChangePersonalInfo}

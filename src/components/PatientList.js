@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaCheck, FaEye } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-
 import Pagination from './Pagination';
 import { getPatientRegistrations } from '../functions/patient';
 
@@ -32,12 +31,26 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
       setError(null);
       const response = await getPatientRegistrations(payload);
       console.log('getPatientList response:', response);
-      const results = response.data.results[0] || [];
+      
+      // Ensure results is an array, default to empty array if undefined
+      const results = response.data.results?.[0] || [];
+      
+      // Update local and parent state
       setLocalPatients(results);
-      setPatients(results); // Update parent state
-      const { totalRows } = response.data.outputValues || { totalRows: 0 };
+      setPatients(results);
+
+      // Safely extract totalRows, default to 0 if undefined
+      const { totalRows = 0 } = response.data.outputValues || {};
       setTotalRecords(totalRows);
-      setTotalPages(Math.ceil(totalRows / rowsPerPage));
+      
+      // Calculate total pages, ensure at least 1 page
+      const calculatedTotalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+      setTotalPages(calculatedTotalPages);
+
+      // Reset currentPage if it exceeds totalPages
+      if (currentPage > calculatedTotalPages) {
+        setCurrentPage(1);
+      }
     } catch (err) {
       setError(
         err.code === 'ER_CON_COUNT_ERROR'
@@ -45,11 +58,15 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
           : 'Failed to load patient list. Please try again later.'
       );
       console.error('Error fetching patient list:', err);
+      setLocalPatients([]);
+      setTotalRecords(0);
+      setTotalPages(1);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Trigger API call when triggerSearch, currentPage, or rowsPerPage changes
   useEffect(() => {
     if (triggerSearch > 0) {
       getPatientList(currentPage);
@@ -57,12 +74,14 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
   }, [triggerSearch, currentPage, rowsPerPage]);
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const handleRowsPerPageChange = (newRowsPerPage) => {
     setRowsPerPage(newRowsPerPage);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page when rows per page changes
   };
 
   return (
@@ -127,7 +146,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
                   onClick={() => onSelectPatient && onSelectPatient(patient)}
                   role={onSelectPatient ? 'button' : undefined}
                   tabIndex={onSelectPatient ? 0 : undefined}
-               >
+                >
                   <td className="py-3 px-4 border text-gray-800">{patient.patientNo}</td>
                   <td className="py-3 px-4 border text-gray-800">
                     {`${patient.firstName} ${patient.middleName || ''} ${patient.lastName}`}
@@ -145,7 +164,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
                         className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors"
                         aria-label={`Select patient ${patient.firstName} ${patient.lastName}`}
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent row click from triggering twice
+                          e.stopPropagation();
                           onSelectPatient(patient);
                         }}
                       >
@@ -170,7 +189,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
         </table>
       </div>
 
-      {triggerSearch > 0 && (
+      {triggerSearch > 0 && totalRecords > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

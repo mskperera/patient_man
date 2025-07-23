@@ -83,14 +83,14 @@ const MessageModel = ({ isOpen, onClose, message, type = "error" }) => {
           >
             Close
           </button>
-          {type === "warning" && (
+          {/* {type === "warning" && (
             <button
               onClick={onClose}
               className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-all duration-200"
             >
               Acknowledge
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>

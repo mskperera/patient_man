@@ -1402,12 +1402,12 @@ export const occupations = [
 // Mock options for DescriptionInput
 export const getGoodPointsOptionsData =async()=>{
 const data=  [
-  { patientId: "1", name: "Problem-solver – I enjoy analyzing issues and finding effective solutions." },
-  { patientId: "2", name: "Quick learner – I can pick up new tools and frameworks rapidly." },
-  { patientId: "3", name: "Strong work ethic – I am committed to meeting deadlines and taking responsibility." },
-  { patientId: "4", name: "Adaptable – I can adjust to new environments, teams, or technologies easily." },
-  { patientId: "5", name: "Team player – I communicate well and collaborate effectively with others." },
-  { patientId: "6", name: "Detail-oriented – I notice small issues before they grow into big problems." },
+  { patientId: "1", name: "Problem-solver : I enjoy analyzing issues and finding effective solutions." },
+  { patientId: "2", name: "Quick learner : I can pick up new tools and frameworks rapidly." },
+  { patientId: "3", name: "Strong work ethic : I am committed to meeting deadlines and taking responsibility." },
+  { patientId: "4", name: "Adaptable : I can adjust to new environments, teams, or technologies easily." },
+  { patientId: "5", name: "Team player : I communicate well and collaborate effectively with others." },
+  { patientId: "6", name: "Detail-oriented : I notice small issues before they grow into big problems." },
   { patientId: "7", name: "Other" },
 ]
 return {data};

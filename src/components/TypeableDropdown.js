@@ -13,22 +13,24 @@ const TypeableDropdown = ({
 }) => {
   // Transform options to match react-select's expected format (value/label)
   const transformedOptions = options.map(option => ({
-    value: option.value,
+    value: option.value.toString(),
     label: option.name,
   }));
 
   // Transform the selected value to match react-select's format
-  const selectedValue = value
-    ? { value: value.value, label: options.find(opt => opt.value === value.value)?.name}
-    : null;
+  const selectedValue = value.value!==value.name
+    ? { value: value.value, label: transformedOptions.find(opt => opt.value.toString() === value.value.toString())?.label}
+    : { value: value.value, label: value.name};
 
   // Handle change and pass the option in the format expected by handleSubjectChange
   const handleChange = (option) => {
-    const newValue = option ? { value: option.value } : null;
+    const newValue = option ? { value: option.value.toString(), name: option.label } : null;
     onChange(newValue);
   };
 
   return (
+    <>
+    {/* {JSON.stringify(value)} */}
     <CreatableSelect
       options={transformedOptions}
       value={selectedValue}
@@ -39,6 +41,7 @@ const TypeableDropdown = ({
       classNamePrefix={classNamePrefix}
       aria-label={ariaLabel}
     />
+    </>
   );
 };
 

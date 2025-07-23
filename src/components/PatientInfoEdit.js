@@ -12,6 +12,7 @@ import {
   FaInfoCircle,
   FaPrint,
   FaChild,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -27,14 +28,12 @@ import TabPersonalInformationIndividual from "./TabPersonalInformationIndividual
 import BasicInformationTab from "./BasicInformationTab";
 import FamilyTab from "./FamilyTab";
 import MedicalTab from "./MedicalTab";
-import TabMedicalChild from "./TabMedicalChild";
+
 
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
-import { getPatientBasicInfo } from "../functions/patient";
+import { getPatientBasicInfo, getProfileTabDetails } from "../functions/patient";
 import TabBasicInformationChild from "./TabBasicInformationChild";
-import TabFamilyChild from "./TabFamilyChild";
-import TabEducationDetailsChild from "./TabEducationDetailsChild";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
@@ -50,6 +49,13 @@ function PatientInfoEdit({ mode = "view" }) {
   const [isLoading, setIsLoading] = useState(false);
   // Default A/L subjects (Science stream as default, will allow stream selection)
  
+const [tabDetails,setTabDetails]=useState({
+isBasicInfo:false,
+isEducationInfo:false,
+isFamilyInfo:false,
+isMedicalInfo:false,
+isPersonalInfo:false,
+});
 
   const [basicInformation, setBasicInformation] = useState({
     patientNo: "",
@@ -85,12 +91,36 @@ function PatientInfoEdit({ mode = "view" }) {
    setIsLoading(false);
   };
 
+
+    const loadProfileTabDetails = async () => {
+    setIsLoading(true);
+    const result = await getProfileTabDetails(id);
+    const data = result.data;
+    setTabDetails(data);
+    console.log('getProfileTabDetails', data);
+ if (data) {
+
+
+
+ }
+   setIsLoading(false);
+  };
+
+
+
    useEffect(() => {
     if (id) {
+    
       loadBasicInformationData();
+      loadProfileTabDetails();
     }
   }, [id]);
 
+  const refreshTabDetailsHandler = (newId) => {
+    //setNewId(newId);
+    //loadBasicInformationData();
+    loadProfileTabDetails();
+  };
 
   return (   
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -242,6 +272,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaInfoCircle className="mr-2" size={16} />
           Basic Information
+             <span className="ml-1">
+                {!tabDetails.isBasicInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -253,6 +288,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaUser className="mr-2" size={16} />
           Personal
+             <span className="ml-1">
+                {!tabDetails.isPersonalInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         {/* <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -276,6 +316,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaHeartPulse className="mr-2" size={16} />
           Mental Health
+                   <span className="ml-1">
+                {!tabDetails.isMedicalInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -287,6 +332,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaGraduationCap className="mr-2" size={16} />
           Education
+                <span className="ml-1">
+                {!tabDetails.isEducationInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
 
         <button
@@ -324,11 +374,11 @@ function PatientInfoEdit({ mode = "view" }) {
         </button>
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
-        {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
-        {activeTab === "personal" && <TabPersonalInformationIndividual id={id || newId} />}
+        {activeTab === "basicInformation" && <BasicInformationTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} setNewId={setNewId} />}
+        {activeTab === "personal" && <TabPersonalInformation refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
         {/* {activeTab === "family" && <FamilyTab id={id || newId} />} */}
-        {activeTab === "medical" && <MedicalTab id={id || newId} />}
-        {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
+        {activeTab === "medical" && <MedicalTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
+        {activeTab === "education" && <EducationDetailsTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
            {activeTab === "notes" && <NotesTab />}
         {/* {activeTab === "selfEsteemTest" && <NotesTab />} */}
         {activeTab === "mentalExam" && <TabMentalStatusExam />}
@@ -350,6 +400,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaInfoCircle className="mr-2" size={16} />
           Basic Information
+          <span className="ml-1">
+                {!tabDetails.isBasicInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -361,6 +416,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaUser className="mr-2" size={16} />
           Personal
+             <span className="ml-1">
+                {!tabDetails.isPersonalInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -372,6 +432,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaUsers className="mr-2" size={16} />
           Family
+             <span className="ml-1">
+                {!tabDetails.isFamilyInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
 
         <button
@@ -384,6 +449,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaHeartPulse className="mr-2" size={16} />
           Mental Health
+             <span className="ml-1">
+                {!tabDetails.isMedicalInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -395,6 +465,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaGraduationCap className="mr-2" size={16} />
           Education
+             <span className="ml-1">
+                {!tabDetails.isEducationInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
 
         <button
@@ -421,11 +496,11 @@ function PatientInfoEdit({ mode = "view" }) {
         </button>
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
-        {activeTab === "basicInformation" && <TabBasicInformationChild id={id || newId} setNewId={setNewId} />}
-        {activeTab === "personal" && <TabPersonalInformationChild id={id || newId} />}
-        {activeTab === "family" && <TabFamilyChild id={id || newId} />}
-        {activeTab === "medical" && <TabMedicalChild id={id || newId} />}
-        {activeTab === "education" && <TabEducationDetailsChild id={id || newId} />}
+        {activeTab === "basicInformation" && <TabBasicInformationChild refreshTabDetails={refreshTabDetailsHandler} id={id || newId} setNewId={setNewId} />}
+        {activeTab === "personal" && <TabPersonalInformationChild id={id || newId} refreshTabDetails={refreshTabDetailsHandler} />}
+        {activeTab === "family" && <FamilyTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
+        {activeTab === "medical" && <MedicalTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
+        {activeTab === "education" && <EducationDetailsTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
         {activeTab === "notes" && <NotesTab />}
         {activeTab === "mentalExam" && <TabMentalStatusExam />}
       </form>
@@ -446,6 +521,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaInfoCircle className="mr-2" size={16} />
           Basic Information
+                <span className="ml-1">
+                {!tabDetails.isBasicInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -457,6 +537,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaUser className="mr-2" size={16} />
           Personal
+                <span className="ml-1">
+                {!tabDetails.isPersonalInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -468,6 +553,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaUsers className="mr-2" size={16} />
           Family
+                <span className="ml-1">
+                {!tabDetails.isFamilyInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
 
         <button
@@ -480,6 +570,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaHeartPulse className="mr-2" size={16} />
           Mental Health
+                <span className="ml-1">
+                {!tabDetails.isMedicalInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
         <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -491,6 +586,11 @@ function PatientInfoEdit({ mode = "view" }) {
         >
           <FaGraduationCap className="mr-2" size={16} />
           Education
+                <span className="ml-1">
+                {!tabDetails.isEducationInfo  &&  
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                }
+              </span>
         </button>
 
         <button
@@ -517,11 +617,11 @@ function PatientInfoEdit({ mode = "view" }) {
         </button>
       </div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-8 px-2 ">
-        {activeTab === "basicInformation" && <BasicInformationTab id={id || newId} setNewId={setNewId} />}
-        {activeTab === "personal" && <TabPersonalInformation id={id || newId} />}
-        {activeTab === "family" && <FamilyTab id={id || newId} />}
-        {activeTab === "medical" && <MedicalTab id={id || newId} />}
-        {activeTab === "education" && <EducationDetailsTab id={id || newId} />}
+        {activeTab === "basicInformation" && <BasicInformationTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} setNewId={setNewId} />}
+        {activeTab === "personal" && <TabPersonalInformation refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
+        {activeTab === "family" && <FamilyTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
+        {activeTab === "medical" && <MedicalTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
+        {activeTab === "education" && <EducationDetailsTab refreshTabDetails={refreshTabDetailsHandler} id={id || newId} />}
         {activeTab === "notes" && <NotesTab />}
         {activeTab === "mentalExam" && <TabMentalStatusExam />}
       </form>

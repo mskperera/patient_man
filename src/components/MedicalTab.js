@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
-import { addMedicalInformationData, getMedicalInformationData, medicalInformationData, updateMedicalInformationData } from "../data/mockData";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
-import { getPatientMedicalInfo } from "../functions/patient";
+import { addMedicalInformation, getPatientMedicalInfo, updateMedicalInformation } from "../functions/patient";
+import VoiceToText from "./VoiceToText";
 
 
-const MedicalTab = ({ id, setActiveTab }) => {
+const MedicalTab = ({ id,refreshTabDetails, setActiveTab }) => {
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
@@ -349,63 +349,234 @@ const MedicalTab = ({ id, setActiveTab }) => {
   };
 
   // Handle form submission
-  const handleSubmitMedicalInformation = async (e) => {
-    e.preventDefault();
-    const isValid = validateMedicalInformation();
-    if (isValid) {
-      const submitPayload = generateSubmitPayload(medicalInformation);
-      console.log("Medical Information Payload:", submitPayload);
-      addMedicalInformationData(submitPayload);
-      setMode("edit");
-     // setActiveTab("education"); // Navigate to the next tab
-    }
+   const handleSubmitMedicalInformation = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        const isValid = validateMedicalInformation();
+        console.log("isValid", isValid);
+        if (isValid) {
+            const payload = {
+        patientId:id,
+  physicalAilments: medicalInformation.physicalAilments.value,
+  mainComplaints: medicalInformation.mainComplaints.value,
+  pastComplaints: medicalInformation.pastComplaints.value,
+  worseConditions: medicalInformation.worseConditions.value,
+  improvedConditions: medicalInformation.improvedConditions.value,
+  individualTherapyHours: medicalInformation.individualTherapyHours.value,
+  individualTherapyYears: medicalInformation.individualTherapyYears.value,
+  individualTherapyEndYears: medicalInformation.individualTherapyEndYears.value,
+  groupTherapyHours: medicalInformation.groupTherapyHours.value,
+  psychiatricHospitalizationMonths: medicalInformation.psychiatricHospitalizationMonths.value,
+  currentTreatment: medicalInformation.currentTreatment.value,
+  antidepressantsCount: medicalInformation.antidepressantsCount.value,
+  psychotherapyType: medicalInformation.psychotherapyType.value,
+  additionalInfo: medicalInformation.additionalInfo.value,
+    pageName: "medical",
+    isConfirm: true
   };
+      
+    
+    
+          const submitPayloadWithPatientId = {
+            ...payload,
+            patientId: id,
+          };
+     
+      try{
+           const res=  await addMedicalInformation(submitPayloadWithPatientId)
+          console.log("Save res:", res);
+           //await loadPersonalInformationData();
+              console.log("update result:", res);
+              if(res.data.responseStatus === "failed") {
+          
+                setModal({
+            isOpen: true,
+            message: res.data.outputMessage,
+            type: "warning",
+          });
+    
+             setIsSaving(false);
+    
+                return;
+              }
+    
+              if(res.data.error){
+                      setModal({
+            isOpen: true,
+            message: res.data.error.message,
+            type: "warning",
+          });
+    
+           setIsSaving(false);
+    
+                return;
+    
+              }
+    
+                  setMode("edit");
+              setIsSaving(false);
+                setModal({ isOpen: true, message: res.data.outputValues.outputMessage, type: "success" });
+              refreshTabDetails(Math.random())
+              
+        }
+         catch (err) {
+           console.log("Save Payload: err", err.message);
+          setModal({
+            isOpen: true,
+            message: err.message,
+            type: "error",
+          });
+         setIsSaving(false);
+        }
+    
+          setIsSaving(false);
+      }
+      };
+
+  // const handleSubmitMedicalInformation = async (e) => {
+  //   e.preventDefault();
+  //   const isValid = validateMedicalInformation();
+  //   if (isValid) {
+  //     const submitPayload = generateSubmitPayload(medicalInformation);
+  //     console.log("Medical Information Payload:", submitPayload);
+  //     addMedicalInformationData(submitPayload);
+  //     setMode("edit");
+  //    // setActiveTab("education"); // Navigate to the next tab
+  //   }
+  // };
 
   // Modified handleSubmit to handle section-specific saving
-  const handleSubmitp =async (section) => {
-       setIsSaving(true);
-    const isValid = validateMedicalInformation();
-    if (!isValid) {
-         console.log("Validation failed, not saving.");
-            setIsSaving(false);
-     return false;
-    }
 
-  const payload = {
-    };
-    Object.entries(medicalInformation).forEach(([key, field]) => {
-     // console.log("field.",field);
-      if (field.isTouched) {
-        payload[key] = field.value;
-      }
-    });
-
-
-
-
-
-
-  try{
-     console.log("Save Payload:", payload);
-          const res=await updateMedicalInformationData(id,payload);
-        //await loadPersonalInformationData();
-          console.log("update result:", res);
+      const handleSubmitp =async (section) => {
+      
+    setIsSaving(true);
+        const isValid = validateMedicalInformation();
+        if (!isValid) {
+          console.log("Validation failed, not saving.");
+           setIsSaving(false);
+          return false;
+        }
+    
+    
+        const payload = {
+     physicalAilments: medicalInformation.physicalAilments.value,
+  mainComplaints: medicalInformation.mainComplaints.value,
+  pastComplaints: medicalInformation.pastComplaints.value,
+  worseConditions: medicalInformation.worseConditions.value,
+  improvedConditions: medicalInformation.improvedConditions.value,
+  individualTherapyHours: medicalInformation.individualTherapyHours.value,
+  individualTherapyYears: medicalInformation.individualTherapyYears.value,
+  individualTherapyEndYears: medicalInformation.individualTherapyEndYears.value,
+  groupTherapyHours: medicalInformation.groupTherapyHours.value,
+  psychiatricHospitalizationMonths: medicalInformation.psychiatricHospitalizationMonths.value,
+  currentTreatment: medicalInformation.currentTreatment.value,
+  antidepressantsCount: medicalInformation.antidepressantsCount.value,
+  psychotherapyType: medicalInformation.psychotherapyType.value,
+  additionalInfo: medicalInformation.additionalInfo.value,
+    pageName: "medical",
+    isConfirm: true
+        };
+    
+    
+        console.log("Save Payload:", payload);
+    
+     
+        try{
+          const res=await updateMedicalInformation(id,payload);
+            //await loadPersonalInformationData();
+              console.log("update result:", res);
+  
+  
+  
+   if(res.data.responseStatus === "failed") {
+          
+                setModal({
+            isOpen: true,
+            message: res.data.outputMessage,
+            type: "warning",
+          });
+    
+             setIsSaving(false);
+    
+                return;
+              }
+    
+              if(res.data.error){
+                      setModal({
+            isOpen: true,
+            message: res.data.error.message,
+            type: "warning",
+          });
+    
+           setIsSaving(false);
+    
+                return;
+    
+              }
+  
+  
+              setIsSaving(false);
+              return true;
+        }
+         catch (err) {
+           console.log("Save Payload: err", err.message);
+          setModal({
+            isOpen: true,
+            message: err.message,
+            type: "error",
+          });
+          //setPersonalInformation(initialPersonalInformation);
           setIsSaving(false);
-          return true;
-    }
-     catch (err) {
-       console.log("Save Payload: err", err.message);
-      setModal({
-        isOpen: true,
-        message: err.message,
-        type: "error",
-      });
-     // setMedicalInformation(initialMedicalInformation);
-      setIsSaving(false);
-      return false;
-    }
+          return false;
+        }
+    
+    
+      };
 
-  };
+  // const handleSubmitp =async (section) => {
+  //      setIsSaving(true);
+  //   const isValid = validateMedicalInformation();
+  //   if (!isValid) {
+  //        console.log("Validation failed, not saving.");
+  //           setIsSaving(false);
+  //    return false;
+  //   }
+
+  // const payload = {
+  //   };
+  //   Object.entries(medicalInformation).forEach(([key, field]) => {
+  //    // console.log("field.",field);
+  //     if (field.isTouched) {
+  //       payload[key] = field.value;
+  //     }
+  //   });
+
+
+
+
+
+
+  // try{
+  //    console.log("Save Payload:", payload);
+  //         const res=await updateMedicalInformationData(id,payload);
+  //       //await loadPersonalInformationData();
+  //         console.log("update result:", res);
+  //         setIsSaving(false);
+  //         return true;
+  //   }
+  //    catch (err) {
+  //      console.log("Save Payload: err", err.message);
+  //     setModal({
+  //       isOpen: true,
+  //       message: err.message,
+  //       type: "error",
+  //     });
+  //    // setMedicalInformation(initialMedicalInformation);
+  //     setIsSaving(false);
+  //     return false;
+  //   }
+
+  // };
 
 
     // Toggle edit mode for a specific section
@@ -509,7 +680,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <label className="block text-sm font-medium text-gray-700">
                 List your chief physical ailments, diseases, complaints, or handicaps {medicalInformation.physicalAilments.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                <VoiceToText
                 name="physicalAilments"
                 value={medicalInformation.physicalAilments.value}
                 onChange={handleChange}
@@ -526,7 +697,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <label className="block text-sm font-medium text-gray-700">
                 Briefly list (PRINT) your present main complaints, symptoms, and problems{medicalInformation.mainComplaints.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                 <VoiceToText
                 name="mainComplaints"
                 value={medicalInformation.mainComplaints.value}
                 onChange={handleChange}
@@ -543,7 +714,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <label className="block text-sm font-medium text-gray-700">
                 Briefly list any additional past complaints, symptoms, and problems{medicalInformation.pastComplaints.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                <VoiceToText
                 name="pastComplaints"
                 value={medicalInformation.pastComplaints.value}
                 onChange={handleChange}
@@ -560,7 +731,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <label className="block text-sm font-medium text-gray-700">
                 Under what conditions are your problems worse?{medicalInformation.worseConditions.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                <VoiceToText
                 name="worseConditions"
                 value={medicalInformation.worseConditions.value}
                 onChange={handleChange}
@@ -577,7 +748,7 @@ const MedicalTab = ({ id, setActiveTab }) => {
               <label className="block text-sm font-medium text-gray-700">
                 Under what conditions are they improved?{medicalInformation.improvedConditions.required && <span className="text-red-500">*</span>}
               </label>
-              <textarea
+                  <VoiceToText
                 name="improvedConditions"
                 value={medicalInformation.improvedConditions.value}
                 onChange={handleChange}
