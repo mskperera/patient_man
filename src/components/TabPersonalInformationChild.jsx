@@ -15,23 +15,9 @@ import {
 import VoiceToText from "./VoiceToText";
 import EditButton from "./EditButton";
 
-const maritalStatusOptions = [
-  { value: "never_married", text: "Never Married" },
-  {
-    value: "married_first_time",
-    text: "Married (Living Together) Now for First Time",
-  },
-  {
-    value: "married_second_time",
-    text: "Married (Living Together) Now for Second (or More) Time",
-  },
-  { value: "separated", text: "Separated" },
-  { value: "divorced_not_remarried", text: "Divorced and Not Remarried" },
-  { value: "widowed_not_remarried", text: "Widowed and Not Remarried" },
-];
 
-const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
-
+const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
+ 
   const [personalInformationErrors, setPersonalInformationErrors] = useState(
     {}
   );
@@ -805,350 +791,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
 
       {!isLoading ? (
         <div className="px-8">
-          {/* Personal Details */}
-          <section className="mb-12">
-            <div className="flex justify-between items-center mb-2  pb-2">
-              <h3 className="text-xl font-semibold text-gray-700">
-                Personal Details
-              </h3>
-              {mode !== "add" && (
-                <div className="flex space-x-4">
-                  <EditButton
-                    onClick={() => toggleSectionEdit("personalDetails")}
-                    ariaLabel={
-                      editingSection === "personalDetails"
-                        ? "Save Personal Details"
-                        : "Edit Personal Details"
-                    }
-                    disabled={isSaving}
-                  >
-                    {editingSection === "personalDetails"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </EditButton>
-
-                  {/* <button
-                    onClick={() => toggleSectionEdit("personalDetails")}
-                    className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={
-                      editingSection === "personalDetails"
-                        ? "Save Personal Details"
-                        : "Edit Personal Details"
-                    }
-                    disabled={isSaving}
-                  >
-                    <FaEdit className="mr-2" />
-                    {editingSection === "personalDetails"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </button> */}
-                  {editingSection === "personalDetails" && (
-                    <button
-                      onClick={() => handleCancel("personalDetails")}
-                      className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
-                      aria-label="Cancel Editing"
-                      disabled={isSaving}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            {editingSection === "personalDetails" || mode === "add" ? (
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Present Marital Status{" "}
-                    {personalInformation.maritalStatus.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
-                    {maritalStatusOptions.map((option) => (
-                      <label key={option.value} className="flex items-center">
-                        <input
-                          type="radio"
-                          name="maritalStatus"
-                          value={option.value}
-                          checked={
-                            personalInformation.maritalStatus.value ===
-                            option.value
-                          }
-                          onChange={handleChangePersonalInfo}
-                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
-                          aria-label={option.text}
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          {option.text}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  {personalInformationErrors.maritalStatus && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {personalInformationErrors.maritalStatus}
-                    </p>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Number of Years Married to Present Spouse
-                      {personalInformation.yearsMarried.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      name="yearsMarried"
-                      value={personalInformation.yearsMarried.value}
-                      onChange={handleChangePersonalInfo}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="eg.,1, 1.5, 2"
-                      disabled={
-                        !["married_first_time", "married_second_time"].includes(
-                          personalInformation.maritalStatus.value
-                        )
-                      }
-                      aria-label="Years married"
-                    />
-                    {personalInformationErrors.yearsMarried && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.yearsMarried}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Ages of Male Children
-                      {personalInformation.maleChildrenAges.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      name="maleChildrenAges"
-                      type="text"
-                      value={personalInformation.maleChildrenAges.value}
-                      onChange={handleChangePersonalInfo}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="e.g., 5, 10, 15"
-                      aria-label="Male children ages"
-                    />
-                    {personalInformationErrors.maleChildrenAges && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.maleChildrenAges}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Ages of Female Children{" "}
-                      {personalInformation.femaleChildrenAges.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      name="femaleChildrenAges"
-                      type="text"
-                      value={personalInformation.femaleChildrenAges.value}
-                      onChange={handleChangePersonalInfo}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="e.g., 3, 8"
-                      aria-label="Female children ages"
-                    />
-                    {personalInformationErrors.femaleChildrenAges && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.femaleChildrenAges}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="col-span-2 mx-20">
-                    <label className="block text-sm font-medium text-gray-700">
-                      How religious are you?
-                      {personalInformation.religiosity.required && (
-                        <span className="text-red-500">*</span>
-                      )}{" "}
-                      (1 = Very Religious, 5 = Average, 9 = Atheist)
-                    </label>
-                    <div className="mt-2 flex items-start justify-between">
-                      <div className="flex w-full justify-between">
-                        <span className="text-xs text-gray-600 -ml-1">
-                          Very
-                        </span>
-                        <span className="text-xs text-gray-600">Average</span>
-                        <span className="text-xs text-gray-600 -mr-1">
-                          Atheist
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-1 space-x-1">
-                      {[...Array(9)].map((_, i) => {
-                        const value = (i + 1).toString();
-                        return (
-                          <label
-                            key={value}
-                            className="flex flex-col items-center"
-                          >
-                            <input
-                              type="radio"
-                              name="religiosity"
-                              value={value}
-                              checked={
-                                personalInformation.religiosity.value.toString() ===
-                                value
-                              }
-                              onChange={handleChangePersonalInfo}
-                              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 custom-radio"
-                              aria-label={`Religiosity level ${value}`}
-                            />
-                            <span className="mt-1 text-sm text-gray-700">
-                              {value}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                    {personalInformationErrors.religiosity && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.religiosity}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
-                <div className="mr-5">
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                    <span className="font-bold text-sm w-1/3">
-                      Present Marital Status
-                    </span>
-                    <span className="text-gray-700 text-sm w-2/3 text-right">
-                      {
-                        maritalStatusOptions.find(
-                          (opt) =>
-                            opt.value ===
-                            personalInformation.maritalStatus.value
-                        )?.text
-                      }
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                    <span className="font-bold text-sm w-1/3">
-                      Ages of Male Children
-                    </span>
-                    <span className="text-gray-700 text-sm w-2/3 text-right flex flex-wrap justify-end gap-2">
-                      {personalInformation.maleChildrenAges.value
-                        ? personalInformation.maleChildrenAges.value
-                            .split(",")
-                            .map((age, index) => (
-                              <span
-                                key={`male-${index}`}
-                                className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
-                              >
-                                <FaMale className="mr-1" /> {age.trim()}
-                              </span>
-                            ))
-                        : "N/A"}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                    <span className="font-bold text-sm w-1/3">
-                      Ages of Female Children
-                    </span>
-                    <span className="text-gray-700 text-sm w-2/3 text-right flex flex-wrap justify-end gap-2">
-                      {personalInformation.femaleChildrenAges.value
-                        ? personalInformation.femaleChildrenAges.value
-                            .split(",")
-                            .map((age, index) => (
-                              <span
-                                key={`female-${index}`}
-                                className="inline-flex items-center px-2 py-1 bg-pink-100 text-pink-800 text-xs font-medium rounded-full"
-                              >
-                                <FaFemale className="mr-1" /> {age.trim()}
-                              </span>
-                            ))
-                        : "N/A"}
-                    </span>
-                  </div>
-                </div>
-                <div className="ml-5">
-                  {["married_first_time", "married_second_time"].includes(
-                    personalInformation.maritalStatus.value
-                  ) ? (
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                      <span className="font-bold text-sm w-2/3">
-                        Number of Years Married to Present Spouse
-                      </span>
-                      <span className="text-gray-700 text-sm w-1/3 text-right">
-                        {personalInformation.yearsMarried.value} yrs
-                      </span>
-                    </div>
-                  ) : null}
-                  <div className="py-2.5">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-bold text-sm text-gray-800">
-                        How religious are you?
-                      </span>
-                      <span className="text-gray-600 text-sm font-medium">
-                        {personalInformation.religiosity.value}
-                      </span>
-                    </div>
-                    <div className="relative w-full h-3 bg-gray-100 rounded-full overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
-                      <div
-                        className={`absolute h-full ${
-                          personalInformation.religiosity.value
-                            ? "bg-green-500"
-                            : "bg-gray-200"
-                        } transition-all duration-500 ease-out`}
-                        style={{
-                          width: `${
-                            personalInformation.religiosity.value
-                              ? ((personalInformation.religiosity.value - 1) /
-                                  8) *
-                                100
-                              : 0
-                          }%`,
-                        }}
-                      ></div>
-                      {personalInformation.religiosity.value && (
-                        <div
-                          className="absolute top-0 h-full w-1 bg-gray-800 shadow-lg"
-                          style={{
-                            left: `calc(${
-                              ((personalInformation.religiosity.value - 1) /
-                                8) *
-                              100
-                            }% - 2px)`,
-                          }}
-                        ></div>
-                      )}
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-2 font-medium">
-                      <span className="hover:text-green-600 transition-colors">
-                        Very Religious (1)
-                      </span>
-                      <span className="hover:text-gray-600 transition-colors">
-                        Average (5)
-                      </span>
-                      <span className="hover:text-green-600 transition-colors">
-                        Atheist (9)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
+     
 
           {/* Personal Insights */}
           <section className="mb-12">
@@ -1301,7 +944,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     </p>
                   )}
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     List your main love and sex difficulties
                     {personalInformation.loveSexDifficulties.required && (
@@ -1322,10 +965,10 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                       {personalInformationErrors.loveSexDifficulties}
                     </p>
                   )}
-                </div>
+                </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    List your main school or work difficulties
+                    List your main school difficulties
                     {personalInformation.schoolWorkDifficulties.required && (
                       <span className="text-red-500">*</span>
                     )}
@@ -1423,7 +1066,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     </p>
                   </div>
                 </div>
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                {/* <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
                     Main Love/Sex Difficulties:
                   </strong>
@@ -1432,10 +1075,10 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                       {personalInformation.loveSexDifficulties.value}
                     </p>
                   </div>
-                </div>
+                </div> */}
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
-                    Main School or Work Difficulties:
+                    Main School Difficulties:
                   </strong>
                   <div className="mt-2">
                     <p className="text-gray-700 mt-1">
@@ -1769,4 +1412,4 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
   );
 };
 
-export default PersonalInformation;
+export default TabPersonalInformationChild;

@@ -5,6 +5,7 @@ import TypeableDropdown from './TypeableDropdown';
 import LoadingSpinner from './LoadingSpinner';
 import MessageModel from './MessageModel';
 import { addEducation, addSubject, drpALStreams, drpALSubjects, drpInstitutions, drpOLSubjects, drpUniversitySubjects, getAl, getEducationYears, getOl, getScholarship, getUniversity, updateEducation } from '../functions/patient';
+import EditButton from './EditButton';
 
 const EducationDetails = ({ id, refreshTabDetails }) => {
   const currentYear = 2025;
@@ -1094,12 +1095,29 @@ const handleTextInputChange = (e) => {
         <div className="px-8">
           {/* Educational Background */}
           <section className="mb-12">
-    
             <div className="flex justify-between items-center mb-2 pb-2">
-              <h3 className="text-xl font-semibold text-gray-800">Educational Background</h3>
-              {mode !== 'add' && (
+              <h3 className="text-xl font-semibold text-gray-800">
+                Educational Background
+              </h3>
+              {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("educationYears")}
+                    ariaLabel={
+                      editingSection === "educationYears"
+                        ? "Save Educational Background"
+                        : "Edit Educational Background"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "educationYears"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("educationYears")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
                     aria-label={editingSection === "educationYears" ? "Save Educational Background" : "Edit Educational Background"}
@@ -1107,7 +1125,7 @@ const handleTextInputChange = (e) => {
                   >
                     <FaEdit className="mr-2" />
                     {editingSection === "educationYears" ? (isSaving ? "Saving..." : "Save") : "Edit"}
-                  </button>
+                  </button> */}
                   {editingSection === "educationYears" && (
                     <button
                       onClick={() => handleCancel("educationYears")}
@@ -1121,40 +1139,47 @@ const handleTextInputChange = (e) => {
                 </div>
               )}
             </div>
-            {editingSection === 'educationYears' || mode === 'add' ? (
+            {editingSection === "educationYears" || mode === "add" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Years of Formal Education Completed{ <span className="text-red-500">*</span>}</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Years of Formal Education Completed
+                    {<span className="text-red-500">*</span>}
+                  </label>
                   <select
                     name="educationYears"
-                    value={education.educationYears || ''}
+                    value={education.educationYears || ""}
                     onChange={handleSelectChange}
                     className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    disabled={editingSection !== 'educationYears' && mode !== 'add'}
+                    disabled={
+                      editingSection !== "educationYears" && mode !== "add"
+                    }
                     aria-label="Years of formal education"
                     required
                   >
                     <option value="">Select years</option>
                     {[...Array(21)].map((_, i) => (
                       <option key={i} value={i}>
-                        {i === 20 ? 'More than 20' : i}
+                        {i === 20 ? "More than 20" : i}
                       </option>
                     ))}
                   </select>
                   {educationYearsErrors.educationYears && (
-                    <p className="mt-1 text-sm text-red-600">{educationYearsErrors.educationYears}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {educationYearsErrors.educationYears}
+                    </p>
                   )}
                 </div>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <strong>Years of Formal Education:</strong>{' '}
+                  <strong>Years of Formal Education:</strong>{" "}
                   {education.educationYears || education.educationYears === 0
                     ? education.educationYears === 20
-                      ? 'More than 20'
+                      ? "More than 20"
                       : education.educationYears
-                    : 'N/A'}
+                    : "N/A"}
                 </div>
               </div>
             )}
@@ -1171,24 +1196,52 @@ const handleTextInputChange = (e) => {
                     checked={education.scholarship.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                    disabled={editingSection !== 'scholarship' && mode !== 'add'}
+                    disabled={
+                      editingSection !== "scholarship" && mode !== "add"
+                    }
                     aria-label="Has Grade 5 Scholarship Qualification"
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-xl font-semibold text-gray-800">Grade 5 Scholarship Qualification</h3>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Grade 5 Scholarship Qualification
+                </h3>
               </div>
-              {mode !== 'add' && (
+              {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("scholarship")}
+                    ariaLabel={
+                      editingSection === "scholarship"
+                        ? "Save Grade 5 Scholarship Qualification"
+                        : "Edit Grade 5 Scholarship Qualification"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "scholarship"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("scholarship")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={editingSection === "scholarship" ? "Save Grade 5 Scholarship Qualification" : "Edit Grade 5 Scholarship Qualification"}
+                    aria-label={
+                      editingSection === "scholarship"
+                        ? "Save Grade 5 Scholarship Qualification"
+                        : "Edit Grade 5 Scholarship Qualification"
+                    }
                     disabled={isSaving}
                   >
                     <FaEdit className="mr-2" />
-                    {editingSection === "scholarship" ? (isSaving ? "Saving..." : "Save") : "Edit"}
-                  </button>
+                    {editingSection === "scholarship"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </button> */}
                   {editingSection === "scholarship" && (
                     <button
                       onClick={() => handleCancel("scholarship")}
@@ -1202,14 +1255,16 @@ const handleTextInputChange = (e) => {
                 </div>
               )}
             </div>
-            {editingSection === 'scholarship' || mode === 'add' ? (
+            {editingSection === "scholarship" || mode === "add" ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Marks{ <span className="text-red-500">*</span>}</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Marks{<span className="text-red-500">*</span>}
+                    </label>
                     <input
                       name="education.scholarship.marks"
-                      value={education.scholarship.marks || ''}
+                      value={education.scholarship.marks || ""}
                       onChange={handleTextInputChange}
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       placeholder="Enter marks (e.g., 180)"
@@ -1217,13 +1272,19 @@ const handleTextInputChange = (e) => {
                       aria-label="Scholarship Marks"
                       required
                     />
-                    {scholarshipErrors.marks && <p className="mt-1 text-sm text-red-600">{scholarshipErrors.marks}</p>}
+                    {scholarshipErrors.marks && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {scholarshipErrors.marks}
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">School Admitted{ <span className="text-red-500">*</span>}</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      School Admitted{<span className="text-red-500">*</span>}
+                    </label>
                     <input
                       name="education.scholarship.schoolAdmitted"
-                      value={education.scholarship.schoolAdmitted || ''}
+                      value={education.scholarship.schoolAdmitted || ""}
                       onChange={handleTextInputChange}
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       placeholder="Enter school name"
@@ -1231,17 +1292,23 @@ const handleTextInputChange = (e) => {
                       aria-label="School Admitted"
                       required
                     />
-                    {scholarshipErrors.schoolAdmitted && <p className="mt-1 text-sm text-red-600">{scholarshipErrors.schoolAdmitted}</p>}
+                    {scholarshipErrors.schoolAdmitted && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {scholarshipErrors.schoolAdmitted}
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Result{ <span className="text-red-500">*</span>}</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Result{<span className="text-red-500">*</span>}
+                    </label>
                     <div className="mt-1 flex space-x-4">
                       <label className="flex items-center">
                         <input
                           type="radio"
                           name="education.scholarship.result"
                           value="Pass"
-                          checked={education.scholarship.result === 'Pass'}
+                          checked={education.scholarship.result === "Pass"}
                           onChange={handleRadioChange}
                           className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
                           disabled={education.scholarship.enabled === false}
@@ -1255,7 +1322,7 @@ const handleTextInputChange = (e) => {
                           type="radio"
                           name="education.scholarship.result"
                           value="Fail"
-                          checked={education.scholarship.result === 'Fail'}
+                          checked={education.scholarship.result === "Fail"}
                           onChange={handleRadioChange}
                           className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
                           disabled={education.scholarship.enabled === false}
@@ -1264,14 +1331,20 @@ const handleTextInputChange = (e) => {
                         <span className="ml-2 text-sm text-gray-700">Fail</span>
                       </label>
                     </div>
-                    {scholarshipErrors.result && <p className="mt-1 text-sm text-red-600">{scholarshipErrors.result}</p>}
+                    {scholarshipErrors.result && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {scholarshipErrors.result}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Remark</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
                   <textarea
                     name="education.scholarship.remark"
-                    value={education.scholarship.remark || ''}
+                    value={education.scholarship.remark || ""}
                     onChange={handleTextInputChange}
                     className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter any additional remarks"
@@ -1284,23 +1357,27 @@ const handleTextInputChange = (e) => {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <strong>Has Grade 5 Scholarship Qualification:</strong>{' '}
-                  {education.scholarship.enabled !== false ? 'Yes' : 'No'}
+                  <strong>Has Grade 5 Scholarship Qualification:</strong>{" "}
+                  {education.scholarship.enabled !== false ? "Yes" : "No"}
                 </div>
                 {education.scholarship.enabled !== false && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <strong>Marks:</strong> {education.scholarship.marks || 'N/A'}
+                      <strong>Marks:</strong>{" "}
+                      {education.scholarship.marks || "N/A"}
                     </div>
                     <div>
-                      <strong>School Admitted:</strong> {education.scholarship.schoolAdmitted || 'N/A'}
+                      <strong>School Admitted:</strong>{" "}
+                      {education.scholarship.schoolAdmitted || "N/A"}
                     </div>
                     <div>
-                      <strong>Result:</strong> {education.scholarship.result || 'N/A'}
+                      <strong>Result:</strong>{" "}
+                      {education.scholarship.result || "N/A"}
                     </div>
                     <div className="col-span-3">
                       <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <strong>Remark:</strong> {education.scholarship.remark || 'N/A'}
+                        <strong>Remark:</strong>{" "}
+                        {education.scholarship.remark || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -1309,7 +1386,7 @@ const handleTextInputChange = (e) => {
             )}
           </section>
           {/* G.C.E Ordinary Level (O/L) Qualifications */}
-             
+
           <section className="mb-14">
             <div className="flex justify-between items-center mb-2 pb-2">
               <div className="flex items-center space-x-3">
@@ -1320,24 +1397,50 @@ const handleTextInputChange = (e) => {
                     checked={education.ol.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                    disabled={editingSection !== 'ol' && mode !== 'add'}
+                    disabled={editingSection !== "ol" && mode !== "add"}
                     aria-label="Has G.C.E O/L Qualifications"
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-xl font-semibold text-gray-800">G.C.E Ordinary Level (O/L) Qualifications</h3>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  G.C.E Ordinary Level (O/L) Qualifications
+                </h3>
               </div>
-              {mode !== 'add' && (
+              {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("ol")}
+                    ariaLabel={
+                      editingSection === "ol"
+                        ? "Save O/L Qualifications"
+                        : "Edit O/L Qualifications"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "ol"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("ol")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={editingSection === "ol" ? "Save O/L Qualifications" : "Edit O/L Qualifications"}
+                    aria-label={
+                      editingSection === "ol"
+                        ? "Save O/L Qualifications"
+                        : "Edit O/L Qualifications"
+                    }
                     disabled={isSaving}
                   >
                     <FaEdit className="mr-2" />
-                    {editingSection === "ol" ? (isSaving ? "Saving..." : "Save") : "Edit"}
-                  </button>
+                    {editingSection === "ol"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </button> */}
                   {editingSection === "ol" && (
                     <button
                       onClick={() => handleCancel("ol")}
@@ -1351,33 +1454,44 @@ const handleTextInputChange = (e) => {
                 </div>
               )}
             </div>
-            {editingSection === 'ol' || mode === 'add' ? (
+            {editingSection === "ol" || mode === "add" ? (
               <div className="space-y-4">
-              
-                   {olSubjectListError && <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">{olSubjectListError}</p>}
+                {olSubjectListError && (
+                  <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">
+                    {olSubjectListError}
+                  </p>
+                )}
 
                 {education.ol.subjects.map((subject, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <div className="w-1/3">
-                      <label className="block text-sm font-medium text-gray-700">Subject{ <span className="text-red-500">*</span>}</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Subject{<span className="text-red-500">*</span>}
+                      </label>
                       <TypeableDropdown
                         options={olsubjectsOptions}
-                        value={{ value: subject.value,name:subject.name }}
-                        onChange={(option) => handleSubjectChange('ol', index, option)}
+                        value={{ value: subject.value, name: subject.name }}
+                        onChange={(option) =>
+                          handleSubjectChange("ol", index, option)
+                        }
                         placeholder="Select or type subject"
                         isDisabled={!subject.isNew === true}
                         className="mt-1"
                         classNamePrefix="select"
                         aria-label={`O/L Subject ${index + 1}`}
                       />
-                      {(olErrors[`subject_${index}_name`] || olErrors[`subject_${index}_duplicate`]) && (
+                      {(olErrors[`subject_${index}_name`] ||
+                        olErrors[`subject_${index}_duplicate`]) && (
                         <p className="mt-1 text-sm text-red-600">
-                          {olErrors[`subject_${index}_name`] || olErrors[`subject_${index}_duplicate`]}
+                          {olErrors[`subject_${index}_name`] ||
+                            olErrors[`subject_${index}_duplicate`]}
                         </p>
                       )}
                     </div>
                     <div className="w-1/4">
-                      <label className="block text-sm font-medium text-gray-700">Year{ <span className="text-red-500">*</span>}</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Year{<span className="text-red-500">*</span>}
+                      </label>
                       <select
                         name={`education.ol.subjects.${index}.year`}
                         value={subject.year || currentYear}
@@ -1394,24 +1508,28 @@ const handleTextInputChange = (e) => {
                       </select>
                     </div>
                     <div className="w-1/4">
-                      <label className="block text-sm font-medium text-gray-700">Grade{ <span className="text-red-500">*</span>}</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Grade{<span className="text-red-500">*</span>}
+                      </label>
                       <input
                         name={`education.ol.subjects.${index}.marks`}
-                        value={subject.marks || ''}
+                        value={subject.marks || ""}
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Grade (e.g., A, B, C, S, W)"
-                       // disabled={!subject.isNew === true}
+                        // disabled={!subject.isNew === true}
                         aria-label={`O/L Subject ${index + 1} marks`}
                         required
                       />
                       {olErrors[`subject_${index}_marks`] && (
-                        <p className="mt-1 text-sm text-red-600">{olErrors[`subject_${index}_marks`]}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {olErrors[`subject_${index}_marks`]}
+                        </p>
                       )}
                     </div>
                     <button
                       type="button"
-                      onClick={() => removeItem('ol', index)}
+                      onClick={() => removeItem("ol", index)}
                       className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
                       disabled={education.ol.enabled === false}
                       aria-label="Remove O/L Subject"
@@ -1436,18 +1554,22 @@ const handleTextInputChange = (e) => {
 
                 <button
                   type="button"
-                  onClick={() => addCustomSubject('ol')}
+                  onClick={() => addCustomSubject("ol")}
                   className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
-                  disabled={education.ol.enabled === false || !canAddOLSubject()}
+                  disabled={
+                    education.ol.enabled === false || !canAddOLSubject()
+                  }
                   aria-label="Add O/L Subject"
                 >
                   Add O/L Subject
                 </button>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Remark</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
                   <textarea
                     name="ol.remark"
-                    value={education.ol.remark || ''}
+                    value={education.ol.remark || ""}
                     onChange={handleTextInputChange}
                     className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter any additional remarks"
@@ -1460,33 +1582,46 @@ const handleTextInputChange = (e) => {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <strong>Has O/L Qualifications:</strong>{' '}
-                  {education.ol.enabled !== false ? 'Yes' : 'No'}
+                  <strong>Has O/L Qualifications:</strong>{" "}
+                  {education.ol.enabled !== false ? "Yes" : "No"}
                 </div>
-                {education.ol.enabled !== false && education.ol.subjects.length > 0 ? (
+                {education.ol.enabled !== false &&
+                education.ol.subjects.length > 0 ? (
                   <div>
                     <strong>Subjects:</strong>
                     <table className="w-full border-collapse border bg-white mt-2 border-gray-200">
                       <thead>
                         <tr className="bg-gray-200">
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Subject
+                          </th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Year
+                          </th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Grade
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {education.ol.subjects.map((subject, index) => (
                           <tr key={index}>
-                            <td className="border border-gray-300 p-2">{subject.name || 'N/A'}</td>
-                            <td className="border border-gray-300 p-2">{subject.year || 'N/A'}</td>
-                            <td className="border border-gray-300 p-2">{subject.marks || 'N/A'}</td>
+                            <td className="border border-gray-300 p-2">
+                              {subject.name || "N/A"}
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              {subject.year || "N/A"}
+                            </td>
+                            <td className="border border-gray-300 p-2">
+                              {subject.marks || "N/A"}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                     <div className="mt-2">
                       <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <strong>Remark:</strong> {education.ol.remark || 'N/A'}
+                        <strong>Remark:</strong> {education.ol.remark || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -1498,7 +1633,7 @@ const handleTextInputChange = (e) => {
           </section>
 
           {/* G.C.E Advanced Level (A/L) Qualifications */}
-       
+
           <section className="mb-14">
             {/* {JSON.stringify(education.al.enabled)} */}
             <div className="flex justify-between items-center mb-2 pb-2">
@@ -1510,24 +1645,50 @@ const handleTextInputChange = (e) => {
                     checked={education.al.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                    disabled={editingSection !== 'al' && mode !== 'add'}
+                    disabled={editingSection !== "al" && mode !== "add"}
                     aria-label="Has G.C.E A/L Qualifications"
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-xl font-semibold text-gray-800">G.C.E Advanced Level (A/L) Qualifications</h3>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  G.C.E Advanced Level (A/L) Qualifications
+                </h3>
               </div>
-              {mode !== 'add' && (
+              {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("al")}
+                    ariaLabel={
+                      editingSection === "al"
+                        ? "Save A/L Qualifications"
+                        : "Edit A/L Qualifications"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "al"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("al")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={editingSection === "al" ? "Save A/L Qualifications" : "Edit A/L Qualifications"}
+                    aria-label={
+                      editingSection === "al"
+                        ? "Save A/L Qualifications"
+                        : "Edit A/L Qualifications"
+                    }
                     disabled={isSaving}
                   >
                     <FaEdit className="mr-2" />
-                    {editingSection === "al" ? (isSaving ? "Saving..." : "Save") : "Edit"}
-                  </button>
+                    {editingSection === "al"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </button> */}
                   {editingSection === "al" && (
                     <button
                       onClick={() => handleCancel("al")}
@@ -1541,48 +1702,70 @@ const handleTextInputChange = (e) => {
                 </div>
               )}
             </div>
-            {editingSection === 'al' || mode === 'add' ? (
+            {editingSection === "al" || mode === "add" ? (
               <div className="space-y-4">
-                  
                 {/* {JSON.stringify(alStremsOptions)} */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Stream{ <span className="text-red-500">*</span>}</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Stream{<span className="text-red-500">*</span>}
+                  </label>
                   <TypeableDropdown
                     options={alStremsOptions}
-                    value={{ value: education.al.alStreamId,name:education.al.alStreamName}}
-                    onChange={(option) => handleSubjectChange('stream', null, option)}
+                    value={{
+                      value: education.al.alStreamId,
+                      name: education.al.alStreamName,
+                    }}
+                    onChange={(option) =>
+                      handleSubjectChange("stream", null, option)
+                    }
                     placeholder="Select or type stream"
                     isDisabled={education.al.enabled === false}
                     className="mt-1"
                     classNamePrefix="select"
                     aria-label="A/L Stream"
                   />
-                  {alErrors.stream && <p className="mt-1 text-sm text-red-600">{alErrors.stream}</p>}
+                  {alErrors.stream && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {alErrors.stream}
+                    </p>
+                  )}
                 </div>
-   {alSubjectListError && <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">{alSubjectListError}</p>}
-                
+                {alSubjectListError && (
+                  <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">
+                    {alSubjectListError}
+                  </p>
+                )}
+
                 {education.al.subjects.map((subject, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <div className="w-1/3">
-                      <label className="block text-sm font-medium text-gray-700">Subject{ <span className="text-red-500">*</span>}</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Subject{<span className="text-red-500">*</span>}
+                      </label>
                       <TypeableDropdown
                         options={alSubjectsOptions}
-                        value={{value: subject.value,name:subject.name }}
-                        onChange={(option) => handleSubjectChange('al', index, option,'subject')}
+                        value={{ value: subject.value, name: subject.name }}
+                        onChange={(option) =>
+                          handleSubjectChange("al", index, option, "subject")
+                        }
                         placeholder="Select or type subject"
                         isDisabled={!subject.isNew === true}
                         className="mt-1"
                         classNamePrefix="select"
                         aria-label={`A/L Subject ${index + 1}`}
                       />
-                      {(alErrors[`subject_${index}_name`] || alErrors[`subject_${index}_duplicate`]) && (
+                      {(alErrors[`subject_${index}_name`] ||
+                        alErrors[`subject_${index}_duplicate`]) && (
                         <p className="mt-1 text-sm text-red-600">
-                          {alErrors[`subject_${index}_name`] || alErrors[`subject_${index}_duplicate`]}
+                          {alErrors[`subject_${index}_name`] ||
+                            alErrors[`subject_${index}_duplicate`]}
                         </p>
                       )}
                     </div>
                     <div className="w-1/4">
-                      <label className="block text-sm font-medium text-gray-700">Year{ <span className="text-red-500">*</span>}</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Year{<span className="text-red-500">*</span>}
+                      </label>
                       <select
                         name={`education.al.subjects.${index}.year`}
                         value={subject.year || currentYear}
@@ -1599,10 +1782,12 @@ const handleTextInputChange = (e) => {
                       </select>
                     </div>
                     <div className="w-1/4">
-                      <label className="block text-sm font-medium text-gray-700">Grade{ <span className="text-red-500">*</span>}</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Grade{<span className="text-red-500">*</span>}
+                      </label>
                       <input
                         name={`education.al.subjects.${index}.marks`}
-                        value={subject.marks || ''}
+                        value={subject.marks || ""}
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Grade (e.g., A, B, C, S, W)"
@@ -1611,12 +1796,14 @@ const handleTextInputChange = (e) => {
                         required
                       />
                       {alErrors[`subject_${index}_marks`] && (
-                        <p className="mt-1 text-sm text-red-600">{alErrors[`subject_${index}_marks`]}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {alErrors[`subject_${index}_marks`]}
+                        </p>
                       )}
                     </div>
                     <button
                       type="button"
-                      onClick={() => removeItem('al', index)}
+                      onClick={() => removeItem("al", index)}
                       className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
                       disabled={education.al.enabled === false}
                       aria-label="Remove A/L Subject"
@@ -1640,18 +1827,22 @@ const handleTextInputChange = (e) => {
                 ))}
                 <button
                   type="button"
-                  onClick={() => addCustomSubject('al')}
+                  onClick={() => addCustomSubject("al")}
                   className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
-                  disabled={education.al.enabled === false || !canAddALSubject()}
+                  disabled={
+                    education.al.enabled === false || !canAddALSubject()
+                  }
                   aria-label="Add A/L Subject"
                 >
                   Add A/L Subject
                 </button>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Remark</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
                   <textarea
                     name="al.remark"
-                    value={education.al.remark || ''}
+                    value={education.al.remark || ""}
                     onChange={handleTextInputChange}
                     className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter any additional remarks"
@@ -1664,13 +1855,14 @@ const handleTextInputChange = (e) => {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <strong>Has A/L Qualifications:</strong>{' '}
-                  {education.al.enabled !== false ? 'Yes' : 'No'}
+                  <strong>Has A/L Qualifications:</strong>{" "}
+                  {education.al.enabled !== false ? "Yes" : "No"}
                 </div>
                 {education.al.enabled !== false && (
                   <>
                     <div>
-                      <strong>Stream:</strong> {education.al.alStreamName || 'N/A'}
+                      <strong>Stream:</strong>{" "}
+                      {education.al.alStreamName || "N/A"}
                     </div>
                     {education.al.subjects.length > 0 ? (
                       <div>
@@ -1678,24 +1870,37 @@ const handleTextInputChange = (e) => {
                         <table className="w-full border-collapse border bg-white mt-2 border-gray-200">
                           <thead>
                             <tr className="bg-gray-200">
-                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Subject</th>
-                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
-                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Grade</th>
+                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                                Subject
+                              </th>
+                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                                Year
+                              </th>
+                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                                Grade
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
                             {education.al.subjects.map((subject, index) => (
                               <tr key={index}>
-                                <td className="border border-gray-300 p-2">{subject.name || 'N/A'}</td>
-                                <td className="border border-gray-300 p-2">{subject.year || 'N/A'}</td>
-                                <td className="border border-gray-300 p-2">{subject.marks || 'N/A'}</td>
+                                <td className="border border-gray-300 p-2">
+                                  {subject.name || "N/A"}
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  {subject.year || "N/A"}
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  {subject.marks || "N/A"}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                         <div className="mt-2">
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <strong>Remark:</strong> {education.al.remark || 'N/A'}
+                            <strong>Remark:</strong>{" "}
+                            {education.al.remark || "N/A"}
                           </div>
                         </div>
                       </div>
@@ -1711,7 +1916,6 @@ const handleTextInputChange = (e) => {
           {/* University Qualifications */}
           <section className="mb-14">
             <div className="flex justify-between items-center mb-2 pb-2">
-         
               <div className="flex items-center space-x-3">
                 <label className="flex items-center">
                   <input
@@ -1720,24 +1924,50 @@ const handleTextInputChange = (e) => {
                     checked={education.university.enabled}
                     onChange={handleCheckboxChange}
                     className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                    disabled={editingSection !== 'university' && mode !== 'add'}
+                    disabled={editingSection !== "university" && mode !== "add"}
                     aria-label="Has University Qualifications"
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-xl font-semibold text-gray-800">University/ Academic/ Professional Qualifications</h3>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  University/ Academic/ Professional Qualifications
+                </h3>
               </div>
-              {mode !== 'add' && (
+              {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("university")}
+                    ariaLabel={
+                      editingSection === "university"
+                        ? "Save University Qualifications"
+                        : "Edit University Qualifications"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "university"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("university")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={editingSection === "university" ? "Save University Qualifications" : "Edit University Qualifications"}
+                    aria-label={
+                      editingSection === "university"
+                        ? "Save University Qualifications"
+                        : "Edit University Qualifications"
+                    }
                     disabled={isSaving}
                   >
                     <FaEdit className="mr-2" />
-                    {editingSection === "university" ? (isSaving ? "Saving..." : "Save") : "Edit"}
-                  </button>
+                    {editingSection === "university"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </button> */}
                   {editingSection === "university" && (
                     <button
                       onClick={() => handleCancel("university")}
@@ -1751,47 +1981,74 @@ const handleTextInputChange = (e) => {
                 </div>
               )}
             </div>
-            {editingSection === 'university' || mode === 'add' ? (
+            {editingSection === "university" || mode === "add" ? (
               <div className="space-y-4">
-                      {universitySubjectListError && <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">{universitySubjectListError}</p>}
+                {universitySubjectListError && (
+                  <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">
+                    {universitySubjectListError}
+                  </p>
+                )}
 
                 {education.university.subjects.map((qualification, index) => (
                   <>
-                 
-                  <div key={index} className="flex items-center space-x-4">
-                       
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1">
-                    
-                      <div className='col-span-2'>
-                        <label className="block text-sm font-medium text-gray-700">Degree{ <span className="text-red-500">*</span>}</label>
-           
-                        <TypeableDropdown
-                          options={degreeOptions}
-                          value={{ value: qualification.value,name:qualification.name}}
-                          onChange={(option) => handleSubjectChange('university', index, option,'degree')}
-                          placeholder="Select or type degree"
-                          isDisabled={!qualification.isNew === true}
-                          className="mt-1"
-                          classNamePrefix="select"
-                          aria-label={`Degree ${index + 1}`}
-                        />
-                        {universityErrors[`qualification_${index}_name`] && (
-                          <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_name`]}</p>
-                        )}
-                      </div>
-                      <div className='col-span-2'>
-                        <label className="block text-sm font-medium text-gray-700">Institution{ <span className="text-red-500">*</span>}</label>
-                       <TypeableDropdown
-                          options={institutionsOptions}
-                          value={{ value: qualification.institutionId,name:qualification.institutionName}}
-                          onChange={(option) => handleSubjectChange('university', index, option,'institution')}
-                          placeholder="e.g., University of Colombo"
-                          isDisabled={!qualification.isNew === true}
-                          className="mt-1"
-                          classNamePrefix="select"
-                             aria-label={`Institution ${index + 1}`}
-                        />
-                        {/* <input
+                    <div key={index} className="flex items-center space-x-4">
+                      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1">
+                        <div className="col-span-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Degree{<span className="text-red-500">*</span>}
+                          </label>
+
+                          <TypeableDropdown
+                            options={degreeOptions}
+                            value={{
+                              value: qualification.value,
+                              name: qualification.name,
+                            }}
+                            onChange={(option) =>
+                              handleSubjectChange(
+                                "university",
+                                index,
+                                option,
+                                "degree"
+                              )
+                            }
+                            placeholder="Select or type degree"
+                            isDisabled={!qualification.isNew === true}
+                            className="mt-1"
+                            classNamePrefix="select"
+                            aria-label={`Degree ${index + 1}`}
+                          />
+                          {universityErrors[`qualification_${index}_name`] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {universityErrors[`qualification_${index}_name`]}
+                            </p>
+                          )}
+                        </div>
+                        <div className="col-span-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Institution{<span className="text-red-500">*</span>}
+                          </label>
+                          <TypeableDropdown
+                            options={institutionsOptions}
+                            value={{
+                              value: qualification.institutionId,
+                              name: qualification.institutionName,
+                            }}
+                            onChange={(option) =>
+                              handleSubjectChange(
+                                "university",
+                                index,
+                                option,
+                                "institution"
+                              )
+                            }
+                            placeholder="e.g., University of Colombo"
+                            isDisabled={!qualification.isNew === true}
+                            className="mt-1"
+                            classNamePrefix="select"
+                            aria-label={`Institution ${index + 1}`}
+                          />
+                          {/* <input
                           name={`education.university.subjects.${index}.institution`}
                           value={qualification.institution || ''}
                           onChange={handleTextInputChange}
@@ -1801,106 +2058,109 @@ const handleTextInputChange = (e) => {
                           aria-label={`Institution ${index + 1}`}
                           required
                         /> */}
-                        {universityErrors[`qualification_${index}_institution`] && (
-                          <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_institution`]}</p>
-                        )}
+                          {universityErrors[
+                            `qualification_${index}_institution`
+                          ] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {
+                                universityErrors[
+                                  `qualification_${index}_institution`
+                                ]
+                              }
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Year{<span className="text-red-500">*</span>}
+                          </label>
+
+                          <select
+                            name={`education.university.subjects.${index}.year`}
+                            value={qualification.year || currentYear}
+                            onChange={handleTextInputChange}
+                            className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                            disabled={!qualification.isNew === true}
+                            aria-label={`University Subject ${index + 1} year`}
+                          >
+                            {yearOptions.map((year) => (
+                              <option key={year} value={year}>
+                                {year}
+                              </option>
+                            ))}
+                          </select>
+
+                          {universityErrors[`qualification_${index}_year`] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {universityErrors[`qualification_${index}_year`]}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Marks/GPA{<span className="text-red-500">*</span>}
+                          </label>
+                          <input
+                            name={`education.university.subjects.${index}.marks`}
+                            value={qualification.marks || ""}
+                            onChange={handleTextInputChange}
+                            className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                            placeholder="e.g., 3.8 GPA"
+                            // disabled={!qualification.isNew === true}
+                            aria-label={`Marks ${index + 1}`}
+                            required
+                          />
+                          {universityErrors[`qualification_${index}_marks`] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {universityErrors[`qualification_${index}_marks`]}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                               <div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        <label className="block text-sm font-medium text-gray-700">Year{ <span className="text-red-500">*</span>}</label>
-                       
-                                 <select
-                        name={`education.university.subjects.${index}.year`}
-                        value={qualification.year || currentYear}
-                        onChange={handleTextInputChange}
-                        className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        disabled={!qualification.isNew === true}
-                        aria-label={`University Subject ${index + 1} year`}
+                      <button
+                        type="button"
+                        onClick={() => removeItem("university", index)}
+                        className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
+                        disabled={education.university.enabled === false}
+                        aria-label="Remove University Qualification"
                       >
-                        {yearOptions.map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
-                       
-                  
-                        {universityErrors[`qualification_${index}_year`] && (
-                          <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_year`]}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">Marks/GPA{ <span className="text-red-500">*</span>}</label>
-                        <input
-                          name={`education.university.subjects.${index}.marks`}
-                          value={qualification.marks || ''}
-                          onChange={handleTextInputChange}
-                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="e.g., 3.8 GPA"
-                         // disabled={!qualification.isNew === true}
-                          aria-label={`Marks ${index + 1}`}
-                          required
-                        />
-                        {universityErrors[`qualification_${index}_marks`] && (
-                          <p className="mt-1 text-sm text-red-600">{universityErrors[`qualification_${index}_marks`]}</p>
-                        )}
-                      </div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
+                          />
+                        </svg>
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeItem('university', index)}
-                      className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
-                      disabled={education.university.enabled === false}
-                      aria-label="Remove University Qualification"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                   </>
+                  </>
                 ))}
                 <button
                   type="button"
                   onClick={addUniversityQualification}
                   className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
-                  disabled={education.university.enabled === false || !canAddUniversityQualification()}
+                  disabled={
+                    education.university.enabled === false ||
+                    !canAddUniversityQualification()
+                  }
                   aria-label="Add University Qualification"
                 >
                   Add University Qualification
                 </button>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Remark</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
                   <textarea
                     name="university.remark"
-                    value={education.university.remark || ''}
+                    value={education.university.remark || ""}
                     onChange={handleTextInputChange}
                     className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     placeholder="Enter any additional remarks"
@@ -1913,35 +2173,55 @@ const handleTextInputChange = (e) => {
             ) : (
               <div className="space-y-4">
                 <div>
-                  <strong>Has University Qualifications:</strong>{' '}
-                  {education.university.enabled !== false ? 'Yes' : 'No'}
+                  <strong>Has University Qualifications:</strong>{" "}
+                  {education.university.enabled !== false ? "Yes" : "No"}
                 </div>
-                {education.university.enabled !== false && education.university.subjects.length > 0 ? (
+                {education.university.enabled !== false &&
+                education.university.subjects.length > 0 ? (
                   <div>
                     <strong>Qualifications:</strong>
                     <table className="w-full border-collapse border bg-white border-gray-200 mt-2">
                       <thead>
                         <tr className="bg-gray-200">
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Degree</th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Institution</th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Marks/GPA</th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Degree
+                          </th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Institution
+                          </th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Year
+                          </th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                            Marks/GPA
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {education.university.subjects.map((qualification, index) => (
-                          <tr key={index}>
-                            <td className="border border-gray-300 p-2">{qualification.name || 'N/A'}</td>
-                            <td className="border border-gray-300 p-2">{qualification.institutionName || 'N/A'}</td>
-                              <td className="border border-gray-300 p-2">{qualification.year || 'N/A'}</td>
-                            <td className="border border-gray-300 p-2">{qualification.marks || 'N/A'}</td>
-                          </tr>
-                        ))}
+                        {education.university.subjects.map(
+                          (qualification, index) => (
+                            <tr key={index}>
+                              <td className="border border-gray-300 p-2">
+                                {qualification.name || "N/A"}
+                              </td>
+                              <td className="border border-gray-300 p-2">
+                                {qualification.institutionName || "N/A"}
+                              </td>
+                              <td className="border border-gray-300 p-2">
+                                {qualification.year || "N/A"}
+                              </td>
+                              <td className="border border-gray-300 p-2">
+                                {qualification.marks || "N/A"}
+                              </td>
+                            </tr>
+                          )
+                        )}
                       </tbody>
                     </table>
                     <div className="mt-2">
                       <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <strong>Remark:</strong> {education.university.remark || 'N/A'}
+                        <strong>Remark:</strong>{" "}
+                        {education.university.remark || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -1953,7 +2233,7 @@ const handleTextInputChange = (e) => {
           </section>
 
           {/* Save Button */}
-          {mode === 'add' && (
+          {mode === "add" && (
             <div className="flex justify-end mt-8">
               <button
                 type="button"
@@ -1961,7 +2241,7 @@ const handleTextInputChange = (e) => {
                 className="bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200"
                 aria-label="Save All Education Details"
               >
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </div>
           )}

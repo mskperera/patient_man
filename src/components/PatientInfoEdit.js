@@ -19,19 +19,17 @@ import TabMentalStatusExam from "./TabMentalStatusExam";
 import EducationDetailsTab from "./EducationDetailsTab";
 
 import TabPersonalInformation from "./TabPersonalInformation";
-import TabPersonalInformationChild from "./TabPersonalInformationChild";
-
-import FamilyTab from "./FamilyTab";
+import FamilyTab from "./TabFamilyInformation";
 import MedicalTab from "./MedicalTab";
 
-import moment from "moment";
-import LoadingSpinner from "./LoadingSpinner";
 import {
   getPatientBasicInfo,
   getProfileTabDetails,
 } from "../functions/patient";
 import TabBasicInformation from "./TabBasicInformation";
 import BasicInformationSection from "./BasicInformationSection";
+import TabPersonalInformationChild from "./TabPersonalInformationChild";
+import TabPersonalInformationIndividual from "./TabPersonalInformationIndividual";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
@@ -269,7 +267,7 @@ function PatientInfoEdit({ mode = "view" }) {
               />
             )}
             {activeTab === "personal" && (
-              <TabPersonalInformation
+              <TabPersonalInformationIndividual
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />

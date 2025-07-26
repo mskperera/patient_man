@@ -30,7 +30,7 @@ const maritalStatusOptions = [
   { value: "widowed_not_remarried", text: "Widowed and Not Remarried" },
 ];
 
-const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
+const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab }) => {
 
   const [personalInformationErrors, setPersonalInformationErrors] = useState(
     {}
@@ -968,60 +968,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="col-span-2 mx-20">
-                    <label className="block text-sm font-medium text-gray-700">
-                      How religious are you?
-                      {personalInformation.religiosity.required && (
-                        <span className="text-red-500">*</span>
-                      )}{" "}
-                      (1 = Very Religious, 5 = Average, 9 = Atheist)
-                    </label>
-                    <div className="mt-2 flex items-start justify-between">
-                      <div className="flex w-full justify-between">
-                        <span className="text-xs text-gray-600 -ml-1">
-                          Very
-                        </span>
-                        <span className="text-xs text-gray-600">Average</span>
-                        <span className="text-xs text-gray-600 -mr-1">
-                          Atheist
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-1 space-x-1">
-                      {[...Array(9)].map((_, i) => {
-                        const value = (i + 1).toString();
-                        return (
-                          <label
-                            key={value}
-                            className="flex flex-col items-center"
-                          >
-                            <input
-                              type="radio"
-                              name="religiosity"
-                              value={value}
-                              checked={
-                                personalInformation.religiosity.value.toString() ===
-                                value
-                              }
-                              onChange={handleChangePersonalInfo}
-                              className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 custom-radio"
-                              aria-label={`Religiosity level ${value}`}
-                            />
-                            <span className="mt-1 text-sm text-gray-700">
-                              {value}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                    {personalInformationErrors.religiosity && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.religiosity}
-                      </p>
-                    )}
-                  </div>
-                </div>
+              
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
@@ -1325,7 +1272,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    List your main school or work difficulties
+                    List your main work difficulties
                     {personalInformation.schoolWorkDifficulties.required && (
                       <span className="text-red-500">*</span>
                     )}
@@ -1435,7 +1382,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                 </div>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
-                    Main School or Work Difficulties:
+                    Main Work Difficulties:
                   </strong>
                   <div className="mt-2">
                     <p className="text-gray-700 mt-1">
@@ -1769,4 +1716,4 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
   );
 };
 
-export default PersonalInformation;
+export default TabPersonalInformationIndividual;

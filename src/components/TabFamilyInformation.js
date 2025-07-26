@@ -1,25 +1,23 @@
 import { useState, useEffect } from "react";
-import { FaEdit, FaFemale, FaMale } from "react-icons/fa";
+import { FaFemale, FaMale } from "react-icons/fa";
 import {
-  addFamilyInformationData,
-  getFamilyInformationData,
-  getOccupations,
   getRaisedBy,
   getReligions,
   getTypesOfPerson,
-  updateFamilyInformationData,
 } from "../data/mockData";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
 import {
   addFamilyInformation,
+  drpOccupations,
   getPatientFamilyInfo,
   updateFamilyInformation,
 } from "../functions/patient";
 import VoiceToText from "./VoiceToText";
+import EditButton from "./EditButton";
 
-const Family = ({ id, refreshTabDetails, setActiveTab }) => {
+const TabFamilyInformation = ({ id, refreshTabDetails, setActiveTab }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
@@ -286,9 +284,20 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
     loadDropdowns();
   }, []);
 
+
+
+
+  const loadDrpOccupations = async () => {
+    const occupations = await drpOccupations();
+    setOccupations(occupations.data.results[0]);
+  };
+
+  useEffect(() => {
+    loadDropdowns();
+  }, []);
+
   const loadDropdowns = async () => {
-    const occupations = await getOccupations();
-    setOccupations(occupations.data);
+    await loadDrpOccupations();
 
     const religions = await getReligions();
     setReligions(religions.data);
@@ -299,6 +308,8 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
     const raisedByOptions = await getRaisedBy();
     setRaisedByOptions(raisedByOptions.data);
   };
+
+
 
   const loadFamilyInformationData = async () => {
     setIsLoading(true);
@@ -1039,7 +1050,23 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
               </h3>
               {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("spouse")}
+                    ariaLabel={
+                      editingSection === "spouse"
+                        ? "Save Spouse Info"
+                        : "Edit Spouse Info"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "spouse"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("spouse")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
                     aria-label={
@@ -1055,7 +1082,7 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
                         ? "Saving..."
                         : "Save"
                       : "Edit"}
-                  </button>
+                  </button> */}
                   {editingSection === "spouse" && (
                     <button
                       onClick={() => handleCancel("spouse")}
@@ -1184,7 +1211,23 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
               </h3>
               {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("parental")}
+                    ariaLabel={
+                      editingSection === "parental"
+                        ? "Save Parental Info"
+                        : "Edit Parental Info"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "parental"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("parental")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
                     aria-label={
@@ -1200,7 +1243,7 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
                         ? "Saving..."
                         : "Save"
                       : "Edit"}
-                  </button>
+                  </button> */}
                   {editingSection === "parental" && (
                     <button
                       onClick={() => handleCancel("parental")}
@@ -1600,7 +1643,23 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
               </h3>
               {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("sibling")}
+                    ariaLabel={
+                      editingSection === "sibling"
+                        ? "Save Sibling Info"
+                        : "Edit Sibling Info"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "sibling"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("sibling")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
                     aria-label={
@@ -1616,7 +1675,7 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
                         ? "Saving..."
                         : "Save"
                       : "Edit"}
-                  </button>
+                  </button> */}
                   {editingSection === "sibling" && (
                     <button
                       onClick={() => handleCancel("sibling")}
@@ -2122,7 +2181,23 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
               </h3>
               {mode !== "add" && (
                 <div className="flex space-x-4">
-                  <button
+                  <EditButton
+                    onClick={() => toggleSectionEdit("familyMentalHealth")}
+                    ariaLabel={
+                      editingSection === "sifamilyMentalHealthbling"
+                        ? "Save Family Mental Health Info"
+                        : "Edit Family Mental Health Info"
+                    }
+                    disabled={isSaving}
+                  >
+                    {editingSection === "familyMentalHealth"
+                      ? isSaving
+                        ? "Saving..."
+                        : "Save"
+                      : "Edit"}
+                  </EditButton>
+
+                  {/* <button
                     onClick={() => toggleSectionEdit("familyMentalHealth")}
                     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
                     aria-label={
@@ -2138,7 +2213,7 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
                         ? "Saving..."
                         : "Save"
                       : "Edit"}
-                  </button>
+                  </button> */}
                   {editingSection === "familyMentalHealth" && (
                     <button
                       onClick={() => handleCancel("familyMentalHealth")}
@@ -2318,4 +2393,4 @@ const Family = ({ id, refreshTabDetails, setActiveTab }) => {
   );
 };
 
-export default Family;
+export default TabFamilyInformation;
