@@ -1402,24 +1402,24 @@ export const occupations = [
 // Mock options for DescriptionInput
 export const getGoodPointsOptionsData =async()=>{
 const data=  [
-  { patientId: "1", name: "Problem-solver : I enjoy analyzing issues and finding effective solutions." },
-  { patientId: "2", name: "Quick learner : I can pick up new tools and frameworks rapidly." },
-  { patientId: "3", name: "Strong work ethic : I am committed to meeting deadlines and taking responsibility." },
-  { patientId: "4", name: "Adaptable : I can adjust to new environments, teams, or technologies easily." },
-  { patientId: "5", name: "Team player : I communicate well and collaborate effectively with others." },
-  { patientId: "6", name: "Detail-oriented : I notice small issues before they grow into big problems." },
-  { patientId: "7", name: "Other" },
+  { id: "1", name: "Problem-solver : I enjoy analyzing issues and finding effective solutions." },
+  { id: "2", name: "Quick learner : I can pick up new tools and frameworks rapidly." },
+  { id: "3", name: "Strong work ethic : I am committed to meeting deadlines and taking responsibility." },
+  { id: "4", name: "Adaptable : I can adjust to new environments, teams, or technologies easily." },
+  { id: "5", name: "Team player : I communicate well and collaborate effectively with others." },
+  { id: "6", name: "Detail-oriented : I notice small issues before they grow into big problems." },
+  { id: "7", name: "Other" },
 ]
 return {data};
 };
 
 export const getBadPointsOptions = async()=>{
   const data=  [
-  { patientId: "101", name: "Procrastination" },
-  { patientId: "102", name: "Shyness" },
-  { patientId: "103", name: "Impatience" },
-  { patientId: "104", name: "Perfectionism" },
-  { patientId: "105", name: "Other" },
+  { id: "101", name: "Procrastination" },
+  { id: "102", name: "Shyness" },
+  { id: "103", name: "Impatience" },
+  { id: "104", name: "Perfectionism" },
+  { id: "105", name: "Other" },
 ]
 return {data};
 };

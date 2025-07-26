@@ -10,11 +10,13 @@ import PatientInfoEdit from './components/PatientInfoEdit';
 import AppointmentCalendar from './components/appoinments/AppointmentCalendar';
 import PatientTypeSelection from './pages/PatientTypeSelection';
 import AddAppointment from './components/appoinments/AddAppointment';
+import LoginPage from './components/LoginPage';
+// import OccupationManager from './components/OccupationManager';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <TopNav />
         <div className="flex pt-16 pb-12">
           <Sidebar />
@@ -30,7 +32,10 @@ function App() {
                 {/* <Route path="/add-note" element={<Notes />} /> */}
                 {/* <Route path="/edit-patient/:id" element={<PatientInfoEdit />} /> */}
                 <Route path="/add-patient" element={<PatientInfoEdit mode="add" />} />
+      <Route path="/login" element={<LoginPage mode="add" />} />
+                 {/* <Route path="/occupation-man" element={<OccupationManager />} /> */}
                 {/* <Route path="/notes" element={<Notes />} /> */}
+                
                 <Route path="/patients/report/:id" element={<PatientReport />} />
                 <Route path="/appointments" element={<AppointmentCalendar />} />
                 <Route path="/add-appointment" element={<AddAppointment />} />

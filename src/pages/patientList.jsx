@@ -21,9 +21,9 @@ const [patients, setPatients] = useState([]);
   }, []);
 
   return (
-    <div className="p-6 bg-white">
+    <div className="p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="flex items-center text-2xl font-bold text-gray-800">
+        <h2 className="flex items-center text-xl font-bold text-gray-800">
           <FaUserMd className="mr-2" size={28} />
           Patient List
         </h2>
@@ -61,7 +61,7 @@ const [patients, setPatients] = useState([]);
             Search
           </button>
           <button
-            onClick={() => navigate('/add-patient', { state: { mode: 'add' } })}
+            onClick={() => navigate('/patientType?mode=add', { state: { mode: 'add' } })}
             className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition w-full sm:w-auto justify-center"
             aria-label="Register Patient"
           >

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Pagination from './Pagination';
 import { getPatientRegistrations } from '../functions/patient';
 
-function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSelectPatient }) {
+function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSelectPatient,hidePaginationIfTotalPagesIsOne }) {
   const [localPatients, setLocalPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -142,7 +142,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
               localPatients.map((patient) => (
                 <tr
                   key={patient.patientId}
-                  className={`hover:bg-gray-50 transition-colors ${onSelectPatient ? 'cursor-pointer' : ''}`}
+                  className={`hover:bg-sky-100 transition-colors ${onSelectPatient ? 'cursor-pointer' : ''}`}
                   onClick={() => onSelectPatient && onSelectPatient(patient)}
                   role={onSelectPatient ? 'button' : undefined}
                   tabIndex={onSelectPatient ? 0 : undefined}
@@ -189,7 +189,10 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
         </table>
       </div>
 
-      {triggerSearch > 0 && totalRecords > 0 && (
+{hidePaginationIfTotalPagesIsOne ? (
+   
+   totalPages > 1 ?(
+   triggerSearch > 0 && totalRecords > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -199,7 +202,22 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
           onRowsPerPageChange={handleRowsPerPageChange}
           totalRecords={totalRecords}
         />
-      )}
+      )):null
+
+     ) : 
+
+      triggerSearch > 0 && totalRecords > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPageOptions={rowsPerPageOptions}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          totalRecords={totalRecords}
+        />
+      )
+      }
     </div>
   );
 }

@@ -14,10 +14,10 @@ const EducationDetails = ({ id, refreshTabDetails }) => {
   const [mode, setMode] = useState("add");
   const [education, setEducation] = useState({
     educationYears: '',
-    scholarship: { enabled: true, marks: '', schoolAdmitted: '', result: '', remark: '' },
-    ol: { enabled: true, subjects: [], remark: '' },
-    al: { enabled: true, alStreamId: '', alStreamName: '', subjects: [], remark: '' },
-    university: { enabled: true, subjects: [], remark: '',institutionId: '', institutionName: '' },
+    scholarship: { enabled: false, marks: '', schoolAdmitted: '', result: '', remark: '' },
+    ol: { enabled: false, subjects: [], remark: '' },
+    al: { enabled: false, alStreamId: '', alStreamName: '', subjects: [], remark: '' },
+    university: { enabled: false, subjects: [], remark: '',institutionId: '', institutionName: '' },
   });
 
   const [educationYearsErrors, setEducationYearsErrors] = useState({});
@@ -146,6 +146,7 @@ const EducationDetails = ({ id, refreshTabDetails }) => {
     //const result = await getALData(id);
     const result = await getAl(id);
     const patientData = result.data;
+      console.log('loadAlData ',result)
       if(patientData?.error){
     console.log('patientData.error',patientData.error)
      setModal({
@@ -319,15 +320,15 @@ const EducationDetails = ({ id, refreshTabDetails }) => {
             isAL: education.al.enabled || false,
             alStreamName: education.al.alStreamName || '',
             alSubjects: education.al.subjects.map(subject => ({
-                name: subject.name || 'N/A',
+                name: subject.name,
                 marks: subject.marks,
                 year: subject.year,
             })) || [],
             alRemark: education.al.remark || '',
             isUniversity: education.university.enabled || false,
             universitySubjects: education.university.subjects.map(subject => ({
-                name: subject.name || 'N/A',
-                institution: subject.institutionName || 'N/A',
+                name: subject.name,
+                institution: subject.institutionName,
                 marks: subject.marks,
                 year: subject.year,
             })) || [],
@@ -341,6 +342,12 @@ const EducationDetails = ({ id, refreshTabDetails }) => {
         if(res.data.outputValues.responseStatus === "failed") {
 
             setModal({ isOpen: true, message: res.data.outputValues.outputMessage, type: "warning" });
+            setIsSaving(false);
+            return;
+        }
+
+        if (res.error) {
+            setModal({ isOpen: true, message: res.error, type: "error" });
             setIsSaving(false);
             return;
         }
@@ -370,11 +377,7 @@ const EducationDetails = ({ id, refreshTabDetails }) => {
             refreshTabDetails(Math.random())
 
         console.log('Response:', res);
-        if (res.error) {
-            setModal({ isOpen: true, message: res.error, type: "error" });
-            setIsSaving(false);
-            return;
-        }
+    
         setMode("edit");
     } else {
          setModal({ isOpen: true, message: 'Please correct the errors in the form before saving.', type: "warning" });
@@ -1014,7 +1017,7 @@ const handleTextInputChange = (e) => {
         // Transform the education payload to match the Postman structure
         const transformedPayload = {
             patientId: id, // Hardcoded or replace with dynamic value if available
-            educationYears: education.educationYears || 0,
+           educationYears: education.educationYears || 0,
             isScholarship: education.scholarship.enabled || false,
             scholarshipMarks: education.scholarship.marks || 0,
             schoolAdmitted: education.scholarship.schoolAdmitted || '',
@@ -1030,15 +1033,15 @@ const handleTextInputChange = (e) => {
             isAL: education.al.enabled || false,
             alStreamName: education.al.alStreamName || '',
             alSubjects: education.al.subjects.map(subject => ({
-                name: subject.name || 'N/A',
+                name: subject.name,
                 marks: subject.marks,
                 year: subject.year,
             })) || [],
             alRemark: education.al.remark || '',
             isUniversity: education.university.enabled || false,
             universitySubjects: education.university.subjects.map(subject => ({
-                name: subject.name || 'N/A',
-                institution: subject.institution || 'N/A',
+                name: subject.name,
+                institution: subject.institutionName,
                 marks: subject.marks,
                 year: subject.year,
             })) || [],
@@ -1093,7 +1096,7 @@ const handleTextInputChange = (e) => {
           <section className="mb-12">
     
             <div className="flex justify-between items-center mb-2 pb-2">
-              <h3 className="text-2xl font-semibold text-gray-800">Educational Background</h3>
+              <h3 className="text-xl font-semibold text-gray-800">Educational Background</h3>
               {mode !== 'add' && (
                 <div className="flex space-x-4">
                   <button
@@ -1173,7 +1176,7 @@ const handleTextInputChange = (e) => {
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-2xl font-semibold text-gray-800">Grade 5 Scholarship Qualification</h3>
+                <h3 className="text-xl font-semibold text-gray-800">Grade 5 Scholarship Qualification</h3>
               </div>
               {mode !== 'add' && (
                 <div className="flex space-x-4">
@@ -1322,7 +1325,7 @@ const handleTextInputChange = (e) => {
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-2xl font-semibold text-gray-800">G.C.E Ordinary Level (O/L) Qualifications</h3>
+                <h3 className="text-xl font-semibold text-gray-800">G.C.E Ordinary Level (O/L) Qualifications</h3>
               </div>
               {mode !== 'add' && (
                 <div className="flex space-x-4">
@@ -1398,7 +1401,7 @@ const handleTextInputChange = (e) => {
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Grade (e.g., A, B, C, S, W)"
-                        disabled={!subject.isNew === true}
+                       // disabled={!subject.isNew === true}
                         aria-label={`O/L Subject ${index + 1} marks`}
                         required
                       />
@@ -1512,7 +1515,7 @@ const handleTextInputChange = (e) => {
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-2xl font-semibold text-gray-800">G.C.E Advanced Level (A/L) Qualifications</h3>
+                <h3 className="text-xl font-semibold text-gray-800">G.C.E Advanced Level (A/L) Qualifications</h3>
               </div>
               {mode !== 'add' && (
                 <div className="flex space-x-4">
@@ -1603,7 +1606,7 @@ const handleTextInputChange = (e) => {
                         onChange={handleTextInputChange}
                         className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Grade (e.g., A, B, C, S, W)"
-                        disabled={!subject.isNew === true}
+                        //disabled={!subject.isNew === true}
                         aria-label={`A/L Subject ${index + 1} marks`}
                         required
                       />
@@ -1708,6 +1711,7 @@ const handleTextInputChange = (e) => {
           {/* University Qualifications */}
           <section className="mb-14">
             <div className="flex justify-between items-center mb-2 pb-2">
+         
               <div className="flex items-center space-x-3">
                 <label className="flex items-center">
                   <input
@@ -1721,7 +1725,7 @@ const handleTextInputChange = (e) => {
                   />
                   <span className="ml-2 text-sm text-gray-700"></span>
                 </label>
-                <h3 className="text-2xl font-semibold text-gray-800">University Qualifications</h3>
+                <h3 className="text-xl font-semibold text-gray-800">University/ Academic/ Professional Qualifications</h3>
               </div>
               {mode !== 'add' && (
                 <div className="flex space-x-4">
@@ -1842,14 +1846,14 @@ const handleTextInputChange = (e) => {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Marks/Grade{ <span className="text-red-500">*</span>}</label>
+                        <label className="block text-sm font-medium text-gray-700">Marks/GPA{ <span className="text-red-500">*</span>}</label>
                         <input
                           name={`education.university.subjects.${index}.marks`}
                           value={qualification.marks || ''}
                           onChange={handleTextInputChange}
                           className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                          placeholder="e.g., First Class"
-                          disabled={!qualification.isNew === true}
+                        placeholder="e.g., 3.8 GPA"
+                         // disabled={!qualification.isNew === true}
                           aria-label={`Marks ${index + 1}`}
                           required
                         />
@@ -1921,7 +1925,7 @@ const handleTextInputChange = (e) => {
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Degree</th>
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Institution</th>
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Year</th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Marks/Grade</th>
+                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">Marks/GPA</th>
                         </tr>
                       </thead>
                       <tbody>

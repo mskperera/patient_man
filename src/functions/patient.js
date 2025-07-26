@@ -697,6 +697,76 @@ export const addSubject = async (data) => {
   }
 };
 
+
+
+export const drpBadPoints = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/badPoints`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const drpGoodPoints = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/goodPoints`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const drpOccupations = async () => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .get(`/dropdown/occupations`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
 // export const addContact = async (data) => {
 //   try {
 //     const tenantId = getTenantId();
