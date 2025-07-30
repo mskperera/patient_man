@@ -148,9 +148,12 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
                   tabIndex={onSelectPatient ? 0 : undefined}
                 >
                   <td className="py-3 px-4 border text-gray-800">{patient.patientNo}</td>
-                  <td className="py-3 px-4 border text-gray-800">
-                    {`${patient.firstName} ${patient.middleName || ''} ${patient.lastName}`}
+                   <td className="py-3 px-4 border text-gray-800">
+                    {`${patient.fullName}`}
                   </td>
+                  {/* <td className="py-3 px-4 border text-gray-800">
+                    {`${patient.firstName} ${patient.middleName || ''} ${patient.lastName}`}
+                  </td> */}
                   <td className="py-3 px-4 border text-gray-800">{patient.gender || 'N/A'}</td>
                   <td className="py-3 px-4 border text-gray-800">
                     {patient.businessPhone || patient.homePhone || 'N/A'}

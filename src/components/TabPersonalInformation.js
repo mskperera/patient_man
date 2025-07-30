@@ -9,6 +9,7 @@ import {
   drpBadPoints,
   drpGoodPoints,
   drpOccupations,
+  drpSocialDifficulties,
   getPatientPersonalInfo,
   updatePersonalInformation,
 } from "../functions/patient";
@@ -120,7 +121,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
       isTouched: false,
       isValid: true,
       required: true,
-      dataType: "string",
+      dataType: "array",
     },
     loveSexDifficulties: {
       label: "Main Love and Sex Difficulties",
@@ -256,7 +257,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
         },
         socialDifficulties: {
           ...personalInformation.socialDifficulties,
-          value: patientData.socialDifficulties,
+          value: patientData.socialDifficulties.split(";;"),
           isTouched: false,
           isValid: true,
         },
@@ -320,6 +321,8 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
   const [goodPointsOptions, setGoodPointsOptions] = useState([]);
   const [badPointsOptions, setBadPointsOptions] = useState([]);
   const [occupations, setOccupations] = useState([]);
+   const [socialDifficultiesOptions, setSocialDifficultiesOptions] = useState([]);
+  
 
   const loadDrpGoodPoints = async () => {
     const goodPoints = await drpGoodPoints();
@@ -336,6 +339,11 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
     setOccupations(occupations.data.results[0]);
   };
 
+    const loadDrpSocialDifficulties = async () => {
+    const result = await drpSocialDifficulties();
+    setSocialDifficultiesOptions(result.data.results[0]);
+  };
+
   useEffect(() => {
     loadDropdowns();
   }, []);
@@ -344,6 +352,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
     await loadDrpGoodPoints();
     await loadDrpBadPoints();
     await loadDrpOccupations();
+    await loadDrpSocialDifficulties();
   };
 
   // Store initial state when entering edit mode
@@ -387,7 +396,9 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
       badPoints: personalInformation.badPoints.value.map((item) => ({
         name: item,
       })),
-      socialDifficulties: personalInformation.socialDifficulties.value,
+      socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({
+        name: item,
+      })),
       loveSexDifficulties: personalInformation.loveSexDifficulties.value,
       schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
       lifeGoals: personalInformation.lifeGoals.value,
@@ -688,7 +699,9 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
         badPoints: personalInformation.badPoints.value.map((item) => ({
           name: item,
         })),
-        socialDifficulties: personalInformation.socialDifficulties.value,
+        socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({
+          name: item,
+        })),
         loveSexDifficulties: personalInformation.loveSexDifficulties.value,
         schoolWorkDifficulties:
           personalInformation.schoolWorkDifficulties.value,
@@ -1280,13 +1293,23 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    List your main social difficulties
-                    {personalInformation.socialDifficulties.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <VoiceToText
+                  <DescriptionInput
+                    patient={personalInformation}
+                    setValue={(value) => {
+                      handleDescriptionChange("socialDifficulties", value);
+                    }}
+                    setPatient={(newPatient) => {
+                      setPersonalInformation(newPatient);
+                    }}
+                    isEditing={editingSection === "insights" || mode === "add"}
+                    fieldName="socialDifficulties"
+                    label="List your main social difficulties"
+                    placeholder="Select social challenges"
+                    descriptionOptions={socialDifficultiesOptions}
+                    isTypeable={false}
+                  />
+
+                  {/* <VoiceToText
                     name="socialDifficulties"
                     value={personalInformation.socialDifficulties.value}
                     onChange={handleChangePersonalInfo}
@@ -1294,7 +1317,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     rows="4"
                     placeholder="Describe social challenges"
                     aria-label="Social difficulties"
-                  />
+                  /> */}
                   {personalInformationErrors.socialDifficulties && (
                     <p className="mt-1 text-sm text-red-600">
                       {personalInformationErrors.socialDifficulties}
@@ -1395,7 +1418,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Things Liked:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsLiked.value}
                     </p>
                   </div>
@@ -1418,8 +1441,8 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Social Difficulties:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
-                      {personalInformation.socialDifficulties.value}
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
+                      {renderListItems(personalInformation.socialDifficulties.value)}
                     </p>
                   </div>
                 </div>
@@ -1428,7 +1451,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     Main Love/Sex Difficulties:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.loveSexDifficulties.value}
                     </p>
                   </div>
@@ -1438,7 +1461,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     Main School or Work Difficulties:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.schoolWorkDifficulties.value ||
                         "N/A"}
                     </p>
@@ -1447,7 +1470,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Life Goals:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.lifeGoals.value}
                     </p>
                   </div>
@@ -1457,7 +1480,7 @@ const PersonalInformation = ({ id, refreshTabDetails, setActiveTab }) => {
                     Things Most Like to Change:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsToChange.value}
                     </p>
                   </div>

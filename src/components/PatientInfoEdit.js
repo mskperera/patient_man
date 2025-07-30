@@ -16,11 +16,11 @@ import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import NotesTab from "./NotesTab";
 import TabMentalStatusExam from "./TabMentalStatusExam";
-import EducationDetailsTab from "./EducationDetailsTab";
+import TabEducationDetails from "./TabEducationDetails";
 
 import TabPersonalInformation from "./TabPersonalInformation";
 import FamilyTab from "./TabFamilyInformation";
-import MedicalTab from "./MedicalTab";
+import TabMentalHealth from "./TabMentalHealth";
 
 import {
   getPatientBasicInfo,
@@ -30,6 +30,10 @@ import TabBasicInformation from "./TabBasicInformation";
 import BasicInformationSection from "./BasicInformationSection";
 import TabPersonalInformationChild from "./TabPersonalInformationChild";
 import TabPersonalInformationIndividual from "./TabPersonalInformationIndividual";
+import TabFamilyInformationChild from "./TabFamilyInformationChild";
+import TabMentalHealthChild from "./TabMentalHealthChild";
+import TabEducationDetailsChild from "./TabEducationDetailsChild";
+import TabBasicInformationFamily from "./TabBasicInformationFamily";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
@@ -274,13 +278,13 @@ function PatientInfoEdit({ mode = "view" }) {
             )}
             {/* {activeTab === "family" && <FamilyTab id={id || newId} />} */}
             {activeTab === "medical" && (
-              <MedicalTab
+              <TabMentalHealth
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
             {activeTab === "education" && (
-              <EducationDetailsTab
+              <TabEducationDetails
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
@@ -419,19 +423,19 @@ function PatientInfoEdit({ mode = "view" }) {
               />
             )}
             {activeTab === "family" && (
-              <FamilyTab
+              <TabFamilyInformationChild
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
             {activeTab === "medical" && (
-              <MedicalTab
+              <TabMentalHealthChild
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
             {activeTab === "education" && (
-              <EducationDetailsTab
+              <TabEducationDetailsChild
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
@@ -555,7 +559,7 @@ function PatientInfoEdit({ mode = "view" }) {
             className="space-y-4 px-2 "
           >
             {activeTab === "basicInformation" && (
-              <TabBasicInformation
+              <TabBasicInformationFamily
                 patientTypeId={patientType}
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
@@ -575,13 +579,13 @@ function PatientInfoEdit({ mode = "view" }) {
               />
             )}
             {activeTab === "medical" && (
-              <MedicalTab
+              <TabMentalHealth
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
             {activeTab === "education" && (
-              <EducationDetailsTab
+              <TabEducationDetails
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />

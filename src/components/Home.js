@@ -41,7 +41,7 @@ function Home() {
         <form onSubmit={handleSearch} className="space-y-6">
           <div className="flex flex-wrap justify-center gap-4 mb-6">
             {[
-              { value: 'patientNo', label: 'Patient ID' },
+              { value: 'patientNo', label: 'Patient No.' },
               { value: 'firstName', label: 'First Name' },
               { value: 'lastName', label: 'Last Name' },
               { value: 'email', label: 'Email' },

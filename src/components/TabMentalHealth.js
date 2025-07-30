@@ -849,19 +849,19 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
               <div className="space-y-4">
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Chief Physical Ailments:</strong>{" "}
-                  <div className="mt-2">
+                  <div className="mt-2 whitespace-pre-line">
                     {renderListItems(medicalInformation.physicalAilments.value)}
                   </div>
                 </div>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Present Main Complaints:</strong>{" "}
-                  <div className="mt-2">
+                  <div className="mt-2 whitespace-pre-line">
                     {renderListItems(medicalInformation.mainComplaints.value)}
                   </div>
                 </div>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Past Complaints:</strong>{" "}
-                  <div className="mt-2">
+                  <div className="mt-2 whitespace-pre-line">
                     {renderListItems(medicalInformation.pastComplaints.value)}
                   </div>
                 </div>
@@ -869,7 +869,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                   <strong className="text-sm">
                     Conditions When Problems Worsen:
                   </strong>{" "}
-                  <div className=" mt-2">
+                  <div className=" mt-2 whitespace-pre-line">
                     {renderListItems(medicalInformation.worseConditions.value)}
                   </div>
                 </div>
@@ -877,7 +877,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                   <strong className="text-sm">
                     Conditions When Problems Improve:
                   </strong>{" "}
-                  <div className=" mt-2">
+                  <div className=" mt-2 whitespace-pre-line">
                     {renderListItems(
                       medicalInformation.improvedConditions.value
                     )}
@@ -948,7 +948,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
-                        Hours of individual therapy
+                        Past history of psychiatric treatment or councelling
                         {medicalInformation.individualTherapyHours.required && (
                           <span className="text-red-500">*</span>
                         )}
@@ -969,81 +969,9 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                         </p>
                       )}
                     </div>
-                    <div>
+                      <div>
                       <label className="block text-sm font-medium text-gray-600">
-                        Spread over years
-                        {medicalInformation.individualTherapyYears.required && (
-                          <span className="text-red-500">*</span>
-                        )}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        name="individualTherapyYears"
-                        value={medicalInformation.individualTherapyYears.value}
-                        onChange={handleChange}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="Enter years"
-                        aria-label="Individual therapy years"
-                      />
-                      {medicalInformationErrors.individualTherapyYears && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {medicalInformationErrors.individualTherapyYears}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600">
-                        Ending years ago
-                        {medicalInformation.individualTherapyEndYears
-                          .required && <span className="text-red-500">*</span>}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        name="individualTherapyEndYears"
-                        value={
-                          medicalInformation.individualTherapyEndYears.value
-                        }
-                        onChange={handleChange}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="Enter years"
-                        aria-label="Individual therapy end years"
-                      />
-                      {medicalInformationErrors.individualTherapyEndYears && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {medicalInformationErrors.individualTherapyEndYears}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600">
-                        Hours of group therapy
-                        {medicalInformation.groupTherapyHours.required && (
-                          <span className="text-red-500">*</span>
-                        )}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        name="groupTherapyHours"
-                        value={medicalInformation.groupTherapyHours.value}
-                        onChange={handleChange}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="Enter hours"
-                        aria-label="Group therapy hours"
-                      />
-                      {medicalInformationErrors.groupTherapyHours && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {medicalInformationErrors.groupTherapyHours}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600">
-                        Months of psychiatric hospitalization
+                        Psychiatric hospitalization
                         {medicalInformation.psychiatricHospitalizationMonths
                           .required && <span className="text-red-500">*</span>}
                       </label>
@@ -1068,8 +996,82 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                         </p>
                       )}
                     </div>
+                    {/* <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Spread over years
+                        {medicalInformation.individualTherapyYears.required && (
+                          <span className="text-red-500">*</span>
+                        )}
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        name="individualTherapyYears"
+                        value={medicalInformation.individualTherapyYears.value}
+                        onChange={handleChange}
+                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                        placeholder="Enter years"
+                        aria-label="Individual therapy years"
+                      />
+                      {medicalInformationErrors.individualTherapyYears && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {medicalInformationErrors.individualTherapyYears}
+                        </p>
+                      )}
+                    </div> */}
+                    {/* <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Ending years ago
+                        {medicalInformation.individualTherapyEndYears
+                          .required && <span className="text-red-500">*</span>}
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        name="individualTherapyEndYears"
+                        value={
+                          medicalInformation.individualTherapyEndYears.value
+                        }
+                        onChange={handleChange}
+                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                        placeholder="Enter years"
+                        aria-label="Individual therapy end years"
+                      />
+                      {medicalInformationErrors.individualTherapyEndYears && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {medicalInformationErrors.individualTherapyEndYears}
+                        </p>
+                      )}
+                    </div> */}
                   </div>
+                   {/*  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                  <div>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Hours of group therapy
+                        {medicalInformation.groupTherapyHours.required && (
+                          <span className="text-red-500">*</span>
+                        )}
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        name="groupTherapyHours"
+                        value={medicalInformation.groupTherapyHours.value}
+                        onChange={handleChange}
+                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                        placeholder="Enter hours"
+                        aria-label="Group therapy hours"
+                      />
+                      {medicalInformationErrors.groupTherapyHours && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {medicalInformationErrors.groupTherapyHours}
+                        </p>
+                      )}
+                    </div>
+                  
+                  </div> */}
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Are you undergoing treatment anywhere else now?
@@ -1113,7 +1115,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                     </p>
                   )}
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Number of times during past year you have taken
                     antidepressants
@@ -1136,8 +1138,9 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                       {medicalInformationErrors.antidepressantsCount}
                     </p>
                   )}
-                </div>
-                <div>
+                </div> */}
+              </div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Type of psychotherapy you have mainly had
                     {medicalInformation.psychotherapyType.required && (
@@ -1146,7 +1149,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                     (briefly describe method of treatment—ex., dream analysis,
                     free association, drugs, hypnosis, etc.)
                   </label>
-                  <input
+                  <VoiceToText
                     name="psychotherapyType"
                     value={medicalInformation.psychotherapyType.value}
                     onChange={handleChange}
@@ -1159,7 +1162,8 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                       {medicalInformationErrors.psychotherapyType}
                     </p>
                   )}
-                </div>
+              
+                </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Additional information that you think might be helpful
@@ -1186,12 +1190,12 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Individual Therapy Hours:</strong>{" "}
+                  <strong className="text-sm">Past history of psychiatric treatment or councelling :</strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.individualTherapyHours.value || "N/A"}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Individual Therapy Years:</strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.individualTherapyYears.value || "N/A"}
@@ -1205,16 +1209,16 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                     {medicalInformation.individualTherapyEndYears.value ||
                       "N/A"}
                   </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+                </div> */}
+                {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Group Therapy Hours:</strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.groupTherapyHours.value || "N/A"}
                   </div>
-                </div>
+                </div> */}
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
-                    Psychiatric Hospitalization Months:
+                    Psychiatric Hospitalization :
                   </strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.psychiatricHospitalizationMonths
@@ -1227,24 +1231,28 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                     {medicalInformation.currentTreatment.value || "N/A"}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
                     Antidepressants Count (Past Year):
                   </strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.antidepressantsCount.value || "N/A"}
                   </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
+                </div> */}
+                 {/* <div className="md:col-span-2">
+                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Psychotherapy Type:</strong>{" "}
-                  <div className="">
+                  <div className="whitespace-pre-line">
                     {medicalInformation.psychotherapyType.value || "N/A"}
                   </div>
-                </div>
+                  </div>
+                </div> */}
                 <div className="md:col-span-2">
                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                    <strong className="text-sm">Additional Information:</strong>{" "}
+                    <strong className="text-sm whitespace-pre-line">Additional Information:</strong>{" "}
+                    <div className="whitespace-pre-line">
                     {renderListItems(medicalInformation.additionalInfo.value)}
+                  </div>
                   </div>
                 </div>
               </div>

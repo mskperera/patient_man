@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FaHome, FaUsers, FaUserPlus, FaCalendarAlt, FaList } from 'react-icons/fa';
+import { FaHome, FaUsers, FaUserPlus, FaCalendarAlt, FaList, FaBars, FaTh } from 'react-icons/fa';
+import { FaTableCellsLarge } from 'react-icons/fa6';
 import { Link, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -39,22 +40,24 @@ function Sidebar() {
         isOpen ? 'w-64' : 'w-16'
       } z-40 md:w-64`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-sky-200">
-        <span
-          className={`${
-            isOpen ? 'block' : 'hidden'
-          } md:block font-semibold text-white text-xl tracking-tight`}
-        >
-          Menu
-        </span>
-        <button
-          className="md:hidden text-white hover:text-sky-200 transition-colors duration-200 p-2 rounded-full bg-sky-700 hover:bg-sky-800"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle sidebar"
-        >
-          {isOpen ? '◄' : '►'}
-        </button>
-      </div>
+  <div className="flex items-center justify-between p-4 border-b border-sky-200">
+  <span
+    className={`${
+      isOpen ? 'block' : 'hidden'
+    } md:flex items-center gap-2 font-semibold text-white text-xl tracking-tight`}
+  >
+    <FaTh className="text-white" />
+    Menu
+  </span>
+  <button
+    className="md:hidden text-white hover:text-sky-200 transition-colors duration-200 p-2 rounded-full bg-sky-700 hover:bg-sky-800"
+    onClick={() => setIsOpen(!isOpen)}
+    aria-label="Toggle sidebar"
+  >
+    {isOpen ? '◄' : '►'}
+  </button>
+</div>
+
       <nav className="mt-4 flex-1">
         {navItems.map((item) => (
           <Link
@@ -84,22 +87,26 @@ function Sidebar() {
           </Link>
         ))}
       </nav>
-       <div className="absolute bottom-4 w-full text-center">
-        <p className={`${isOpen ? 'block' : 'hidden'} md:block text-white text-sm font-medium`}>
-          Powered by{' '}
-          <a
-            href="https://legendbyte.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-sky-200 transition-colors duration-200"
-          >
-            Legendbyte
-          </a>
-        </p>
-        {/* <p className={`${isOpen ? 'block' : 'hidden'} md:block text-white text-xs font-light mt-1`}>
-         " Freedom and Innovation for a Living Planet."
-        </p> */}
-      </div>
+<div className="absolute bottom-4 w-full text-center">
+  <p className={`${isOpen ? 'block' : 'hidden'} md:block text-white text-sm font-medium`}>
+    Powered by{' '}
+    <a
+      href="https://legendbyte.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline hover:text-sky-200 transition-colors duration-200"
+    >
+      Legendbyte
+    </a>{' '}
+    © 2025.
+    
+     {/* <br/> All rights reserved. */}
+  </p>
+  {/* <p className={`${isOpen ? 'block' : 'hidden'} md:block text-white text-xs font-light mt-1`}>
+    " Freedom and Innovation for a Living Planet."
+  </p> */}
+</div>
+
     </div>
   );
 }

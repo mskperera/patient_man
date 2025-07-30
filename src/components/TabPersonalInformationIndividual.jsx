@@ -1342,7 +1342,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Things Liked:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsLiked.value}
                     </p>
                   </div>
@@ -1365,7 +1365,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Social Difficulties:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.socialDifficulties.value}
                     </p>
                   </div>
@@ -1375,7 +1375,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                     Main Love/Sex Difficulties:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.loveSexDifficulties.value}
                     </p>
                   </div>
@@ -1385,7 +1385,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                     Main Work Difficulties:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.schoolWorkDifficulties.value ||
                         "N/A"}
                     </p>
@@ -1394,7 +1394,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Life Goals:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.lifeGoals.value}
                     </p>
                   </div>
@@ -1404,7 +1404,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                     Things Most Like to Change:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsToChange.value}
                     </p>
                   </div>

@@ -15,7 +15,7 @@ import {
 import VoiceToText from "./VoiceToText";
 import EditButton from "./EditButton";
 
-const TabFamilyInformation = ({ id, refreshTabDetails, setActiveTab }) => {
+const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
@@ -1045,166 +1045,7 @@ const TabFamilyInformation = ({ id, refreshTabDetails, setActiveTab }) => {
 
       {!isLoading ? (
         <div className="px-8">
-          {/* Spouse's Information */}
-          <section className="mb-12">
-            <div className="flex justify-between items-center mb-2 pb-2">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Spouse's Information
-              </h3>
-              {mode !== "add" && (
-                <div className="flex space-x-4">
-                  <EditButton
-                    onClick={() => toggleSectionEdit("spouse")}
-                    ariaLabel={
-                      editingSection === "spouse"
-                        ? "Save Spouse Info"
-                        : "Edit Spouse Info"
-                    }
-                    disabled={isSaving}
-                  >
-                    {editingSection === "spouse"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </EditButton>
-
-                  {/* <button
-                    onClick={() => toggleSectionEdit("spouse")}
-                    className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={
-                      editingSection === "spouse"
-                        ? "Save Spouse Info"
-                        : "Edit Spouse Info"
-                    }
-                    disabled={isSaving}
-                  >
-                    <FaEdit className="mr-2" />
-                    {editingSection === "spouse"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </button> */}
-                  {editingSection === "spouse" && (
-                    <button
-                      onClick={() => handleCancel("spouse")}
-                      className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
-                      aria-label="Cancel Editing"
-                      disabled={isSaving}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            {editingSection === "spouse" || mode === "add" ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Spouse's Occupation
-                      {familyInformation.spouseOccupation.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <select
-                      name="spouseOccupation"
-                      value={familyInformation.spouseOccupation.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      aria-label="Spouse's occupation"
-                    >
-                      <option value="">Select occupation</option>
-                      {occupations.map((occupation) => (
-                        <option key={occupation.id} value={occupation.name}>
-                          {occupation.name}
-                        </option>
-                      ))}
-                    </select>
-                    {familyInformationErrors.spouseOccupation && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {familyInformationErrors.spouseOccupation}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Spouse's Occupation Status
-                      {familyInformation.spouseOccupationFullTime.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <div className="flex items-center space-x-4 mt-5">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="spouseOccupationFullTime"
-                          value="full-time"
-                          checked={
-                            familyInformation.spouseOccupationFullTime.value ===
-                            "full-time"
-                          }
-                          onChange={handleOccupationStatusChange}
-                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
-                          disabled={!familyInformation.spouseOccupation.value}
-                          aria-label="Spouse full-time"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          Full-time
-                        </span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="spouseOccupationFullTime"
-                          value="part-time"
-                          checked={
-                            familyInformation.spouseOccupationFullTime.value ===
-                            "part-time"
-                          }
-                          onChange={handleOccupationStatusChange}
-                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
-                          disabled={!familyInformation.spouseOccupation.value}
-                          aria-label="Spouse part-time"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          Part-time
-                        </span>
-                      </label>
-                    </div>
-                    {familyInformationErrors.spouseOccupationFullTime && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {familyInformationErrors.spouseOccupationFullTime}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="border-2 rounded-lg p-4 bg-white  border-gray-200 ">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="flex justify-between items-center py-2.5 border-gray-200 last:border-b-0 mr-7">
-                    <span className="font-bold text-sm w-1/3">
-                      Spouse's Occupation
-                    </span>
-                    <span className="text-gray-800 text-sm w-2/3 text-right">
-                      {familyInformation.spouseOccupation.value}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2.5 border-gray-200 last:border-b-0 ml-7">
-                    <span className="font-bold text-sm w-1/2">
-                      Spouse's Occupation Status
-                    </span>
-                    <span className="text-gray-800 text-sm w-1/2 text-right">
-                      {familyInformation.spouseOccupationFullTime.value}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
+   
 
           {/* Parental Information */}
           <section className="mb-12">
@@ -2396,4 +2237,4 @@ const TabFamilyInformation = ({ id, refreshTabDetails, setActiveTab }) => {
   );
 };
 
-export default TabFamilyInformation;
+export default TabFamilyInformationChild;

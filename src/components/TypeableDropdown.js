@@ -19,7 +19,7 @@ const TypeableDropdown = ({
 
   // Transform the selected value to match react-select's format
   const selectedValue = value.value!==value.name
-    ? { value: value.value, label: transformedOptions.find(opt => opt.value.toString() === value.value.toString())?.label}
+    ? { value: value.value, label: transformedOptions.find(opt => opt.value == value.value)?.label}
     : { value: value.value, label: value.name};
 
   // Handle change and pass the option in the format expected by handleSubjectChange

@@ -9,6 +9,7 @@ import {
   drpBadPoints,
   drpGoodPoints,
   drpOccupations,
+  drpSocialDifficulties,
   getPatientPersonalInfo,
   updatePersonalInformation,
 } from "../functions/patient";
@@ -306,7 +307,8 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
   const [goodPointsOptions, setGoodPointsOptions] = useState([]);
   const [badPointsOptions, setBadPointsOptions] = useState([]);
   const [occupations, setOccupations] = useState([]);
-
+  const [socialDifficultiesOptions, setSocialDifficultiesOptions] = useState([]);
+  
   const loadDrpGoodPoints = async () => {
     const goodPoints = await drpGoodPoints();
     setGoodPointsOptions(goodPoints.data.results[0]);
@@ -322,6 +324,11 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     setOccupations(occupations.data.results[0]);
   };
 
+      const loadDrpSocialDifficulties = async () => {
+      const result = await drpSocialDifficulties();
+      setSocialDifficultiesOptions(result.data.results[0]);
+    };
+
   useEffect(() => {
     loadDropdowns();
   }, []);
@@ -330,6 +337,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     await loadDrpGoodPoints();
     await loadDrpBadPoints();
     await loadDrpOccupations();
+    await loadDrpSocialDifficulties();
   };
 
   // Store initial state when entering edit mode
@@ -923,20 +931,21 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    List your main social difficulties
-                    {personalInformation.socialDifficulties.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <VoiceToText
-                    name="socialDifficulties"
-                    value={personalInformation.socialDifficulties.value}
-                    onChange={handleChangePersonalInfo}
-                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    rows="4"
-                    placeholder="Describe social challenges"
-                    aria-label="Social difficulties"
+                
+                   <DescriptionInput
+                    patient={personalInformation}
+                    setValue={(value) => {
+                      handleDescriptionChange("socialDifficulties", value);
+                    }}
+                    setPatient={(newPatient) => {
+                      setPersonalInformation(newPatient);
+                    }}
+                    isEditing={editingSection === "insights" || mode === "add"}
+                    fieldName="socialDifficulties"
+                    label="List your main social difficulties"
+                    placeholder="Select social challenges"
+                    descriptionOptions={socialDifficultiesOptions}
+                    isTypeable={false}
                   />
                   {personalInformationErrors.socialDifficulties && (
                     <p className="mt-1 text-sm text-red-600">
@@ -1038,7 +1047,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Things Liked:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsLiked.value}
                     </p>
                   </div>
@@ -1061,7 +1070,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Social Difficulties:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.socialDifficulties.value}
                     </p>
                   </div>
@@ -1081,7 +1090,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                     Main School Difficulties:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.schoolWorkDifficulties.value ||
                         "N/A"}
                     </p>
@@ -1090,7 +1099,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Life Goals:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.lifeGoals.value}
                     </p>
                   </div>
@@ -1100,7 +1109,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                     Things Most Like to Change:
                   </strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
+                    <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsToChange.value}
                     </p>
                   </div>
