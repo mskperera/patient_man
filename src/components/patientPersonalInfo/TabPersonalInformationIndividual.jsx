@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import DescriptionInput from "./DescriptionInput";
-import LoadingSpinner from "./LoadingSpinner";
-import MessageModel from "./MessageModel";
+import DescriptionInput from "../DescriptionInput";
+import LoadingSpinner from "../LoadingSpinner";
+import MessageModel from "../MessageModel";
 import {
   addPersonalInformation,
   drpBadPoints,
   drpGoodPoints,
   drpOccupations,
+  drpSocialDifficulties,
   getPatientPersonalInfo,
   updatePersonalInformation,
-} from "../functions/patient";
-import VoiceToText from "./VoiceToText";
-import EditButton from "./EditButton";
+} from "../../functions/patient";
+import VoiceToText from "../VoiceToText";
+import EditButton from "../EditButton";
 
 const maritalStatusOptions = [
   { value: "never_married", text: "Never Married" },
@@ -48,6 +49,9 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
   });
 
   const [isOccupationLoading, setIsOccupationLoading] = useState(false);
+
+    const [socialDifficultiesOptions, setSocialDifficultiesOptions] = useState([]);
+  
 
   const [personalInformation, setPersonalInformation] = useState({
     maritalStatus: {
@@ -254,9 +258,9 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
           isTouched: false,
           isValid: true,
         },
-        socialDifficulties: {
+       socialDifficulties: {
           ...personalInformation.socialDifficulties,
-          value: patientData.socialDifficulties,
+          value: patientData.socialDifficulties.split(";;"),
           isTouched: false,
           isValid: true,
         },
@@ -335,6 +339,10 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
     const occupations = await drpOccupations();
     setOccupations(occupations.data.results[0]);
   };
+   const loadDrpSocialDifficulties = async () => {
+      const result = await drpSocialDifficulties();
+      setSocialDifficultiesOptions(result.data.results[0]);
+    };
 
   useEffect(() => {
     loadDropdowns();
@@ -344,6 +352,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
     await loadDrpGoodPoints();
     await loadDrpBadPoints();
     await loadDrpOccupations();
+        await loadDrpSocialDifficulties();
   };
 
   // Store initial state when entering edit mode
@@ -387,7 +396,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       badPoints: personalInformation.badPoints.value.map((item) => ({
         name: item,
       })),
-      socialDifficulties: personalInformation.socialDifficulties.value,
+ socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
       loveSexDifficulties: personalInformation.loveSexDifficulties.value,
       schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
       lifeGoals: personalInformation.lifeGoals.value,
@@ -455,11 +464,11 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
 
   // Validate individual field
   const validateField = (name, value, required, dataType) => {
-    console.log("ddddata validateField : ", value);
+   
     if (dataType === "string") {
-      if (required && value.trim() === "") {
-        return `${name} is required`;
-      }
+    if (required && (typeof value !== "string" ? String(value).trim() : value.trim()) === "") {
+  return `${name} is required`;
+}
     }
 
     if (dataType === "array") {
@@ -688,7 +697,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
         badPoints: personalInformation.badPoints.value.map((item) => ({
           name: item,
         })),
-        socialDifficulties: personalInformation.socialDifficulties.value,
+         socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
         loveSexDifficulties: personalInformation.loveSexDifficulties.value,
         schoolWorkDifficulties:
           personalInformation.schoolWorkDifficulties.value,
@@ -969,6 +978,45 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                   </div>
                 </div>
               
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="col-span-2 mx-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  How religious are you?{personalInformation.religiosity.required && <span className="text-red-500">*</span>} (1 = Very Religious, 5 = Average, 9 = Atheist)
+                </label>
+                <div className="mt-2 flex items-start justify-between">
+                  <div className="flex w-full justify-between">
+                    <span className="text-xs text-gray-600 -ml-1">Very</span>
+                    <span className="text-xs text-gray-600">Average</span>
+                    <span className="text-xs text-gray-600 -mr-1">Atheist</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-1 space-x-1">
+                  {[...Array(9)].map((_, i) => {
+                    const value = (i + 1).toString();
+                    return (
+                      <label key={value} className="flex flex-col items-center">
+                        <input
+                          type="radio"
+                          name="religiosity"
+                          value={value}
+                          checked={personalInformation.religiosity.value == value}
+                          onChange={handleChangePersonalInfo}
+                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 custom-radio"
+                          aria-label={`Religiosity level ${value}`}
+                        />
+                        <span className="mt-1 text-sm text-gray-700">{value}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {personalInformationErrors.religiosity && (
+                  <p className="mt-1 text-sm text-red-600">{personalInformationErrors.religiosity}</p>
+                )}
+              </div>
+              <div></div>
+            </div>
+
+
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
@@ -1226,21 +1274,22 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                     )}
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    List your main social difficulties
-                    {personalInformation.socialDifficulties.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <VoiceToText
-                    name="socialDifficulties"
-                    value={personalInformation.socialDifficulties.value}
-                    onChange={handleChangePersonalInfo}
-                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    rows="4"
-                    placeholder="Describe social challenges"
-                    aria-label="Social difficulties"
+                    <div>
+                
+                   <DescriptionInput
+                    patient={personalInformation}
+                    setValue={(value) => {
+                      handleDescriptionChange("socialDifficulties", value);
+                    }}
+                    setPatient={(newPatient) => {
+                      setPersonalInformation(newPatient);
+                    }}
+                    isEditing={editingSection === "insights" || mode === "add"}
+                    fieldName="socialDifficulties"
+                    label="List your main social difficulties"
+                    placeholder="Select social challenges"
+                    descriptionOptions={socialDifficultiesOptions}
+                    isTypeable={false}
                   />
                   {personalInformationErrors.socialDifficulties && (
                     <p className="mt-1 text-sm text-red-600">

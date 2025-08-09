@@ -2,20 +2,137 @@ import { FaMale, FaFemale, FaPrint } from "react-icons/fa";
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
 
-const BasicInformationSection = ({ isLoading, basicInformation }) => {
+const BasicInformationSection = ({ isLoading, basicInformation, patientTypeId }) => {
   return (
     <section className="mb-6">
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <LoadingSpinner />
         </div>
-      ) : basicInformation.firstName ? (
+      ) : patientTypeId === "3" ? (
+        // Family Patient (patientTypeId === 3)
         <div className="mx-4">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Husband Information */}
+              <div className="space-y-2 col-span-2">
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700">Wife</h4>
+            </div>
+
+
+     <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                   <strong className="text-gray-600 font-bold">Name:</strong>
+              <div className="col-span-2">
+                 <span className="text-gray-800">
+                    {`${basicInformation.husbandFirstName || ""} ${
+                      basicInformation.husbandMiddleName ? basicInformation.husbandMiddleName + " " : ""
+                    }${basicInformation.husbandLastName || ""}`.trim() || "N/A"}
+                  </span>
+              </div>
+              <div className="col-span-2">
+                    <span className="text-gray-800">
+                    {`${basicInformation.wifeFirstName || ""} ${
+                      basicInformation.wifeMiddleName ? basicInformation.wifeMiddleName + " " : ""
+                    }${basicInformation.wifeLastName || ""}`.trim() || "N/A"}
+                  </span>
+              </div>
+            </div>
+
+
+      <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                     <strong className="text-gray-600 font-bold">Age:</strong>
+              <div className="col-span-2">
+                  <span className="text-gray-800">{basicInformation.husbandAge || "N/A"}</span>
+              </div>
+              <div className="col-span-2">
+                                    <span className="text-gray-800">{basicInformation.wifeAge || "N/A"}</span>
+              </div>
+            </div>
+             
+
+
+   <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <strong className="text-gray-600 font-bold">Gender:</strong>
+              <div className="col-span-2">
+                    <span className="flex items-center text-gray-800">
+                    {basicInformation.husbandGender || "N/A"}
+                    {basicInformation.husbandGender === "Male" && (
+                      <FaMale className="ml-2 text-sky-600" />
+                    )}
+                    {basicInformation.husbandGender === "Female" && (
+                      <FaFemale className="ml-2 text-teal-500" />
+                    )}
+                  </span>
+              </div>
+              <div className="col-span-2">
+                         <span className="flex items-center text-gray-800">
+                    {basicInformation.wifeGender || "N/A"}
+                    {basicInformation.wifeGender === "Male" && (
+                      <FaMale className="ml-2 text-sky-600" />
+                    )}
+                    {basicInformation.wifeGender === "Female" && (
+                      <FaFemale className="ml-2 text-teal-500" />
+                    )}
+                  </span>
+              </div>
+            </div>
+
+
+             
+              </div>
+
+         
+
+              {/* Record Information and Actions */}
+              <div className="space-y-4 flex flex-col items-start lg:items-end">
+                <div className="space-y-4 w-full">
+                  <div className="flex items-center gap-3">
+                    <strong className="text-gray-600 font-medium">Patient No:</strong>
+                    <span className="text-gray-800">{basicInformation.patientNo || "N/A"}</span>
+                  </div>
+                 
+                  <div className="flex items-center gap-3">
+                    <strong className="text-gray-600 font-medium">Last Modified:</strong>
+                    <span className="text-sky-600">
+                      {basicInformation.lastModified
+                        ? moment(basicInformation.lastModified).format("YYYY MMM DD hh:mm A")
+                        : "N/A"}
+                    </span>
+                  </div>
+
+  <div className="flex items-start gap-3">
+      <strong className="text-gray-600 font-medium">Handled by:</strong>
+      <span className="text-sky-600 max-w-[200px] lg:max-w-[250px] break-words">
+        Dr. Chaminda Weerasiriwardane
+      </span>
+    </div>
+
+                </div>
+                <div className="flex flex-col items-start lg:items-end space-y-4">
+                  
+                  <button
+                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
+                    aria-label="Print patient summary"
+                  >
+                    <FaPrint />
+                    Print Summary
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : basicInformation ? (
+        // Single Patient (patientTypeId !== 3)
+        <div className="mx-4">
+          <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Personal Information */}
               <div className="space-y-4">
-              
                 <div className="flex items-center gap-3">
                   <strong className="text-gray-600 font-medium">Name:</strong>
                   <span className="text-gray-800">
@@ -26,7 +143,7 @@ const BasicInformationSection = ({ isLoading, basicInformation }) => {
                 </div>
                 <div className="flex items-center gap-3">
                   <strong className="text-gray-600 font-medium">Age:</strong>
-                  <span className="text-gray-800">{basicInformation.age}</span>
+                  <span className="text-gray-800">{basicInformation.age || "N/A"}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <strong className="text-gray-600 font-medium">Gender:</strong>
@@ -44,43 +161,33 @@ const BasicInformationSection = ({ isLoading, basicInformation }) => {
 
               {/* Record Information */}
               <div className="space-y-4">
-             
                 <div className="flex items-center gap-3">
                   <strong className="text-gray-600 font-medium">Patient No:</strong>
                   <span className="text-gray-800">{basicInformation.patientNo || "N/A"}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <strong className="text-gray-600 font-medium">Created Date:</strong>
-                  <span className="text-sky-600">
-                    {basicInformation.formDate
-                      ? moment(basicInformation.formDate).format("YYYY MMM DD hh:mm A")
-                      : "N/A"}
-                  </span>
-                </div>
+           
                 <div className="flex items-center gap-3">
                   <strong className="text-gray-600 font-medium">Last Modified:</strong>
                   <span className="text-sky-600">
                     {basicInformation.lastModified
                       ? moment(basicInformation.lastModified).format("YYYY MMM DD hh:mm A")
                       : "N/A"}
-                  </span>
+                    </span>
                 </div>
+
+                  <div className="flex items-start gap-3">
+      <strong className="text-gray-600 font-medium">Handled by:</strong>
+      <span className="text-sky-600 max-w-[200px] lg:max-w-[250px] break-words">
+        Dr. Chaminda Weerasiriwardane
+      </span>
+    </div>
+
               </div>
 
               {/* Actions and Handled By */}
               <div className="space-y-4 flex flex-col items-start lg:items-end">
-            
                 <div className="flex flex-col items-start lg:items-end space-y-4">
-                  <div className="text-left lg:text-right">
-                    <p className="text-gray-600 font-medium">Handled by:</p>
-                    <p className="text-sky-600">Dr. Chaminda Weerasiriwardane</p>
-                  </div>
-                  {/* Profile Image (Commented Out) */}
-                  {/* <img
-                    src={profileImageUrl}
-                    alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-sky-300 shadow-sm"
-                  /> */}
+               
                   <button
                     className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
                     aria-label="Print patient summary"
@@ -101,8 +208,6 @@ const BasicInformationSection = ({ isLoading, basicInformation }) => {
 };
 
 export default BasicInformationSection;
-
-
 
 
 //     <section className="mb-2">

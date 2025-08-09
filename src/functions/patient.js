@@ -461,6 +461,96 @@ export const updatePersonalInformation = async (id,data) => {
 };
 
 
+export const addPersonalInformationFamily = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/personalInformationFamily`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updatePersonalInformationFamily = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/personalInformationFamily/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const addPersonalInformationChild = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/personalInformationChild`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updatePersonalInformationChild = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/personalInformationChild/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
 export const addFamilyInformation = async (data) => {
   try {
     const token = getToken();
@@ -551,6 +641,53 @@ export const updateMedicalInformation = async (id,data) => {
 
 
 
+export const addMedicalInformationFamily = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/medicalInformation_family`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateMedicalInformationFamily = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/medicalInformation_family/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+
 
 export const addEducation = async (data) => {
   try {
@@ -599,6 +736,51 @@ export const updateEducation = async (id,data) => {
 }
 
 
+export const addEducationFamily = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/education_family`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updateEducationFamily = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/education_family/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+
+}
 
 
 export const drpUniversitySubjects = async () => {
@@ -886,125 +1068,12 @@ export const drpSocialDifficulties = async () => {
 };
 
 
-
-// Function to fetch Edexcel IGCSE subjects dropdown data
-export const drpEdexcelIGCSESubjects = async () => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/dropdown/edexceligcsesubjects`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res)
-      .catch((err) => err.response);
-  } catch (err) {
-    return err;
-  }
-};
-
-// Function to fetch Cambridge IGCSE subjects dropdown data
-export const drpCambridgeIGCSESubjects = async () => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/dropdown/cambridgeigcsesubjects`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res)
-      .catch((err) => err.response);
-  } catch (err) {
-    return err;
-  }
-};
-
-// Function to fetch Edexcel A-Level subjects dropdown data
-export const drpEdexcelALSubjects = async () => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/dropdown/edexcelalsubjects`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res)
-      .catch((err) => err.response);
-  } catch (err) {
-    return err;
-  }
-};
-
-// Function to fetch Cambridge A-Level subjects dropdown data
-export const drpCambridgeALSubjects = async () => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/dropdown/cambridgealsubjects`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res)
-      .catch((err) => err.response);
-  } catch (err) {
-    return err;
-  }
-};
-
-
-export const drpEdexcelALStreams = async () => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/dropdown/edexcelalstreams`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res)
-      .catch((err) => err.response);
-  } catch (err) {
-    return err;
-  }
-};
-
-export const drpCambridgeALStreams = async () => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/dropdown/cambridgealstreams`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => res)
-      .catch((err) => err.response);
-  } catch (err) {
-    return err;
-  }
-};
-
-
-
-
-
-
 // Function to fetch Edexcel IGCSE qualifications
-export const getEdexcelIGCSE = async (patientId) => {
+export const getInternationalCurriculum = async (patientId) => {
   try {
     const token = getToken();
     return await customAxios
-      .get(`/patient/edexceligcse/${patientId}`, {
+      .get(`/patient/internationalcurriculum/${patientId}`, {
         headers: {
           "Content-Type": "application/json",
           // authorization: `Bearer ${token}`,
@@ -1021,12 +1090,16 @@ export const getEdexcelIGCSE = async (patientId) => {
   }
 };
 
-// Function to fetch Cambridge IGCSE qualifications
-export const getCambridgeIGCSE = async (patientId) => {
+
+
+
+
+export const drpACES = async () => {
   try {
     const token = getToken();
+
     return await customAxios
-      .get(`/patient/cambridgeigcse/${patientId}`, {
+      .get(`/dropdown/aces`, {
         headers: {
           "Content-Type": "application/json",
           // authorization: `Bearer ${token}`,
@@ -1043,49 +1116,6 @@ export const getCambridgeIGCSE = async (patientId) => {
   }
 };
 
-// Function to fetch Edexcel A-Level qualifications
-export const getEdexcelAL = async (patientId) => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/patient/edexcelal/${patientId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err.response;
-      });
-  } catch (err) {
-    return err;
-  }
-};
-
-// Function to fetch Cambridge A-Level qualifications
-export const getCambridgeAL = async (patientId) => {
-  try {
-    const token = getToken();
-    return await customAxios
-      .get(`/patient/cambridgeal/${patientId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err.response;
-      });
-  } catch (err) {
-    return err;
-  }
-};
 
 // export const addContact = async (data) => {
 //   try {

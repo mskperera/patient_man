@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import DescriptionInput from "./DescriptionInput";
-import LoadingSpinner from "./LoadingSpinner";
-import MessageModel from "./MessageModel";
+import DescriptionInput from "../DescriptionInput";
+import LoadingSpinner from "../LoadingSpinner";
+import MessageModel from "../MessageModel";
 import {
   addPersonalInformation,
   drpBadPoints,
@@ -12,9 +12,9 @@ import {
   drpSocialDifficulties,
   getPatientPersonalInfo,
   updatePersonalInformation,
-} from "../functions/patient";
-import VoiceToText from "./VoiceToText";
-import EditButton from "./EditButton";
+} from "../../functions/patient";
+import VoiceToText from "../VoiceToText";
+import EditButton from "../EditButton";
 
 const maritalStatusOptions = [
   { value: "never_married", text: "Never Married" },

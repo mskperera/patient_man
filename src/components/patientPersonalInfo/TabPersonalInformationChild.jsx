@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import DescriptionInput from "./DescriptionInput";
-import LoadingSpinner from "./LoadingSpinner";
-import MessageModel from "./MessageModel";
+import DescriptionInput from "../DescriptionInput";
+import LoadingSpinner from "../LoadingSpinner";
+import MessageModel from "../MessageModel";
 import {
   addPersonalInformation,
+  addPersonalInformationChild,
   drpBadPoints,
   drpGoodPoints,
   drpOccupations,
   drpSocialDifficulties,
   getPatientPersonalInfo,
   updatePersonalInformation,
-} from "../functions/patient";
-import VoiceToText from "./VoiceToText";
-import EditButton from "./EditButton";
+  updatePersonalInformationChild,
+} from "../../functions/patient";
+import VoiceToText from "../VoiceToText";
+import EditButton from "../EditButton";
 
 
 const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
@@ -37,46 +39,46 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
   const [isOccupationLoading, setIsOccupationLoading] = useState(false);
 
   const [personalInformation, setPersonalInformation] = useState({
-    maritalStatus: {
-      label: "Present Marital Status",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
-    yearsMarried: {
-      label: "Number of Years Married to Present Spouse",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "number",
-    },
-    maleChildrenAges: {
-      label: "Ages of Male Children",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
-    femaleChildrenAges: {
-      label: "Ages of Female Children",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
-    religiosity: {
-      label: "Religiosity",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: true,
-      dataType: "number",
-    },
+    // maritalStatus: {
+    //   label: "Present Marital Status",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: false,
+    //   required: true,
+    //   dataType: "string",
+    // },
+    // yearsMarried: {
+    //   label: "Number of Years Married to Present Spouse",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: false,
+    //   dataType: "number",
+    // },
+    // maleChildrenAges: {
+    //   label: "Ages of Male Children",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: false,
+    //   dataType: "string",
+    // },
+    // femaleChildrenAges: {
+    //   label: "Ages of Female Children",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: false,
+    //   dataType: "string",
+    // },
+    // religiosity: {
+    //   label: "Religiosity",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "number",
+    // },
     thingsLiked: {
       label: "Things You Like to Do Most",
       value: "",
@@ -107,16 +109,16 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       isTouched: false,
       isValid: true,
       required: true,
-      dataType: "string",
+      dataType: "array",
     },
-    loveSexDifficulties: {
-      label: "Main Love and Sex Difficulties",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: true,
-      dataType: "string",
-    },
+    // loveSexDifficulties: {
+    //   label: "Main Love and Sex Difficulties",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "string",
+    // },
     schoolWorkDifficulties: {
       label: "Main School or Work Difficulties",
       value: "",
@@ -141,30 +143,30 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       required: true,
       dataType: "string",
     },
-    occupationTrained: {
-      label: "Occupation(s) Trained For",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
-    occupation: {
-      label: "Present Occupation",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
-    occupationFullTime: {
-      label: "Occupation Status",
-      value: "",
-      isTouched: false,
-      isValid: false,
-      required: true,
-      dataType: "string",
-    },
+    // occupationTrained: {
+    //   label: "Occupation(s) Trained For",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: false,
+    //   required: true,
+    //   dataType: "string",
+    // },
+    // occupation: {
+    //   label: "Present Occupation",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: false,
+    //   required: true,
+    //   dataType: "string",
+    // },
+    // occupationFullTime: {
+    //   label: "Occupation Status",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: false,
+    //   required: true,
+    //   dataType: "string",
+    // },
   });
 
   const loadPersonalInformationData = async () => {
@@ -190,39 +192,39 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
 
     if (patientData) {
       setPersonalInformation({
-        maritalStatus: {
-          ...personalInformation.maritalStatus,
-          value: patientData.maritalStatus,
-          isTouched: false,
-          isValid: true,
-        },
-        yearsMarried: {
-          ...personalInformation.yearsMarried,
-          value: patientData.yearsMarried,
-          isTouched: false,
-          isValid: true,
-          required:
-            patientData.maritalStatus === "married_first_time" ||
-            patientData.maritalStatus === "married_second_time",
-        },
-        maleChildrenAges: {
-          ...personalInformation.maleChildrenAges,
-          value: patientData.maleChildrenAges,
-          isTouched: false,
-          isValid: true,
-        },
-        femaleChildrenAges: {
-          ...personalInformation.femaleChildrenAges,
-          value: patientData.femaleChildrenAges,
-          isTouched: false,
-          isValid: true,
-        },
-        religiosity: {
-          ...personalInformation.religiosity,
-          value: patientData.religiosity,
-          isTouched: false,
-          isValid: true,
-        },
+        // maritalStatus: {
+        //   ...personalInformation.maritalStatus,
+        //   value: patientData.maritalStatus,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // yearsMarried: {
+        //   ...personalInformation.yearsMarried,
+        //   value: patientData.yearsMarried,
+        //   isTouched: false,
+        //   isValid: true,
+        //   required:
+        //     patientData.maritalStatus === "married_first_time" ||
+        //     patientData.maritalStatus === "married_second_time",
+        // },
+        // maleChildrenAges: {
+        //   ...personalInformation.maleChildrenAges,
+        //   value: patientData.maleChildrenAges,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // femaleChildrenAges: {
+        //   ...personalInformation.femaleChildrenAges,
+        //   value: patientData.femaleChildrenAges,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // religiosity: {
+        //   ...personalInformation.religiosity,
+        //   value: patientData.religiosity,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
         thingsLiked: {
           ...personalInformation.thingsLiked,
           value: patientData.thingsLiked,
@@ -241,18 +243,18 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
           isTouched: false,
           isValid: true,
         },
-        socialDifficulties: {
+          socialDifficulties: {
           ...personalInformation.socialDifficulties,
-          value: patientData.socialDifficulties,
+          value: patientData.socialDifficulties.split(";;"),
           isTouched: false,
           isValid: true,
         },
-        loveSexDifficulties: {
-          ...personalInformation.loveSexDifficulties,
-          value: patientData.loveSexDifficulties,
-          isTouched: false,
-          isValid: true,
-        },
+        // loveSexDifficulties: {
+        //   ...personalInformation.loveSexDifficulties,
+        //   value: patientData.loveSexDifficulties,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
         schoolWorkDifficulties: {
           ...personalInformation.schoolWorkDifficulties,
           value: patientData.schoolWorkDifficulties,
@@ -271,24 +273,24 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
           isTouched: false,
           isValid: true,
         },
-        occupationTrained: {
-          ...personalInformation.occupationTrained,
-          value: patientData.occupationTrained,
-          isTouched: false,
-          isValid: true,
-        },
-        occupation: {
-          ...personalInformation.occupation,
-          value: patientData.occupation,
-          isTouched: false,
-          isValid: true,
-        },
-        occupationFullTime: {
-          ...personalInformation.occupationFullTime,
-          value: patientData.occupationFullTime,
-          isTouched: false,
-          isValid: true,
-        },
+        // occupationTrained: {
+        //   ...personalInformation.occupationTrained,
+        //   value: patientData.occupationTrained,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // occupation: {
+        //   ...personalInformation.occupation,
+        //   value: patientData.occupation,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // occupationFullTime: {
+        //   ...personalInformation.occupationFullTime,
+        //   value: patientData.occupationFullTime,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
       });
 
       setIsLoading(false);
@@ -368,27 +370,27 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     console.log("section", section);
     const payload = {
       patientId: id,
-      maritalStatus: personalInformation.maritalStatus.value,
-      yearsMarried:
-        personalInformation.yearsMarried.value === ""
-          ? null
-          : personalInformation.yearsMarried.value,
-      maleChildrenAges: personalInformation.maleChildrenAges.value,
-      femaleChildrenAges: personalInformation.femaleChildrenAges.value,
-      religiosity: personalInformation.religiosity.value,
+      // maritalStatus: personalInformation.maritalStatus.value,
+      // yearsMarried:
+      //   personalInformation.yearsMarried.value === ""
+      //     ? null
+      //     : personalInformation.yearsMarried.value,
+      // maleChildrenAges: personalInformation.maleChildrenAges.value,
+      // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+      // religiosity: personalInformation.religiosity.value,
       thingsLiked: personalInformation.thingsLiked.value,
       assets: personalInformation.assets.value.map((item) => ({ name: item })),
       badPoints: personalInformation.badPoints.value.map((item) => ({
         name: item,
       })),
-      socialDifficulties: personalInformation.socialDifficulties.value,
-      loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+    socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+     // loveSexDifficulties: personalInformation.loveSexDifficulties.value,
       schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
       lifeGoals: personalInformation.lifeGoals.value,
       thingsToChange: personalInformation.thingsToChange.value,
-      occupationTrained: personalInformation.occupationTrained.value,
-      occupation: personalInformation.occupation.value,
-      occupationFullTime: personalInformation.occupationFullTime.value,
+      // occupationTrained: personalInformation.occupationTrained.value,
+      // occupation: personalInformation.occupation.value,
+      // occupationFullTime: personalInformation.occupationFullTime.value,
       pageName: "PatientBackgroundForm",
       isConfirm: true,
     };
@@ -396,7 +398,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     console.log("Save Payload:", payload);
 
     try {
-      const res = await updatePersonalInformation(id, payload);
+      const res = await updatePersonalInformationChild(id, payload);
       console.log("update result:", res);
 
       if (res.data.error) {
@@ -449,11 +451,11 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
 
   // Validate individual field
   const validateField = (name, value, required, dataType) => {
-    console.log("ddddata validateField : ", value);
+   
     if (dataType === "string") {
-      if (required && value.trim() === "") {
-        return `${name} is required`;
-      }
+    if (required && (typeof value !== "string" ? String(value).trim() : value.trim()) === "") {
+  return `${name} is required`;
+}
     }
 
     if (dataType === "array") {
@@ -667,14 +669,14 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     if (isValid) {
       const payload = {
         patientId: id,
-        maritalStatus: personalInformation.maritalStatus.value,
-        yearsMarried:
-          personalInformation.yearsMarried.value === ""
-            ? null
-            : personalInformation.yearsMarried.value,
-        maleChildrenAges: personalInformation.maleChildrenAges.value,
-        femaleChildrenAges: personalInformation.femaleChildrenAges.value,
-        religiosity: personalInformation.religiosity.value,
+        // maritalStatus: personalInformation.maritalStatus.value,
+        // yearsMarried:
+        //   personalInformation.yearsMarried.value === ""
+        //     ? null
+        //     : personalInformation.yearsMarried.value,
+        // maleChildrenAges: personalInformation.maleChildrenAges.value,
+        // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+        // religiosity: personalInformation.religiosity.value,
         thingsLiked: personalInformation.thingsLiked.value,
         assets: personalInformation.assets.value.map((item) => ({
           name: item,
@@ -682,15 +684,14 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
         badPoints: personalInformation.badPoints.value.map((item) => ({
           name: item,
         })),
-        socialDifficulties: personalInformation.socialDifficulties.value,
-        loveSexDifficulties: personalInformation.loveSexDifficulties.value,
-        schoolWorkDifficulties:
-          personalInformation.schoolWorkDifficulties.value,
+      socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+       // loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+      schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
         lifeGoals: personalInformation.lifeGoals.value,
         thingsToChange: personalInformation.thingsToChange.value,
-        occupationTrained: personalInformation.occupationTrained.value,
-        occupation: personalInformation.occupation.value,
-        occupationFullTime: personalInformation.occupationFullTime.value,
+        // occupationTrained: personalInformation.occupationTrained.value,
+        // occupation: personalInformation.occupation.value,
+        // occupationFullTime: personalInformation.occupationFullTime.value,
         pageName: "PatientBackgroundForm",
         isConfirm: true,
       };
@@ -701,7 +702,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       };
 
       try {
-        const res = await addPersonalInformation(submitPayloadWithPatientId);
+        const res = await addPersonalInformationChild(submitPayloadWithPatientId);
         console.log("Save res:", res);
         //await loadPersonalInformationData();
         console.log("update result:", res);
@@ -1070,9 +1071,9 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Social Difficulties:</strong>
                   <div className="mt-2">
-                    <p className="text-gray-700 mt-1 whitespace-pre-line">
-                      {personalInformation.socialDifficulties.value}
-                    </p>
+                 
+                      {renderListItems(personalInformation.socialDifficulties.value)}
+                
                   </div>
                 </div>
                 {/* <div className=" bg-white border border-gray-200 rounded-lg p-4">
@@ -1112,289 +1113,6 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                     <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.thingsToChange.value}
                     </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Occupation Information */}
-          <section className="mb-12">
-            <div className="flex justify-between items-center mb-2  pb-2">
-              <h3 className="text-xl font-semibold text-gray-700">
-                Occupation Information
-              </h3>
-              {mode !== "add" && (
-                <div className="flex space-x-4">
-                  <EditButton
-                    onClick={() => toggleSectionEdit("occupation")}
-                    ariaLabel={
-                      editingSection === "occupation"
-                        ? "Save Occupation Info"
-                        : "Edit Occupation Info"
-                    }
-                    disabled={isSaving}
-                  >
-                    {editingSection === "occupation"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </EditButton>
-
-                  {/* <button
-                    onClick={() => toggleSectionEdit("occupation")}
-                    className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={
-                      editingSection === "occupation"
-                        ? "Save Occupation Info"
-                        : "Edit Occupation Info"
-                    }
-                    disabled={isSaving}
-                  >
-                    <FaEdit className="mr-2" />
-                    {editingSection === "occupation"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </button> */}
-                  {editingSection === "occupation" && (
-                    <button
-                      onClick={() => handleCancel("occupation")}
-                      className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
-                      aria-label="Cancel Editing"
-                      disabled={isSaving}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            {editingSection === "occupation" || mode === "add" ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      What occupation(s) have you mainly been trained for?{" "}
-                      {personalInformation.occupationTrained.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-
-                    {/* <TypeableDropdown
-                          options={occupations}
-                          value={{ value: personalInformation.occupationTrained?.value,name:personalInformation.occupationTrained?.value}}
-                          onChange={(option) => handleSubjectChange(option,'occupationTrained')}
-                          placeholder="Select or type Occupation trained for"
-                          //isDisabled={!qualification.isNew === true}
-                          className="mt-1"
-                          classNamePrefix="select"
-                            aria-label="Occupation trained for"
-                        /> */}
-
-                    <div className="flex items-center justify-start gap-2">
-                      <select
-                        name="occupationTrained"
-                        value={personalInformation.occupationTrained.value}
-                        onChange={handleChangePersonalInfo}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        aria-label="Occupation trained for"
-                      >
-                        <option value="">Select occupation</option>
-                        {occupations.map((occupation) => (
-                          <option key={occupation.id} value={occupation.name}>
-                            {occupation.name}
-                          </option>
-                        ))}
-                      </select>
-
-                      <button
-                        title="Refresh dropdown"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaSync />
-                      </button>
-
-                      <button
-                        title="Add new occupation"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaPlusCircle className="text-green-600" />
-                      </button>
-                    </div>
-                    {personalInformationErrors.occupationTrained && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.occupationTrained}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Present Occupation
-                      {personalInformation.occupation.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    {/* <TypeableDropdown
-                          options={occupations}
-                          value={{ value: personalInformation.occupation?.value,name:personalInformation.occupation?.value}}
-                            onChange={(option) => handleSubjectChange(option,'occupation')}
-                          placeholder="Select or type occupation"
-                          //isDisabled={!qualification.isNew === true}
-                          className="mt-1"
-                          classNamePrefix="select"
-                          aria-label={`Present occupation}`}
-                        /> */}
-                    <div className="flex items-center justify-start gap-2">
-                      <select
-                        name="occupation"
-                        value={personalInformation.occupation.value}
-                        onChange={handleChangePersonalInfo}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        aria-label="Present occupation"
-                      >
-                        <option value="">Select occupation</option>
-                        {occupations.map((occupation) => (
-                          <option key={occupation.id} value={occupation.name}>
-                            {occupation.name}
-                          </option>
-                        ))}
-                      </select>
-
-                      <button
-                        title="Refresh dropdown"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaSync />
-                      </button>
-
-                      <button
-                        title="Add new occupation"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaPlusCircle className="text-green-600" />
-                      </button>
-                    </div>
-
-                    {personalInformationErrors.occupation && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.occupation}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Occupation Status
-                      {personalInformation.occupationFullTime.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <div className="flex items-center space-x-4 mt-5">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="occupationFullTime"
-                          value="full-time"
-                          checked={
-                            personalInformation.occupationFullTime.value ===
-                            "full-time"
-                          }
-                          onChange={handleOccupationStatusChange}
-                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
-                          aria-label="Full-time"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          Full-time
-                        </span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="occupationFullTime"
-                          value="part-time"
-                          checked={
-                            personalInformation.occupationFullTime.value ===
-                            "part-time"
-                          }
-                          onChange={handleOccupationStatusChange}
-                          className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
-                          aria-label="Part-time"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">
-                          Part-time
-                        </span>
-                      </label>
-                    </div>
-                    {personalInformationErrors.occupationFullTime && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {personalInformationErrors.occupationFullTime}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                <div className="border-2 bg-white  border-gray-200 rounded-lg p-4 ">
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                    <span className="font-bold text-sm w-1/2">
-                      What occupation(s) have you mainly been trained for?
-                    </span>
-                    <span className="text-gray-700 text-sm w-1/2 text-right">
-                      {personalInformation.occupationTrained.value}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                    <span className="font-bold text-sm w-1/3">
-                      Present Occupation
-                    </span>
-                    <span className="text-gray-700 text-sm w-2/3 text-right">
-                      {personalInformation.occupation.value}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                    <span className="font-bold text-sm w-1/3">
-                      Occupation Status
-                    </span>
-                    <span className="text-gray-700 text-sm w-2/3 text-right">
-                      {personalInformation.occupationFullTime.value}
-                    </span>
                   </div>
                 </div>
               </div>

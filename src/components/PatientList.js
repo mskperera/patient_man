@@ -102,9 +102,9 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
               <th scope="col" className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Name
               </th>
-              <th scope="col" className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
+              {/* <th scope="col" className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Gender
-              </th>
+              </th> */}
               <th scope="col" className="py-3 px-4 border text-left text-sm font-semibold text-gray-700">
                 Phone
               </th>
@@ -154,7 +154,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
                   {/* <td className="py-3 px-4 border text-gray-800">
                     {`${patient.firstName} ${patient.middleName || ''} ${patient.lastName}`}
                   </td> */}
-                  <td className="py-3 px-4 border text-gray-800">{patient.gender || 'N/A'}</td>
+                  {/* <td className="py-3 px-4 border text-gray-800">{patient.gender || 'N/A'}</td> */}
                   <td className="py-3 px-4 border text-gray-800">
                     {patient.businessPhone || patient.homePhone || 'N/A'}
                   </td>

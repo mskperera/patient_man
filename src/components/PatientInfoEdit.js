@@ -16,24 +16,29 @@ import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import NotesTab from "./NotesTab";
 import TabMentalStatusExam from "./TabMentalStatusExam";
-import TabEducationDetails from "./TabEducationDetails";
+import TabEducationDetails from "./patientEducation/TabEducationDetailsIndividual";
 
-import TabPersonalInformation from "./TabPersonalInformation";
+import TabPersonalInformation from "./patientPersonalInfo/TabPersonalInformation";
 import FamilyTab from "./TabFamilyInformation";
-import TabMentalHealth from "./TabMentalHealth";
+import TabMentalHealth from "./patientMentalHealth/TabMentalHealth";
 
 import {
   getPatientBasicInfo,
   getProfileTabDetails,
 } from "../functions/patient";
-import TabBasicInformation from "./TabBasicInformation";
+import TabBasicInformation from "./patientBasicInformation/TabBasicInformation";
 import BasicInformationSection from "./BasicInformationSection";
-import TabPersonalInformationChild from "./TabPersonalInformationChild";
-import TabPersonalInformationIndividual from "./TabPersonalInformationIndividual";
+import TabPersonalInformationChild from "./patientPersonalInfo/TabPersonalInformationChild";
+import TabPersonalInformationIndividual from "./patientPersonalInfo/TabPersonalInformationIndividual";
 import TabFamilyInformationChild from "./TabFamilyInformationChild";
-import TabMentalHealthChild from "./TabMentalHealthChild";
-import TabEducationDetailsChild from "./TabEducationDetailsChild";
-import TabBasicInformationFamily from "./TabBasicInformationFamily";
+import TabMentalHealthChild from "./patientMentalHealth/TabMentalHealthChild";
+import TabBasicInformationFamily from "./patientBasicInformation/TabBasicInformationFamily";
+import TabPersonalInformationFamily from "./patientPersonalInfo/TabPersonalInformationFamily";
+import TabMentalHealthFamily from "./patientMentalHealth/TabMentalHealthFamily";
+import TabEducationDetailsFamily from "./patientEducation/TabEducationDetailsFamily";
+import TabEducationDetailsChild from "./patientEducation/TabEducationDetailsChild";
+import TabMentalHealthIndividual from "./patientMentalHealth/TabMentalHealthIndividual";
+import TabEducationDetailsIndividual from "./patientEducation/TabEducationDetailsIndividual";
 
 function PatientInfoEdit({ mode = "view" }) {
   const navigate = useNavigate();
@@ -57,15 +62,7 @@ function PatientInfoEdit({ mode = "view" }) {
     isPersonalInfo: false,
   });
 
-  const [basicInformation, setBasicInformation] = useState({
-    patientNo: "",
-    firstName: "",
-    lastName: "",
-    middleName: "",
-    dob: "",
-    age: "",
-    gender: "",
-  });
+  const [basicInformation, setBasicInformation] = useState(null);
 
   const [newId, setNewId] = useState("");
 
@@ -75,16 +72,7 @@ function PatientInfoEdit({ mode = "view" }) {
     const patientData = result.data;
     console.log("patientData", patientData);
     if (patientData) {
-      setBasicInformation({
-        patientNo: patientData.patientNo || "",
-        firstName: patientData.firstName,
-        lastName: patientData?.lastName,
-        dob: patientData.dateOfBirth,
-        age: patientData.age,
-        gender: patientData.gender,
-        formDate: patientData.formDate,
-        lastModified: patientData.lastModified,
-      });
+      setBasicInformation(patientData);
     }
     setIsLoading(false);
   };
@@ -141,7 +129,7 @@ function PatientInfoEdit({ mode = "view" }) {
       {/* {JSON.stringify(basicInfomation)} */}
       {mode !== "add" && (
         <div>
-          <BasicInformationSection basicInformation={basicInformation} />
+        {basicInformation && <BasicInformationSection basicInformation={basicInformation} patientTypeId={patientType} />}
         </div>
       )}
       {patientType === "1" && (
@@ -170,6 +158,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("personal")}
+              disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaUser className="mr-2" size={16} />
               Personal
@@ -198,6 +187,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("medical")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaHeartPulse className="mr-2" size={16} />
               Mental Health
@@ -214,6 +204,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("education")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaGraduationCap className="mr-2" size={16} />
               Education
@@ -231,6 +222,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("mentalExam")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBrain className="mr-2" size={16} />
               Mental Status Exam
@@ -253,6 +245,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("notes")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
@@ -278,13 +271,13 @@ function PatientInfoEdit({ mode = "view" }) {
             )}
             {/* {activeTab === "family" && <FamilyTab id={id || newId} />} */}
             {activeTab === "medical" && (
-              <TabMentalHealth
+              <TabMentalHealthIndividual
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
             {activeTab === "education" && (
-              <TabEducationDetails
+              <TabEducationDetailsIndividual
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
@@ -322,6 +315,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("personal")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaUser className="mr-2" size={16} />
               Personal
@@ -338,6 +332,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("family")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaUsers className="mr-2" size={16} />
               Family
@@ -355,6 +350,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("medical")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaHeartPulse className="mr-2" size={16} />
               Mental Health
@@ -371,6 +367,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("education")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaGraduationCap className="mr-2" size={16} />
               Education
@@ -388,6 +385,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("mentalExam")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBrain className="mr-2" size={16} />
               Mental Status Exam
@@ -399,6 +397,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("notes")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
@@ -472,6 +471,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("personal")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaUser className="mr-2" size={16} />
               Personal
@@ -481,7 +481,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 )}
               </span>
             </button>
-            <button
+            {/* <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "family"
                   ? "bg-sky-600 text-white shadow-sm"
@@ -496,7 +496,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   <FaExclamationCircle className="text-orange-500 text-lg" />
                 )}
               </span>
-            </button>
+            </button> */}
 
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -505,6 +505,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("medical")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaHeartPulse className="mr-2" size={16} />
               Mental Health
@@ -521,6 +522,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("education")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaGraduationCap className="mr-2" size={16} />
               Education
@@ -538,6 +540,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("mentalExam")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBrain className="mr-2" size={16} />
               Mental Status Exam
@@ -549,6 +552,7 @@ function PatientInfoEdit({ mode = "view" }) {
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("notes")}
+                  disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
@@ -567,25 +571,25 @@ function PatientInfoEdit({ mode = "view" }) {
               />
             )}
             {activeTab === "personal" && (
-              <TabPersonalInformation
+              <TabPersonalInformationFamily
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
-            {activeTab === "family" && (
+            {/* {activeTab === "family" && (
               <FamilyTab
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
-            )}
+            )} */}
             {activeTab === "medical" && (
-              <TabMentalHealth
+              <TabMentalHealthFamily
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />
             )}
             {activeTab === "education" && (
-              <TabEducationDetails
+              <TabEducationDetailsFamily
                 refreshTabDetails={refreshTabDetailsHandler}
                 id={id || newId}
               />

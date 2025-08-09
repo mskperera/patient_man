@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit } from "react-icons/fa";
-import LoadingSpinner from "./LoadingSpinner";
-import MessageModel from "./MessageModel";
+import LoadingSpinner from "../LoadingSpinner";
+import MessageModel from "../MessageModel";
 import {
   addMedicalInformation,
   getPatientMedicalInfo,
   updateMedicalInformation,
-} from "../functions/patient";
-import VoiceToText from "./VoiceToText";
-import EditButton from "./EditButton";
+} from "../../functions/patient";
+import VoiceToText from "../VoiceToText";
+import EditButton from "../EditButton";
 
-const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
+const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
@@ -948,7 +947,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
-                        Past history of psychiatric treatment or councelling
+                       Past history of psychiatric treatment or councelling
                         {medicalInformation.individualTherapyHours.required && (
                           <span className="text-red-500">*</span>
                         )}
@@ -969,7 +968,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                         </p>
                       )}
                     </div>
-                      <div>
+                    <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Psychiatric hospitalization
                         {medicalInformation.psychiatricHospitalizationMonths
@@ -1018,8 +1017,8 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                           {medicalInformationErrors.individualTherapyYears}
                         </p>
                       )}
-                    </div> */}
-                    {/* <div>
+                    </div>
+                    <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Ending years ago
                         {medicalInformation.individualTherapyEndYears
@@ -1044,8 +1043,8 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                       )}
                     </div> */}
                   </div>
-                   {/*  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                  <div>
+                   {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                   <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Hours of group therapy
                         {medicalInformation.groupTherapyHours.required && (
@@ -1067,11 +1066,11 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                           {medicalInformationErrors.groupTherapyHours}
                         </p>
                       )}
-                    </div>
-                  
-                  </div> */}
+                    </div> 
+                    
+                  </div>*/}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Are you undergoing treatment anywhere else now?
@@ -1117,8 +1116,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                 </div>
                 {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Number of times during past year you have taken
-                    antidepressants
+                    Number of times during past year you have taken psychiatrist treatments
                     {medicalInformation.antidepressantsCount.required && (
                       <span className="text-red-500">*</span>
                     )}
@@ -1139,7 +1137,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                     </p>
                   )}
                 </div> */}
-              </div>
+           </div>
                 {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Type of psychotherapy you have mainly had
@@ -1162,7 +1160,6 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                       {medicalInformationErrors.psychotherapyType}
                     </p>
                   )}
-              
                 </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
@@ -1218,7 +1215,7 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                 </div> */}
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
-                    Psychiatric Hospitalization :
+                    Psychiatric Hospitalization:
                   </strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.psychiatricHospitalizationMonths
@@ -1233,13 +1230,13 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                 </div>
                 {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
-                    Antidepressants Count (Past Year):
+                    Psychiatrist Treatments Count for the Past Year:
                   </strong>{" "}
                   <div className="text-sm text-right">
                     {medicalInformation.antidepressantsCount.value || "N/A"}
                   </div>
                 </div> */}
-                 {/* <div className="md:col-span-2">
+               {/* <div className="md:col-span-2">
                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Psychotherapy Type:</strong>{" "}
                   <div className="whitespace-pre-line">
@@ -1249,8 +1246,8 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
                 </div> */}
                 <div className="md:col-span-2">
                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                    <strong className="text-sm whitespace-pre-line">Additional Information:</strong>{" "}
-                    <div className="whitespace-pre-line">
+                    <strong className="text-sm">Additional Information:</strong>{" "}
+                  <div className="whitespace-pre-line">
                     {renderListItems(medicalInformation.additionalInfo.value)}
                   </div>
                   </div>
@@ -1279,4 +1276,4 @@ const MedicalTab = ({ id, refreshTabDetails, setActiveTab }) => {
   );
 };
 
-export default MedicalTab;
+export default TabMentalHealthChild;

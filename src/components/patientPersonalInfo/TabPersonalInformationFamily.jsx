@@ -1,0 +1,1621 @@
+import { useEffect, useState } from "react";
+import { FaEdit, FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import DescriptionInput from "../DescriptionInput";
+import LoadingSpinner from "../LoadingSpinner";
+import MessageModel from "../MessageModel";
+import {
+  addPersonalInformation,
+  addPersonalInformationFamily,
+  drpBadPoints,
+  drpGoodPoints,
+  drpOccupations,
+  drpSocialDifficulties,
+  getPatientPersonalInfo,
+  updatePersonalInformation,
+  updatePersonalInformationFamily,
+} from "../../functions/patient";
+import VoiceToText from "../VoiceToText";
+import EditButton from "../EditButton";
+
+const maritalStatusOptions = [
+  { value: "married", text: "Married" },
+  { value: "separated", text: "Separated" },
+  { value: "divorced", text: "Divorced" },
+  { value: "living_together", text: "Living together" },
+  { value: "widowed", text: "Widowed" },
+  { value: "widowed_remarried", text: "Widowed, remarried" },
+];
+
+const workStatusOptions = [
+  { value: "full-time", text: "Full-time" },
+  { value: "part-time", text: "Part-time" },
+];
+
+const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) => {
+  const [personalInformationErrors, setPersonalInformationErrors] = useState({});
+  const [mode, setMode] = useState("add");
+  const [editingSection, setEditingSection] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [initialPersonalInformation, setInitialPersonalInformation] = useState(null);
+  const [modal, setModal] = useState({
+    isOpen: false,
+    message: "",
+    type: "error",
+  });
+
+  const [isOccupationLoading, setIsOccupationLoading] = useState(false);
+
+  const [personalInformation, setPersonalInformation] = useState({
+   
+    maritalStatusHusband: {
+      label: "Husband Present Marital Status",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+    yearsMarriedHusband: {
+      label: "Husband Number of Years Married",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "number",
+    },
+    maritalStatusWife: {
+      label: "Wife Present Marital Status",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+    yearsMarriedWife: {
+      label: "Wife Number of Years Married",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "number",
+    },
+    maleChildrenAges: {
+      label: "Ages of Male Children",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+    femaleChildrenAges: {
+      label: "Ages of Female Children",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+    // religiosity: {
+    //   label: "Religiosity",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "number",
+    // },
+    // thingsLiked: {
+    //   label: "Things You Like to Do Most",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "string",
+    // },
+    // assets: {
+    //   label: "Main Assets and Good Points",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "array",
+    // },
+    // badPoints: {
+    //   label: "Main Bad Points",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "array",
+    // },
+    // socialDifficulties: {
+    //   label: "Main Social Difficulties",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "array",
+    // },
+    loveSexDifficulties: {
+      label: "Main Love and Sex Difficulties",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: true,
+      dataType: "string",
+    },
+    // schoolWorkDifficulties: {
+    //   label: "Main School or Work Difficulties",
+    //   value: "",
+    //   isTouched: false,
+    //   isValid: true,
+    //   required: true,
+    //   dataType: "string",
+    // },
+    lifeGoals: {
+      label: "Main Life Goals",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: true,
+      dataType: "string",
+    },
+    thingsToChange: {
+      label: "Things to Change About Yourself",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: true,
+      dataType: "string",
+    },
+    occupationTrainedHusband: {
+      label: "Husband Occupation(s) Trained For",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+    occupationTrainedWife: {
+      label: "Wife Occupation(s) Trained For",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+    occupationHusband: {
+      label: "Husband Present Occupation",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+    occupationWife: {
+      label: "Wife Present Occupation",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+
+     workStatusHusband: {
+      label: "Work Status",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+
+    workStatusWife: {
+      label: "Work Status",
+      value: "",
+      isTouched: false,
+      isValid: false,
+      required: true,
+      dataType: "string",
+    },
+
+
+  });
+
+  const loadPersonalInformationData = async () => {
+    setIsLoading(true);
+    const result = await getPatientPersonalInfo(id);
+    const patientData = result.data;
+
+    if (patientData.error) {
+      setModal({
+        isOpen: true,
+        message: patientData.error.message,
+        type: "error",
+      });
+    }
+
+    if (patientData) {
+      setMode("edit");
+    }
+
+    if (patientData) {
+      setPersonalInformation({
+        maritalStatusHusband: {
+          ...personalInformation.maritalStatusHusband,
+          value: patientData.maritalStatusHusband || "",
+          isTouched: false,
+          isValid: true,
+        },
+        yearsMarriedHusband: {
+          ...personalInformation.yearsMarriedHusband,
+          value: patientData.yearsMarriedHusband || "",
+          isTouched: false,
+          isValid: true,
+          required: patientData.maritalStatusHusband === "married",
+        },
+        maritalStatusWife: {
+          ...personalInformation.maritalStatusWife,
+          value: patientData.maritalStatusWife || "",
+          isTouched: false,
+          isValid: true,
+        },
+        yearsMarriedWife: {
+          ...personalInformation.yearsMarriedWife,
+          value: patientData.yearsMarriedWife || "",
+          isTouched: false,
+          isValid: true,
+          required: patientData.maritalStatusWife === "married",
+        },
+        maleChildrenAges: {
+          ...personalInformation.maleChildrenAges,
+          value: patientData.maleChildrenAges,
+          isTouched: false,
+          isValid: true,
+        },
+        femaleChildrenAges: {
+          ...personalInformation.femaleChildrenAges,
+          value: patientData.femaleChildrenAges,
+          isTouched: false,
+          isValid: true,
+        },
+        // religiosity: {
+        //   ...personalInformation.religiosity,
+        //   value: patientData.religiosity,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // thingsLiked: {
+        //   ...personalInformation.thingsLiked,
+        //   value: patientData.thingsLiked,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // assets: {
+        //   ...personalInformation.assets,
+        //   value: patientData.assets.split(";;"),
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // badPoints: {
+        //   ...personalInformation.badPoints,
+        //   value: patientData.badPoints.split(";;"),
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        // socialDifficulties: {
+        //   ...personalInformation.socialDifficulties,
+        //   value: patientData.socialDifficulties.split(";;"),
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        loveSexDifficulties: {
+          ...personalInformation.loveSexDifficulties,
+          value: patientData.loveSexDifficulties,
+          isTouched: false,
+          isValid: true,
+        },
+        // schoolWorkDifficulties: {
+        //   ...personalInformation.schoolWorkDifficulties,
+        //   value: patientData.schoolWorkDifficulties,
+        //   isTouched: false,
+        //   isValid: true,
+        // },
+        lifeGoals: {
+          ...personalInformation.lifeGoals,
+          value: patientData.lifeGoals,
+          isTouched: false,
+          isValid: true,
+        },
+        thingsToChange: {
+          ...personalInformation.thingsToChange,
+          value: patientData.thingsToChange,
+          isTouched: false,
+          isValid: true,
+        },
+        occupationTrainedHusband: {
+          ...personalInformation.occupationTrainedHusband,
+          value: patientData.occupationTrainedHusband || "",
+          isTouched: false,
+          isValid: true,
+        },
+        occupationTrainedWife: {
+          ...personalInformation.occupationTrainedWife,
+          value: patientData.occupationTrainedWife || "",
+          isTouched: false,
+          isValid: true,
+        },
+        occupationHusband: {
+          ...personalInformation.occupationHusband,
+          value: patientData.occupationHusband || "",
+          isTouched: false,
+          isValid: true,
+        },
+        occupationWife: {
+          ...personalInformation.occupationWife,
+          value: patientData.occupationWife || "",
+          isTouched: false,
+          isValid: true,
+        },
+        workStatusHusband: {
+          ...personalInformation.occupationFullTimeHusband,
+          value: patientData.occupationFullTimeHusband || "",
+          isTouched: false,
+          isValid: true,
+        },
+            workStatusWife: {
+          ...personalInformation.occupationFullTimeWife,
+          value: patientData.occupationFullTimeWife || "",
+          isTouched: false,
+          isValid: true,
+        },
+      });
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (id) {
+      loadPersonalInformationData();
+    }
+  }, [id]);
+
+  const [goodPointsOptions, setGoodPointsOptions] = useState([]);
+  const [badPointsOptions, setBadPointsOptions] = useState([]);
+  const [occupations, setOccupations] = useState([]);
+  const [socialDifficultiesOptions, setSocialDifficultiesOptions] = useState([]);
+
+  const loadDrpGoodPoints = async () => {
+    const goodPoints = await drpGoodPoints();
+    setGoodPointsOptions(goodPoints.data.results[0]);
+  };
+
+  const loadDrpBadPoints = async () => {
+    const badPoints = await drpBadPoints();
+    setBadPointsOptions(badPoints.data.results[0]);
+  };
+
+  const loadDrpOccupations = async () => {
+    const occupations = await drpOccupations();
+    setOccupations(occupations.data.results[0]);
+  };
+
+  const loadDrpSocialDifficulties = async () => {
+    const result = await drpSocialDifficulties();
+    setSocialDifficultiesOptions(result.data.results[0]);
+  };
+
+  useEffect(() => {
+    loadDropdowns();
+  }, []);
+
+  const loadDropdowns = async () => {
+    await loadDrpGoodPoints();
+    await loadDrpBadPoints();
+    await loadDrpOccupations();
+    await loadDrpSocialDifficulties();
+  };
+
+  useEffect(() => {
+    setInitialPersonalInformation({ ...personalInformation });
+  }, [editingSection]);
+
+  const toggleSectionEdit = async (section) => {
+    if (editingSection === section) {
+      const isValid = await handleSubmitp(section);
+      if (isValid) setEditingSection(null);
+    } else {
+      setEditingSection(section);
+    }
+  };
+
+  const handleSubmitp = async (section) => {
+    setIsSaving(true);
+    const isValid = validatePersonalInformation();
+    if (!isValid) {
+      setIsSaving(false);
+      return false;
+    }
+
+    const payload = {
+      patientId: id,
+      maritalStatusHusband: personalInformation.maritalStatusHusband.value,
+      yearsMarriedHusband:
+        personalInformation.yearsMarriedHusband.value === ""
+          ? null
+          : personalInformation.yearsMarriedHusband.value,
+      maritalStatusWife: personalInformation.maritalStatusWife.value,
+      yearsMarriedWife:
+        personalInformation.yearsMarriedWife.value === ""
+          ? null
+          : personalInformation.yearsMarriedWife.value,
+      maleChildrenAges: personalInformation.maleChildrenAges.value,
+      femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+      // religiosity: personalInformation.religiosity.value,
+      // thingsLiked: personalInformation.thingsLiked.value,
+      // assets: personalInformation.assets.value.map((item) => ({ name: item })),
+      // badPoints: personalInformation.badPoints.value.map((item) => ({ name: item })),
+      // socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+      loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+      // schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
+      lifeGoals: personalInformation.lifeGoals.value,
+      thingsToChange: personalInformation.thingsToChange.value,
+      occupationTrainedHusband: personalInformation.occupationTrainedHusband.value,
+      occupationTrainedWife: personalInformation.occupationTrainedWife.value,
+      occupationHusband: personalInformation.occupationHusband.value,
+      occupationWife: personalInformation.occupationWife.value,
+      occupationFullTimeHusband: personalInformation.workStatusHusband.value,
+      occupationFullTimeWife: personalInformation.workStatusWife.value,
+      pageName: "PatientBackgroundForm",
+      isConfirm: true,
+    };
+
+    try {
+      const res = await updatePersonalInformationFamily(id, payload);
+
+      if (res.data.error) {
+        setModal({ isOpen: true, message: res.data.error.message, type: "error" });
+        setIsSaving(false);
+        return;
+      }
+
+      if (res.data.outputValues.responseStatus === "failed") {
+        setModal({
+          isOpen: true,
+          message: res.data.outputValues.outputMessage,
+          type: "warning",
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      await loadPersonalInformationData();
+
+      setModal({
+        isOpen: true,
+        message: res.data.outputValues.outputMessage,
+        type: "success",
+      });
+
+      setIsSaving(false);
+      return true;
+    } catch (err) {
+      setModal({ isOpen: true, message: err.message, type: "error" });
+      setIsSaving(false);
+      return false;
+    }
+  };
+
+  const validateField = (name, value, required, dataType) => {
+    if (dataType === "string") {
+      if (required && value.trim() === "") {
+        return `${name} is required`;
+      }
+    }
+
+    if (dataType === "array") {
+      if (required && value.length === 0) {
+        return `${name} is required`;
+      }
+    }
+
+    if (value && dataType === "number") {
+      if (isNaN(value) || Number(value) < 0) {
+        return `${name} must be a valid non-negative number`;
+      }
+    }
+
+    return "";
+  };
+
+  const handleChangePersonalInfo = (e) => {
+    const { name, value } = e.target;
+    const { required, dataType } = personalInformation[name];
+    const error = validateField(personalInformation[name].label, value, required, dataType);
+
+    setPersonalInformation((prev) => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        value,
+        isTouched: true,
+        isValid: error === "",
+      },
+    }));
+
+    setPersonalInformationErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+
+    if (name === "maritalStatusHusband" || name === "maritalStatusWife") {
+      const isMarried = value === "married";
+      const fieldToUpdate = name === "maritalStatusHusband" ? "yearsMarriedHusband" : "yearsMarriedWife";
+      setPersonalInformation((prev) => ({
+        ...prev,
+        [fieldToUpdate]: {
+          ...prev[fieldToUpdate],
+          required: isMarried,
+          isValid: !isMarried || (value.trim() !== "" && !isNaN(value)),
+        },
+      }));
+      setPersonalInformationErrors((prev) => ({
+        ...prev,
+        [fieldToUpdate]: isMarried && !value.trim() ? `${fieldToUpdate.replace("Husband", "").replace("Wife", "")} Number of Years Married is required` : "",
+      }));
+    }
+  };
+
+  const handleSubjectChange = async (selectedOption, field) => {
+    const { name, value } = selectedOption;
+    const { required, dataType } = personalInformation[field];
+    const error = validateField(personalInformation[field].label, selectedOption.name, required, dataType);
+
+    setPersonalInformation((prev) => ({
+      ...prev,
+      [field]: {
+        ...prev[field],
+        value: selectedOption.name,
+        isTouched: true,
+        isValid: error === "",
+      },
+    }));
+
+    setPersonalInformationErrors((prev) => ({
+      ...prev,
+      [field]: error,
+    }));
+  };
+
+  const handleDescriptionChange = (fieldName, value) => {
+    const { required, dataType } = personalInformation[fieldName];
+    const error = validateField(personalInformation[fieldName].label, value, required, dataType);
+
+    setPersonalInformation((prev) => ({
+      ...prev,
+      [fieldName]: {
+        ...prev[fieldName],
+        value: value.split(";;").filter((item) => item.trim()),
+        isTouched: true,
+        isValid: error === "",
+      },
+    }));
+
+    setPersonalInformationErrors((prev) => ({
+      ...prev,
+      [fieldName]: error,
+    }));
+  };
+
+  const handleWorkStatusChange = (e) => {
+    const {value,name} = e.target;
+    setPersonalInformation((prev) => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        value,
+        isTouched: true,
+        isValid: true,
+      },
+    }));
+    setPersonalInformationErrors((prev) => ({
+      ...prev,
+      workStatus: "",
+    }));
+  };
+
+  const validatePersonalInformation = () => {
+    const errors = {};
+    let isFormValid = true;
+    const updatedInfo = { ...personalInformation };
+
+    Object.entries(personalInformation).forEach(([key, field]) => {
+
+      if(!field.value)
+ console.log('validatePersonalInformation:',key,field.value)
+
+      if (!field || typeof field !== "object" || !("value" in field)) return;
+   
+      const { value, required, dataType } = field;
+      let errorMessage = validateField(field.label, value, required, dataType);
+
+      if (key === "yearsMarriedHusband" && personalInformation.maritalStatusHusband.value === "married") {
+        if (!value || (typeof value === "string" && value.trim() === "")) {
+          errorMessage = "Husband Number of Years Married is required";
+        }
+      }
+      if (key === "yearsMarriedWife" && personalInformation.maritalStatusWife.value === "married") {
+        if (!value || (typeof value === "string" && value.trim() === "")) {
+          errorMessage = "Wife Number of Years Married is required";
+        }
+      }
+
+      if (errorMessage) {
+        isFormValid = false;
+        errors[key] = errorMessage;
+        updatedInfo[key].isValid = false;
+      } else {
+        updatedInfo[key].isValid = true;
+      }
+      updatedInfo[key].isTouched = updatedInfo[key].isTouched || false;
+    });
+
+    setPersonalInformation(updatedInfo);
+    setPersonalInformationErrors(errors);
+    return isFormValid;
+  };
+
+  const generateSubmitPayload = (infoObject) => {
+    const payload = {};
+    for (const key in infoObject) {
+      if (infoObject.hasOwnProperty(key)) {
+        payload[key] = infoObject[key].value;
+      }
+    }
+    return payload;
+  };
+
+  const handleSubmitPersonalInformation = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const isValid = validatePersonalInformation();
+
+    console.log('handleSubmitPersonalInformation:',isValid)
+    if (isValid) {
+      const payload = {
+        patientId: id,
+        maritalStatusHusband: personalInformation.maritalStatusHusband.value,
+        yearsMarriedHusband:
+          personalInformation.yearsMarriedHusband.value === ""
+            ? null
+            : personalInformation.yearsMarriedHusband.value,
+        maritalStatusWife: personalInformation.maritalStatusWife.value,
+        yearsMarriedWife:
+          personalInformation.yearsMarriedWife.value === ""
+            ? null
+            : personalInformation.yearsMarriedWife.value,
+        maleChildrenAges: personalInformation.maleChildrenAges.value,
+        femaleChildrenAges: personalInformation.femaleChildrenAges.value,
+        // religiosity: personalInformation.religiosity.value,
+        // thingsLiked: personalInformation.thingsLiked.value,
+        // assets: personalInformation.assets.value.map((item) => ({ name: item })),
+        // badPoints: personalInformation.badPoints.value.map((item) => ({ name: item })),
+        // socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+        loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+        // schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
+        lifeGoals: personalInformation.lifeGoals.value,
+        thingsToChange: personalInformation.thingsToChange.value,
+        occupationTrainedHusband: personalInformation.occupationTrainedHusband.value,
+        occupationTrainedWife: personalInformation.occupationTrainedWife.value,
+        occupationHusband: personalInformation.occupationHusband.value,
+        occupationWife: personalInformation.occupationWife.value,
+            occupationFullTimeHusband: personalInformation.workStatusHusband.value,
+      occupationFullTimeWife: personalInformation.workStatusWife.value,
+        pageName: "PatientBackgroundForm",
+        isConfirm: true,
+      };
+
+      const submitPayloadWithPatientId = {
+        ...payload,
+        patientId: id,
+      };
+
+      try {
+        const res = await addPersonalInformationFamily(submitPayloadWithPatientId);
+          if (res.data.error) {
+          setModal({
+            isOpen: true,
+            message: res.data.error.message,
+            type: "error",
+          });
+          setIsSaving(false);
+          return;
+        }
+
+        if (res.data.outputValues.responseStatus === "failed") {
+          setModal({
+            isOpen: true,
+            message: res.data.outputValues.outputMessage,
+            type: "warning",
+          });
+          setIsSaving(false);
+          return;
+        }
+
+        // if(section==="occupation"){
+        //   console.log('dddhhhhhhlllllll drop')
+        //     await loadDrpOccupations();
+        // }
+
+        await loadPersonalInformationData();
+
+        setModal({
+          isOpen: true,
+          message: res.data.outputValues.outputMessage,
+          type: "success",
+        });
+        refreshTabDetails(Math.random());
+      } catch (err) {
+        setModal({ isOpen: true, message: err.message, type: "error" });
+      }
+    }
+    setIsSaving(false);
+  };
+
+  const handleCancel = (editingSection) => {
+    if (initialPersonalInformation) {
+      setPersonalInformation(initialPersonalInformation);
+      setPersonalInformationErrors({});
+    }
+    setEditingSection(null);
+  };
+
+  const renderListItems = (value) => {
+    let items = [];
+    if (typeof value === "string") {
+      items = value.split(";;").filter((item) => item.trim());
+    } else if (Array.isArray(value)) {
+      items = value.filter((item) => item.trim());
+    }
+
+    if (items.length === 0) {
+      return <p className="text-gray-500 italic">N/A</p>;
+    }
+
+    return (
+      <ul className="list-disc pl-5 space-y-1">
+        {items.map((item, index) => (
+          <li key={index} className="text-gray-700">{item}</li>
+        ))}
+      </ul>
+    );
+  };
+
+  return (
+    <>
+      <MessageModel
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+        message={modal.message}
+        type={modal.type}
+      />
+
+      {!isLoading ? (
+       <div className="px-8">
+      {/* Personal Details */}
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-xl font-semibold text-gray-700">Personal Details</h3>
+          {mode !== "add" && (
+            <div className="flex space-x-4">
+              <EditButton
+                onClick={() => toggleSectionEdit("personalDetails")}
+                ariaLabel={
+                  editingSection === "personalDetails"
+                    ? "Save Personal Details"
+                    : "Edit Personal Details"
+                }
+                disabled={isSaving}
+              >
+                {editingSection === "personalDetails"
+                  ? isSaving
+                    ? "Saving..."
+                    : "Save"
+                  : "Edit"}
+              </EditButton>
+              {editingSection === "personalDetails" && (
+                <button
+                  onClick={() => handleCancel("personalDetails")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {editingSection === "personalDetails" || mode === "add" ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700">Wife</h4>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Present Marital Status{" "}
+                {personalInformation.maritalStatusHusband.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <div className="col-span-2">
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  {maritalStatusOptions.map((option) => (
+                    <label key={option.value} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="maritalStatusHusband"
+                        value={option.value}
+                        checked={
+                          personalInformation.maritalStatusHusband.value === option.value
+                        }
+                        onChange={handleChangePersonalInfo}
+                        className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                        aria-label={option.text}
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{option.text}</span>
+                    </label>
+                  ))}
+                </div>
+                {personalInformationErrors.maritalStatusHusband && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.maritalStatusHusband}
+                  </p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  {maritalStatusOptions.map((option) => (
+                    <label key={option.value} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="maritalStatusWife"
+                        value={option.value}
+                        checked={
+                          personalInformation.maritalStatusWife.value === option.value
+                        }
+                        onChange={handleChangePersonalInfo}
+                        className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                        aria-label={option.text}
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{option.text}</span>
+                    </label>
+                  ))}
+                </div>
+                {personalInformationErrors.maritalStatusWife && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.maritalStatusWife}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Number of Years Married{" "}
+                {personalInformation.yearsMarriedHusband.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <div className="col-span-2">
+                <input
+                  type="number"
+                  name="yearsMarriedHusband"
+                  value={personalInformation.yearsMarriedHusband.value}
+                  onChange={handleChangePersonalInfo}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., 1, 1.5, 2"
+                  disabled={personalInformation.maritalStatusHusband.value !== "married"}
+                  aria-label="Husband years married"
+                />
+                {personalInformationErrors.yearsMarriedHusband && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.yearsMarriedHusband}
+                  </p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <input
+                  type="number"
+                  name="yearsMarriedWife"
+                  value={personalInformation.yearsMarriedWife.value}
+                  onChange={handleChangePersonalInfo}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., 1, 1.5, 2"
+                  disabled={personalInformation.maritalStatusWife.value !== "married"}
+                  aria-label="Wife years married"
+                />
+                {personalInformationErrors.yearsMarriedWife && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.yearsMarriedWife}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Ages of Children{" "}
+                {personalInformation.maleChildrenAges.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <div className="col-span-2">
+                <input
+                  name="maleChildrenAges"
+                  type="text"
+                  value={personalInformation.maleChildrenAges.value}
+                  onChange={handleChangePersonalInfo}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., 5, 10, 15"
+                  aria-label="Male children ages"
+                />
+                {personalInformationErrors.maleChildrenAges && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.maleChildrenAges}
+                  </p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <input
+                  name="femaleChildrenAges"
+                  type="text"
+                  value={personalInformation.femaleChildrenAges.value}
+                  onChange={handleChangePersonalInfo}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                  placeholder="e.g., 3, 8"
+                  aria-label="Female children ages"
+                />
+                {personalInformationErrors.femaleChildrenAges && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.femaleChildrenAges}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700 mb-4">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700 mb-4">Wife</h4>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <span className="font-bold text-sm">Marital Status</span>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {maritalStatusOptions.find(
+                      (opt) => opt.value === personalInformation.maritalStatusHusband.value
+                    )?.text || "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {maritalStatusOptions.find(
+                      (opt) => opt.value === personalInformation.maritalStatusWife.value
+                    )?.text || "N/A"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <span className="font-bold text-sm">Years Married</span>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.maritalStatusHusband.value === "married"
+                      ? `${personalInformation.yearsMarriedHusband.value || "N/A"} yrs`
+                      : "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.maritalStatusWife.value === "married"
+                      ? `${personalInformation.yearsMarriedWife.value || "N/A"} yrs`
+                      : "N/A"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <span className="font-bold text-sm">Ages of Children</span>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="flex flex-wrap justify-start gap-2">
+                    {personalInformation.maleChildrenAges.value
+                      ? personalInformation.maleChildrenAges.value
+                          .split(",")
+                          .map((age, index) => (
+                            <span
+                              key={`male-${index}`}
+                              className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+                            >
+                              <FaMale className="mr-1" /> {age.trim()}
+                            </span>
+                          ))
+                      : "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="flex flex-wrap justify-start gap-2">
+                    {personalInformation.femaleChildrenAges.value
+                      ? personalInformation.femaleChildrenAges.value
+                          .split(",")
+                          .map((age, index) => (
+                            <span
+                              key={`female-${index}`}
+                              className="inline-flex items-center px-2 py-1 bg-pink-100 text-pink-800 text-xs font-medium rounded-full"
+                            >
+                              <FaFemale className="mr-1" /> {age.trim()}
+                            </span>
+                          ))
+                      : "N/A"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Personal Insights */}
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-xl font-semibold text-gray-700">Personal Insights</h3>
+          {mode !== "add" && (
+            <div className="flex space-x-4">
+              <EditButton
+                onClick={() => toggleSectionEdit("insights")}
+                ariaLabel={
+                  editingSection === "insights"
+                    ? "Save Personal Insights"
+                    : "Edit Personal Insights"
+                }
+                disabled={isSaving}
+              >
+                {editingSection === "insights"
+                  ? isSaving
+                    ? "Saving..."
+                    : "Save"
+                  : "Edit"}
+              </EditButton>
+              {editingSection === "insights" && (
+                <button
+                  onClick={() => handleCancel("insights")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {editingSection === "insights" || mode === "add" ? (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                List your main love and sex difficulties
+                {personalInformation.loveSexDifficulties.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <VoiceToText
+                name="loveSexDifficulties"
+                value={personalInformation.loveSexDifficulties.value}
+                onChange={handleChangePersonalInfo}
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                rows="4"
+                placeholder="Describe relationship challenges"
+                aria-label="Love and sex difficulties"
+              />
+              {personalInformationErrors.loveSexDifficulties && (
+                <p className="mt-1 text-sm text-red-600">
+                  {personalInformationErrors.loveSexDifficulties}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                List your main life goals
+                {personalInformation.lifeGoals.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <VoiceToText
+                name="lifeGoals"
+                value={personalInformation.lifeGoals.value}
+                onChange={handleChangePersonalInfo}
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                rows="4"
+                placeholder="List your life goals"
+                aria-label="Life goals"
+              />
+              {personalInformationErrors.lifeGoals && (
+                <p className="mt-1 text-sm text-red-600">
+                  {personalInformationErrors.lifeGoals}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                List the things about yourself you would most like to change
+                {personalInformation.thingsToChange.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <VoiceToText
+                name="thingsToChange"
+                value={personalInformation.thingsToChange.value}
+                onChange={handleChangePersonalInfo}
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                rows="4"
+                placeholder="Describe desired changes"
+                aria-label="Things to change"
+              />
+              {personalInformationErrors.thingsToChange && (
+                <p className="mt-1 text-sm text-red-600">
+                  {personalInformationErrors.thingsToChange}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main Love/Sex Difficulties:</strong>
+              <div className="mt-2">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                  {personalInformation.loveSexDifficulties.value}
+                </p>
+              </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Main Life Goals:</strong>
+              <div className="mt-2">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                  {personalInformation.lifeGoals.value}
+                </p>
+              </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <strong className="text-sm">Things Most Like to Change:</strong>
+              <div className="mt-2">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                  {personalInformation.thingsToChange.value}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Occupation Information */}
+      <section className="mb-12">
+        <div className="flex justify-between items-center mb-2 pb-2">
+          <h3 className="text-xl font-semibold text-gray-700">Occupation Information</h3>
+          {mode !== "add" && (
+            <div className="flex space-x-4">
+              <EditButton
+                onClick={() => toggleSectionEdit("occupation")}
+                ariaLabel={
+                  editingSection === "occupation"
+                    ? "Save Occupation Info"
+                    : "Edit Occupation Info"
+                }
+                disabled={isSaving}
+              >
+                {editingSection === "occupation"
+                  ? isSaving
+                    ? "Saving..."
+                    : "Save"
+                  : "Edit"}
+              </EditButton>
+              {editingSection === "occupation" && (
+                <button
+                  onClick={() => handleCancel("occupation")}
+                  className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
+                  aria-label="Cancel Editing"
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {editingSection === "occupation" || mode === "add" ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700">Wife</h4>
+            </div>
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Occupation(s) Trained For{" "}
+                {personalInformation.occupationTrainedHusband.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <div className="col-span-2">
+                <div className="flex items-center justify-start gap-2">
+                  <select
+                    name="occupationTrainedHusband"
+                    value={personalInformation.occupationTrainedHusband.value}
+                    onChange={handleChangePersonalInfo}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    aria-label="Husband occupation trained for"
+                  >
+                    <option value="">Select occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaSync />
+                  </button>
+                  <button
+                    title="Add new occupation"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaPlusCircle className="text-green-600" />
+                  </button>
+                </div>
+                {personalInformationErrors.occupationTrainedHusband && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.occupationTrainedHusband}
+                  </p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <div className="flex items-center justify-start gap-2">
+                  <select
+                    name="occupationTrainedWife"
+                    value={personalInformation.occupationTrainedWife.value}
+                    onChange={handleChangePersonalInfo}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    aria-label="Wife occupation trained for"
+                  >
+                    <option value="">Select occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaSync />
+                  </button>
+                  <button
+                    title="Add new occupation"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaPlusCircle className="text-green-600" />
+                  </button>
+                </div>
+                {personalInformationErrors.occupationTrainedWife && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.occupationTrainedWife}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Present Occupation{" "}
+                {personalInformation.occupationHusband.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <div className="col-span-2">
+                <div className="flex items-center justify-start gap-2">
+                  <select
+                    name="occupationHusband"
+                    value={personalInformation.occupationHusband.value}
+                    onChange={handleChangePersonalInfo}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    aria-label="Husband present occupation"
+                  >
+                    <option value="">Select occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaSync />
+                  </button>
+                  <button
+                    title="Add new occupation"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaPlusCircle className="text-green-600" />
+                  </button>
+                </div>
+                {personalInformationErrors.occupationHusband && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.occupationHusband}
+                  </p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <div className="flex items-center justify-start gap-2">
+                  <select
+                    name="occupationWife"
+                    value={personalInformation.occupationWife.value}
+                    onChange={handleChangePersonalInfo}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    aria-label="Wife present occupation"
+                  >
+                    <option value="">Select occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaSync />
+                  </button>
+                  <button
+                    title="Add new occupation"
+                    onClick={async () => {
+                      try {
+                        setIsOccupationLoading(true);
+                        await loadDrpOccupations();
+                      } finally {
+                        setIsOccupationLoading(false);
+                      }
+                    }}
+                    disabled={isOccupationLoading}
+                  >
+                    <FaPlusCircle className="text-green-600" />
+                  </button>
+                </div>
+                {personalInformationErrors.occupationWife && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.occupationWife}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Work Status{" "}
+                {personalInformation.workStatusHusband.required && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <div className="col-span-2">
+                <div className="flex items-center space-x-4 mt-2">
+                  {workStatusOptions.map((option) => (
+                    <label key={option.value} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="workStatusHusband"
+                        value={option.value}
+                        checked={
+                          personalInformation.workStatusHusband.value === option.value
+                        }
+                        onChange={handleWorkStatusChange}
+                        className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                        aria-label={option.text}
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{option.text}</span>
+                    </label>
+                  ))}
+                </div>
+                {personalInformationErrors.workStatusHusband && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.workStatusHusband}
+                  </p>
+                )}
+              </div>
+              <div className="col-span-2">
+                <div className="flex items-center space-x-4 mt-2">
+                  {workStatusOptions.map((option) => (
+                    <label key={option.value} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="workStatusWife"
+                        value={option.value}
+                        checked={
+                          personalInformation.workStatusWife.value === option.value
+                        }
+                        onChange={handleWorkStatusChange}
+                        className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
+                        aria-label={option.text}
+                      />
+                      <span className="ml-2 text-sm text-gray-700">{option.text}</span>
+                    </label>
+                  ))}
+                </div>
+                {personalInformationErrors.workStatusWife && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {personalInformationErrors.workStatusWife}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700 mb-4">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700 mb-4">Wife</h4>
+            </div>
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <span className="font-bold text-sm">Occupation(s) Trained For</span>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.occupationTrainedHusband.value || "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.occupationTrainedWife.value || "N/A"}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <span className="font-bold text-sm">Present Occupation</span>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.occupationHusband.value || "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.occupationWife.value || "N/A"}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <span className="font-bold text-sm">Work Status</span>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.workStatusHusband.value || "N/A"}
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="whitespace-pre-line">
+                    {personalInformation.workStatusWife.value || "N/A"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {mode === "add" && (
+        <div className="flex justify-end space-x-4 mt-6">
+          <button
+            type="button"
+            onClick={handleSubmitPersonalInformation}
+            className="flex items-center bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-700 transition-all duration-200 shadow-md"
+            aria-label="Save and go to next tab"
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      )}
+    </div>
+      ) : (
+        <LoadingSpinner />
+      )}
+    </>
+  );
+};
+
+export default TabPersonalInformationFamily;

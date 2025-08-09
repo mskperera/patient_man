@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
-import LoadingSpinner from "./LoadingSpinner";
-import MessageModel from "./MessageModel";
+import LoadingSpinner from "../LoadingSpinner";
+import MessageModel from "../MessageModel";
 import {
   addBasicInformation,
   getPatientBasicInfo,
   updateBasicInformation,
-} from "../functions/patient";
+} from "../../functions/patient";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import EditButton from "./EditButton";
+import EditButton from "../EditButton";
 
 const TabBasicInformation = ({
   id,
@@ -594,13 +594,13 @@ const TabBasicInformation = ({
               <LoadingSpinner />
             </div>
           ) : editingSection === "basic" || mode === "add" ? (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+            <div className="">
               <div className="space-y-8">
                 {/* Personal Details */}
                 <div>
-                  <h4 className="text-lg font-semibold text-sky-700 mb-4">
+                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
                     Personal Details
-                  </h4>
+                  </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
@@ -730,9 +730,9 @@ const TabBasicInformation = ({
 
                 {/* Contact Information */}
                 <div>
-                  <h4 className="text-lg font-semibold text-sky-700 mb-4">
+                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
                     Contact Information
-                  </h4>
+                  </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
@@ -816,9 +816,9 @@ const TabBasicInformation = ({
 
                 {/* Referral Information */}
                 <div>
-                  <h4 className="text-lg font-semibold text-sky-700 mb-4">
+                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
                     Referral Information
-                  </h4>
+                  </h4> */}
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
@@ -926,9 +926,9 @@ const TabBasicInformation = ({
               <div className="space-y-8">
                 {/* Personal Details */}
                 <div>
-                  <h4 className="text-lg font-semibold text-sky-700 mb-4">
+                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
                     Personal Details
-                  </h4>
+                  </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                       <span className="text-gray-600 font-medium font-semibold">
@@ -987,9 +987,9 @@ const TabBasicInformation = ({
 
                 {/* Contact Information */}
                 <div>
-                  <h4 className="text-lg font-semibold text-sky-700 mb-4">
+                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
                     Contact Information
-                  </h4>
+                  </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                       <span className="text-gray-600 font-medium font-semibold">
@@ -1028,9 +1028,9 @@ const TabBasicInformation = ({
 
                 {/* Referral Information */}
                 <div>
-                  <h4 className="text-lg font-semibold text-sky-700 mb-4">
+                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
                     Referral Information
-                  </h4>
+                  </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                       <span className="text-gray-600 font-medium font-semibold">
