@@ -21,14 +21,14 @@ function PatientTypeSelection() {
     {
       id: '2',
       name: 'Child',
-      description: 'Register a pediatric patient',
+      description: 'Register a child patient',
       icon: FaChild,
       ariaLabel: 'Add Child Patient',
     },
     {
       id: '3',
       name: 'Family',
-      description: 'Register a family group',
+      description: 'Register a couple (husband and wife)',
       icon: FaUsers,
       ariaLabel: 'Add Family Patient',
     },
