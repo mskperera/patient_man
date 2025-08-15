@@ -46,6 +46,7 @@ const [patients, setPatients] = useState([]);
             aria-label="Select search filter"
           >
             <option value="patientNo">Patient No</option>
+              <option value="patientName">Patient Name</option>
             <option value="firstName">First Name</option>
              <option value="lastName">Last Name</option>
             <option value="phone">Phone</option>

@@ -3,6 +3,7 @@ import { FaCheck, FaEye } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Pagination from './Pagination';
 import { getPatientRegistrations } from '../functions/patient';
+import MessageModel from './MessageModel';
 
 function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSelectPatient,hidePaginationIfTotalPagesIsOne }) {
   const [localPatients, setLocalPatients] = useState([]);
@@ -14,12 +15,20 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
   const [totalRecords, setTotalRecords] = useState(0);
   const rowsPerPageOptions = [10, 20, 50];
 
+    const [modal, setModal] = useState({
+    isOpen: false,
+    message: "",
+    type: "error",
+  });
+
+
   const getPatientList = async (page = 1) => {
     const payload = {
       patientNo: filterType === 'patientNo' ? searchQuery : null,
       homePhone: filterType === 'mobile' ? searchQuery : null,
       businessPhone: filterType === 'mobile' ? searchQuery : null,
       email: filterType === 'email' ? searchQuery : null,
+      patientName: filterType === 'patientName' ? searchQuery : null,
       firstName: filterType === 'firstName' ? searchQuery : null,
       lastName: filterType === 'lastName' ? searchQuery : null,
       skip: (page - 1) * rowsPerPage,
@@ -32,6 +41,19 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
       const response = await getPatientRegistrations(payload);
       console.log('getPatientList response:', response);
       
+
+        if (response.data.error) {
+          setError(response.data.error.message)
+          
+          setModal({
+            isOpen: true,
+            message: response.data.error.message,
+            type: "error",
+          });
+
+          return;
+        }
+
       // Ensure results is an array, default to empty array if undefined
       const results = response.data.results?.[0] || [];
       
@@ -91,6 +113,12 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
           {error}
         </div>
       )}
+           <MessageModel
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+        message={modal.message}
+        type={modal.type}
+      />
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border">

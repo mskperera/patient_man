@@ -42,8 +42,9 @@ function Home() {
           <div className="flex flex-wrap justify-center gap-4 mb-6">
             {[
               { value: 'patientNo', label: 'Patient No.' },
-              { value: 'firstName', label: 'First Name' },
-              { value: 'lastName', label: 'Last Name' },
+              // { value: 'firstName', label: 'First Name' },
+               { value: 'patientName', label: 'Patient Name (First,Middle or Last)' },
+              // { value: 'lastName', label: 'Last Name' },
               { value: 'email', label: 'Email' },
               { value: 'mobile', label: 'Mobile' },
             ].map((option) => (

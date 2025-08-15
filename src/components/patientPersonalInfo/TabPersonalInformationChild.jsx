@@ -826,23 +826,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                       : "Edit"}
                   </EditButton>
 
-                  {/* <button
-                    onClick={() => toggleSectionEdit("insights")}
-                    className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={
-                      editingSection === "insights"
-                        ? "Save Personal Insights"
-                        : "Edit Personal Insights"
-                    }
-                    disabled={isSaving}
-                  >
-                    <FaEdit className="mr-2" />
-                    {editingSection === "insights"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </button> */}
+              
                   {editingSection === "insights" && (
                     <button
                       onClick={() => handleCancel("insights")}

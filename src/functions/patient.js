@@ -1117,6 +1117,120 @@ export const drpACES = async () => {
 };
 
 
+export const getMentalStatusExam = async (patientId) => {
+  try {
+    const token = getToken();
+    return await customAxios
+      .get(`/patient/mentalStatusExam/${patientId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const addMentalStatusExam = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/mental-status-exam`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateMentalStatusExam = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/mental-status-exam/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const addMentalStatusExamFamily = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/patient/mental-status-exam-family`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updateMentalStatusExamFamily = async (id,data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .put(`/patient/mental-status-exam-family/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
 // export const addContact = async (data) => {
 //   try {
 //     const tenantId = getTenantId();

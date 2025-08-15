@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
   FaUser,
-  FaNotesMedical,
   FaGraduationCap,
-  FaMale,
-  FaFemale,
   FaBrain,
   FaUsers,
   FaInfoCircle,
-  FaPrint,
   FaChild,
   FaExclamationCircle,
 } from "react-icons/fa";
 import { FaBookMedical, FaHeartPulse } from "react-icons/fa6";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import NotesTab from "./NotesTab";
-import TabMentalStatusExam from "./TabMentalStatusExam";
-import TabEducationDetails from "./patientEducation/TabEducationDetailsIndividual";
-
-import TabPersonalInformation from "./patientPersonalInfo/TabPersonalInformation";
-import FamilyTab from "./TabFamilyInformation";
-import TabMentalHealth from "./patientMentalHealth/TabMentalHealth";
+import TabMentalStatusExam from "../components/mentalStatusExam/TabMentalStatusExam";
 
 import {
   getPatientBasicInfo,
@@ -39,9 +30,10 @@ import TabEducationDetailsFamily from "./patientEducation/TabEducationDetailsFam
 import TabEducationDetailsChild from "./patientEducation/TabEducationDetailsChild";
 import TabMentalHealthIndividual from "./patientMentalHealth/TabMentalHealthIndividual";
 import TabEducationDetailsIndividual from "./patientEducation/TabEducationDetailsIndividual";
+import LoadingSpinner from "./LoadingSpinner";
+import TabMentalStatusExamFamily from "./mentalStatusExam/TabMentalStatusExamFamily";
 
 function PatientInfoEdit({ mode = "view" }) {
-  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("basicInformation");
   //const { id } = useParams(); // Get patientNo from URL params
@@ -51,8 +43,16 @@ function PatientInfoEdit({ mode = "view" }) {
 
   const id = searchParams.get("id");
 
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const [isLoading, setIsLoading] = useState(true);
   // Default A/L subjects (Science stream as default, will allow stream selection)
+
+  useEffect(()=>{
+if(id===null){
+  setIsLoading(false);
+}
+  },[])
+
 
   const [tabDetails, setTabDetails] = useState({
     isBasicInfo: false,
@@ -60,6 +60,7 @@ function PatientInfoEdit({ mode = "view" }) {
     isFamilyInfo: false,
     isMedicalInfo: false,
     isPersonalInfo: false,
+     isMentalStatusExam: false,
   });
 
   const [basicInformation, setBasicInformation] = useState(null);
@@ -78,14 +79,14 @@ function PatientInfoEdit({ mode = "view" }) {
   };
 
   const loadProfileTabDetails = async () => {
-    setIsLoading(true);
+   // setIsLoading(true);
     const result = await getProfileTabDetails(id);
     const data = result.data;
     setTabDetails(data);
     console.log("getProfileTabDetails", data);
     if (data) {
     }
-    setIsLoading(false);
+   // setIsLoading(false);
   };
 
   useEffect(() => {
@@ -103,6 +104,9 @@ function PatientInfoEdit({ mode = "view" }) {
 
   return (
     <div className="p-6 min-h-screen">
+     {isLoading ? <LoadingSpinner/> : <>
+      
+    
       <div className="flex justify-between items-center mb-6">
         {patientType === "1" && (
           <h2 className="flex items-center text-xl font-bold text-gray-800  pb-2">
@@ -134,7 +138,7 @@ function PatientInfoEdit({ mode = "view" }) {
       )}
       {patientType === "1" && (
         <>
-          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
+          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-200 rounded-lg">
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "basicInformation"
@@ -156,7 +160,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "personal"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              }  disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("personal")}
               disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -185,7 +189,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "medical"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              }  disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("medical")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -202,7 +206,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "education"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("education")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -220,12 +224,17 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "mentalExam"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("mentalExam")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBrain className="mr-2" size={16} />
               Mental Status Exam
+                  <span className="ml-1">
+                {!tabDetails.isMentalStatusExam && (
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                )}
+              </span>
             </button>
             {/* <button
           className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -243,7 +252,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "notes"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
               onClick={() => setActiveTab("notes")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -284,14 +293,16 @@ function PatientInfoEdit({ mode = "view" }) {
             )}
             {activeTab === "notes" && <NotesTab />}
             {/* {activeTab === "selfEsteemTest" && <NotesTab />} */}
-            {activeTab === "mentalExam" && <TabMentalStatusExam />}
+            {activeTab === "mentalExam" && <TabMentalStatusExam 
+                    refreshTabDetails={refreshTabDetailsHandler}
+            id={id || newId} />}
           </form>
         </>
       )}
 
       {patientType === "2" && (
         <>
-          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
+          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-200 rounded-lg">
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "basicInformation"
@@ -313,7 +324,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "personal"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("personal")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -330,7 +341,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "family"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("family")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -348,7 +359,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "medical"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("medical")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -365,7 +376,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "education"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("education")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -383,19 +394,24 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "mentalExam"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("mentalExam")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBrain className="mr-2" size={16} />
               Mental Status Exam
+                  <span className="ml-1">
+                {!tabDetails.isMentalStatusExam && (
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                )}
+              </span>
             </button>
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "notes"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("notes")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -440,14 +456,16 @@ function PatientInfoEdit({ mode = "view" }) {
               />
             )}
             {activeTab === "notes" && <NotesTab />}
-            {activeTab === "mentalExam" && <TabMentalStatusExam />}
+            {activeTab === "mentalExam" && <TabMentalStatusExam 
+                    refreshTabDetails={refreshTabDetailsHandler}
+            id={id || newId} />}
           </form>
         </>
       )}
 
       {patientType === "3" && (
         <>
-          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-lg">
+          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-200 rounded-lg">
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "basicInformation"
@@ -469,7 +487,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "personal"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("personal")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -503,7 +521,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "medical"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("medical")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -520,7 +538,7 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "education"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("education")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -538,19 +556,24 @@ function PatientInfoEdit({ mode = "view" }) {
                 activeTab === "mentalExam"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("mentalExam")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBrain className="mr-2" size={16} />
               Mental Status Exam
+                  <span className="ml-1">
+                {!tabDetails.isMentalStatusExam && (
+                  <FaExclamationCircle className="text-orange-500 text-lg" />
+                )}
+              </span>
             </button>
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "notes"
                   ? "bg-sky-600 text-white shadow-sm"
                   : "bg-transparent text-gray-700  hover:bg-sky-200"
-              }`}
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("notes")}
                   disabled={tabDetails.isBasicInfo? false : true}
             >
@@ -595,11 +618,15 @@ function PatientInfoEdit({ mode = "view" }) {
               />
             )}
             {activeTab === "notes" && <NotesTab />}
-            {activeTab === "mentalExam" && <TabMentalStatusExam />}
+            {activeTab === "mentalExam" && <TabMentalStatusExamFamily 
+                    refreshTabDetails={refreshTabDetailsHandler}
+                     id={id || newId} />}
           </form>
         </>
       )}
+        </>}
     </div>
+    
   );
 }
 
