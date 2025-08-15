@@ -6,7 +6,7 @@ import PatientList from '../components/PatientList';
 function Home() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('firstName');
+  const [filterType, setFilterType] = useState('patientName');
   const [triggerSearch, setTriggerSearch] = useState(0);
   const [patients, setPatients] = useState([]);
   const [error, setError] = useState('');
