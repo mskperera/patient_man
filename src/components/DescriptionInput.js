@@ -117,6 +117,8 @@ const DescriptionInput = ({ patient, setPatient, setValue, isEditing, fieldName,
               aria-label={`Custom ${fieldName} description`}
             />
           )}
+
+          
           {descriptionList.length > 0 && (
             <div className="mt-3">
               <div className="flex justify-start flex-wrap gap-2">

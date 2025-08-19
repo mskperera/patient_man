@@ -68,7 +68,7 @@ const TabBasicInformation = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "date",
     },
     age: {
@@ -76,7 +76,7 @@ const TabBasicInformation = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "number",
     },
     gender: {
@@ -100,7 +100,7 @@ const TabBasicInformation = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "phone",
     },
     businessPhone: {
@@ -116,7 +116,7 @@ const TabBasicInformation = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     referralSource: {
@@ -124,7 +124,7 @@ const TabBasicInformation = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     referralSourceOther: {
@@ -137,10 +137,10 @@ const TabBasicInformation = ({
     },
     referralPartyPresent: {
       label: "Referral Party Present",
-      value: false,
+      value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "boolean",
     },
   });
@@ -287,6 +287,7 @@ const TabBasicInformation = ({
   const handleSubmit = async (section) => {
     setIsSaving(true);
     const isValid = validateBasicInformation();
+    console.log('isvalid',isValid)
     if (!isValid) {
       setIsSaving(false);
       return false;
@@ -296,8 +297,8 @@ const TabBasicInformation = ({
       lastName: basicInformation.lastName.value,
       firstName: basicInformation.firstName.value,
       middleName: basicInformation.middleName.value,
-      dateOfBirth: basicInformation.dateOfBirth.value,
-      age: basicInformation.age.value,
+      dateOfBirth: basicInformation.dateOfBirth.value.trim().length===0 ? null:basicInformation.dateOfBirth.value,
+            age: basicInformation.age.value.trim().length===0 ? null:basicInformation.age.value,
       gender: basicInformation.gender.value,
       email: basicInformation.email.value,
       homePhone: basicInformation.homePhone.value,
@@ -379,6 +380,7 @@ const TabBasicInformation = ({
     const required = basicInformation[name].required;
     const error = validateField(basicInformation[name].label, value, required);
 
+    //console.log('handleChangeBasicInfo:',{name,value})
     const updatedInfo = {
       ...basicInformation,
       [name]: {
@@ -397,9 +399,11 @@ const TabBasicInformation = ({
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
+
+      console.log('age:',age)
       updatedInfo["age"] = {
         ...basicInformation["age"],
-        value: age.toString(),
+        value: age.toString()=="NaN" ? '' : age.toString(),
         isTouched: true,
         isValid: true,
       };
@@ -418,6 +422,8 @@ const TabBasicInformation = ({
     const updatedInfo = { ...basicInformation };
 
     Object.entries(basicInformation).forEach(([key, field]) => {
+
+      console.log('validate basicinfo',{key, field})
       if (!field || typeof field !== "object" || !("value" in field)) return;
       const { value, required, dataType } = field;
       let errorMessage = "";
@@ -462,6 +468,7 @@ const TabBasicInformation = ({
       }
 
       if (errorMessage) {
+        console.log('errorMessage',errorMessage)
         isFormValid = false;
         errors[key] = errorMessage;
         updatedInfo[key].isValid = false;
@@ -489,8 +496,8 @@ const TabBasicInformation = ({
       lastName: basicInformation.lastName.value,
       firstName: basicInformation.firstName.value,
       middleName: basicInformation.middleName.value,
-      dateOfBirth: basicInformation.dateOfBirth.value,
-      age: basicInformation.age.value,
+      dateOfBirth: basicInformation.dateOfBirth.value.trim().length===0 ? null:basicInformation.dateOfBirth.value,
+      age: basicInformation.age.value.trim().length===0 ? null:basicInformation.age.value,
       gender: basicInformation.gender.value,
       email: basicInformation.email.value,
       homePhone: basicInformation.homePhone.value,
@@ -664,7 +671,7 @@ const TabBasicInformation = ({
                         onChange={handleChangeBasicInfo}
                         className="mt-1 w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         aria-label="Date of Birth"
-                        required
+                       // required
                       />
                       {basicInformationErrors.dateOfBirth && (
                         <p className="mt-1 text-sm text-red-600">
@@ -745,7 +752,7 @@ const TabBasicInformation = ({
                         className="mt-1 w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                         placeholder="Enter home phone"
                         aria-label="Home Phone"
-                        required
+                      //  required
                       />
                       {basicInformationErrors.homePhone && (
                         <p className="mt-1 text-sm text-red-600">
@@ -803,7 +810,7 @@ const TabBasicInformation = ({
                         rows="3"
                         placeholder="Enter permanent address"
                         aria-label="Permanent Address"
-                        required
+                      //  required
                       />
                       {basicInformationErrors.permanentAddress && (
                         <p className="mt-1 text-sm text-red-600">
@@ -935,7 +942,7 @@ const TabBasicInformation = ({
                         First Name:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.firstName.value || "N/A"}
+                        {basicInformation.firstName.value}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -943,7 +950,7 @@ const TabBasicInformation = ({
                         Last Name:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.lastName.value || "N/A"}
+                        {basicInformation.lastName.value}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -951,7 +958,7 @@ const TabBasicInformation = ({
                         Middle Name:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.middleName.value || "N/A"}
+                        {basicInformation.middleName.value}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -963,7 +970,7 @@ const TabBasicInformation = ({
                           ? moment(basicInformation.dateOfBirth.value).format(
                               "YYYY MMM DD"
                             )
-                          : "N/A"}
+                          : ""}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -971,7 +978,7 @@ const TabBasicInformation = ({
                         Age:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.age.value} Years
+                        {basicInformation.age.value} {basicInformation.age.value ? 'Years':''} 
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -979,7 +986,7 @@ const TabBasicInformation = ({
                         Gender:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.gender.value || "N/A"}
+                        {basicInformation.gender.value}
                       </span>
                     </div>
                   </div>
@@ -996,7 +1003,7 @@ const TabBasicInformation = ({
                         Home Phone:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.homePhone.value || "N/A"}
+                        {basicInformation.homePhone.value}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -1004,7 +1011,7 @@ const TabBasicInformation = ({
                         Mobile Phone:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.businessPhone.value || "N/A"}
+                        {basicInformation.businessPhone.value}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -1012,7 +1019,7 @@ const TabBasicInformation = ({
                         Email:
                       </span>
                       <span className="text-gray-800 text-right">
-                        {basicInformation.email.value || "N/A"}
+                        {basicInformation.email.value}
                       </span>
                     </div>
                     <div className="md:col-span-2 lg:col-span-3 flex justify-between items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
@@ -1020,7 +1027,7 @@ const TabBasicInformation = ({
                         Permanent Address:
                       </span>
                       <span className="text-gray-800 text-right max-w-[70%]">
-                        {basicInformation.permanentAddress.value || "N/A"}
+                        {basicInformation.permanentAddress.value}
                       </span>
                     </div>
                   </div>

@@ -146,7 +146,7 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
     },
     historyOfACESHusband: {
       label: "Husband ACES History",
-      value: [],
+      value: "",
       isTouched: false,
       isValid: true,
       required: false,
@@ -154,7 +154,7 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
     },
     historyOfACESWife: {
       label: "Wife ACES History",
-      value: [],
+      value: "",
       isTouched: false,
       isValid: true,
       required: false,
@@ -213,6 +213,8 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
         type: "error",
       });
     }
+
+    console.log('patientData',patientData)
 
     if (patientData) {
       setMedicalInformation({
@@ -282,11 +284,11 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
         },
         historyOfACESHusband: {
           ...medicalInformation.historyOfACESHusband,
-          value: patientData.historyOfACESHusband.split(";;"),
+          value:patientData.historyOfACESHusband ? patientData.historyOfACESHusband.split(";;"):'',
         },
         historyOfACESWife: {
           ...medicalInformation.historyOfACESWife,
-          value: patientData.historyOfACESWife.split(";;"),
+          value:patientData.historyOfACESWife ? patientData.historyOfACESWife.split(";;"):'',
         },
         additionalInfoHusband: {
           ...medicalInformation.additionalInfoHusband,
@@ -422,12 +424,12 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
         historyOfMentalIllnessWife: medicalInformation.historyOfMentalIllnessWife.value,
         historyOfSubstanceAbuseHusband: medicalInformation.historyOfSubstanceAbuseHusband.value,
         historyOfSubstanceAbuseWife: medicalInformation.historyOfSubstanceAbuseWife.value,
-        historyOfACESHusband: medicalInformation.historyOfACESHusband.value.map((item) => ({
+        historyOfACESHusband:medicalInformation.historyOfACESHusband.value ? medicalInformation.historyOfACESHusband.value.map((item) => ({
         name: item,
-      })),
-        historyOfACESWife: medicalInformation.historyOfACESWife.value.map((item) => ({
+      })):null,
+        historyOfACESWife:medicalInformation.historyOfACESWife.value ? medicalInformation.historyOfACESWife.value.map((item) => ({
         name: item,
-      })),
+      })):null,
         additionalInfoHusband: medicalInformation.additionalInfoHusband.value,
         additionalInfoWife: medicalInformation.additionalInfoWife.value,
         utcOffset: new Date().getTimezoneOffset(),
@@ -448,10 +450,10 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
           return;
         }
       
-        if (res.data.responseStatus === "failed") {
+        if (res.data.outputValues.responseStatus === "failed") {
           setModal({
             isOpen: true,
-            message: res.data.outputMessage,
+            message: res.data.outputValues.outputMessage,
             type: "warning",
           });
           setIsSaving(false);
@@ -504,12 +506,12 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
       historyOfMentalIllnessWife: medicalInformation.historyOfMentalIllnessWife.value,
       historyOfSubstanceAbuseHusband: medicalInformation.historyOfSubstanceAbuseHusband.value,
       historyOfSubstanceAbuseWife: medicalInformation.historyOfSubstanceAbuseWife.value,
-      historyOfACESHusband: medicalInformation.historyOfACESHusband.value.map((item) => ({
+     historyOfACESHusband:medicalInformation.historyOfACESHusband.value ? medicalInformation.historyOfACESHusband.value.map((item) => ({
         name: item,
-      })),
-      historyOfACESWife: medicalInformation.historyOfACESWife.value.map((item) => ({
+      })):null,
+        historyOfACESWife:medicalInformation.historyOfACESWife.value ? medicalInformation.historyOfACESWife.value.map((item) => ({
         name: item,
-      })),
+      })):null,
       additionalInfoHusband: medicalInformation.additionalInfoHusband.value,
       additionalInfoWife: medicalInformation.additionalInfoWife.value,
       utcOffset: new Date().getTimezoneOffset(),
@@ -532,10 +534,10 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
         return;
       }
      
-      if (res.data.responseStatus === "failed") {
+      if (res.data.outputValues.responseStatus === "failed") {
         setModal({
           isOpen: true,
-          message: res.data.outputMessage,
+          message: res.data.outputValues.outputMessage,
           type: "warning",
         });
         setIsSaving(false);

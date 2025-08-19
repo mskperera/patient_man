@@ -39,7 +39,7 @@ const TabBasicInformationFamily = ({
       value: "NEW",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     husbandFirstName: {
@@ -71,7 +71,7 @@ const TabBasicInformationFamily = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "date",
     },
     husbandAge: {
@@ -103,7 +103,7 @@ const TabBasicInformationFamily = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "phone",
     },
     husbandMobilePhone: {
@@ -119,7 +119,7 @@ const TabBasicInformationFamily = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     wifeFirstName: {
@@ -127,7 +127,7 @@ const TabBasicInformationFamily = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: false,
+      required: true,
       dataType: "string",
     },
     wifeLastName: {
@@ -135,7 +135,7 @@ const TabBasicInformationFamily = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: false,
+      required: true,
       dataType: "string",
     },
     wifeMiddleName: {
@@ -167,7 +167,7 @@ const TabBasicInformationFamily = ({
       value: "",
       isTouched: false,
       isValid: false,
-      required: false,
+      required: true,
       dataType: "string",
     },
     wifeEmail: {
@@ -220,7 +220,7 @@ const TabBasicInformationFamily = ({
     },
     referralPartyPresent: {
       label: "Referral Party Present",
-      value: false,
+      value: "",
       isTouched: false,
       isValid: false,
       required: false,
@@ -484,8 +484,8 @@ const TabBasicInformationFamily = ({
       husbandFirstName: basicInformation.husbandFirstName.value,
       husbandLastName: basicInformation.husbandLastName.value,
       husbandMiddleName: basicInformation.husbandMiddleName.value,
-      husbandDateOfBirth: basicInformation.husbandDateOfBirth.value,
-      husbandAge: basicInformation.husbandAge.value,
+      husbandDateOfBirth: basicInformation.husbandDateOfBirth.value.trim().length===0 ? null:basicInformation.husbandDateOfBirth.value,
+      husbandAge: basicInformation.husbandAge.value.trim().length===0 ? null:basicInformation.husbandAge.value,
       husbandGender: basicInformation.husbandGender.value,
       husbandEmail: basicInformation.husbandEmail.value,
       husbandHomePhone: basicInformation.husbandHomePhone.value,
@@ -494,8 +494,8 @@ const TabBasicInformationFamily = ({
       wifeFirstName: basicInformation.wifeFirstName.value,
       wifeLastName: basicInformation.wifeLastName.value,
       wifeMiddleName: basicInformation.wifeMiddleName.value,
-      wifeDateOfBirth: basicInformation.wifeDateOfBirth.value,
-      wifeAge: basicInformation.wifeAge.value,
+      wifeDateOfBirth: basicInformation.wifeDateOfBirth.value.trim().length===0 ? null:basicInformation.wifeDateOfBirth.value,
+      wifeAge: basicInformation.wifeAge.value.trim().length===0 ? null:basicInformation.wifeAge.value,
       wifeGender: basicInformation.wifeGender.value,
       wifeEmail: basicInformation.wifeEmail.value,
       wifeHomePhone: basicInformation.wifeHomePhone.value,
@@ -602,7 +602,7 @@ const validateField = (name, value, required) => {
       }
       updatedInfo["husbandAge"] = {
         ...basicInformation["husbandAge"],
-        value: age.toString(),
+           value: age.toString()=="NaN" ? '' : age.toString(),
         isTouched: true,
         isValid: true,
       };
@@ -618,7 +618,7 @@ const validateField = (name, value, required) => {
       }
       updatedInfo["wifeAge"] = {
         ...basicInformation["wifeAge"],
-        value: age.toString(),
+            value: age.toString()=="NaN" ? '' : age.toString(),
         isTouched: true,
         isValid: true,
       };
@@ -676,8 +676,8 @@ const validateField = (name, value, required) => {
       husbandFirstName: basicInformation.husbandFirstName.value,
       husbandLastName: basicInformation.husbandLastName.value,
       husbandMiddleName: basicInformation.husbandMiddleName.value,
-      husbandDateOfBirth: basicInformation.husbandDateOfBirth.value,
-      husbandAge: basicInformation.husbandAge.value,
+      husbandDateOfBirth: basicInformation.husbandDateOfBirth.value.trim().length===0 ? null:basicInformation.husbandDateOfBirth.value,
+      husbandAge: basicInformation.husbandAge.value.trim().length===0 ? null:basicInformation.husbandAge.value,
       husbandGender: basicInformation.husbandGender.value,
       husbandEmail: basicInformation.husbandEmail.value,
       husbandHomePhone: basicInformation.husbandHomePhone.value,
@@ -686,8 +686,8 @@ const validateField = (name, value, required) => {
       wifeFirstName: basicInformation.wifeFirstName.value,
       wifeLastName: basicInformation.wifeLastName.value,
       wifeMiddleName: basicInformation.wifeMiddleName.value,
-      wifeDateOfBirth: basicInformation.wifeDateOfBirth.value,
-      wifeAge: basicInformation.wifeAge.value,
+      wifeDateOfBirth: basicInformation.wifeDateOfBirth.value.trim().length===0 ? null:basicInformation.wifeDateOfBirth.value,
+      wifeAge: basicInformation.wifeAge.value.trim().length===0 ? null:basicInformation.wifeAge.value,
       wifeGender: basicInformation.wifeGender.value,
       wifeEmail: basicInformation.wifeEmail.value,
       wifeHomePhone: basicInformation.wifeHomePhone.value,
@@ -925,7 +925,6 @@ const validateField = (name, value, required) => {
                   onChange={handleChangeBasicInfo}
                   className="mt-1 w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   aria-label="Husband Date of Birth"
-                  required
                 />
                 {basicInformationErrors.husbandDateOfBirth && (
                   <p className="mt-1 text-sm text-red-600">
@@ -959,7 +958,7 @@ const validateField = (name, value, required) => {
                     <span className="text-gray-800 font-medium">
                       {basicInformation.husbandAge.value}
                     </span>
-                    <span className="text-gray-600">Years</span>
+                   {basicInformation.husbandAge.value ? <span className="text-gray-600">Years</span>:''} 
                   </div>
                 )}
               </div>
@@ -969,7 +968,7 @@ const validateField = (name, value, required) => {
                     <span className="text-gray-800 font-medium">
                       {basicInformation.wifeAge.value}
                     </span>
-                    <span className="text-gray-600">Years</span>
+                  {basicInformation.wifeAge.value ? <span className="text-gray-600">Years</span>:''}
                   </div>
                 )}
               </div>
@@ -1064,7 +1063,6 @@ const validateField = (name, value, required) => {
                   rows="3"
                   placeholder="Enter permanent address"
                   aria-label="Husband Permanent Address"
-                  required
                 />
                 {basicInformationErrors.husbandPermanentAddress && (
                   <p className="mt-1 text-sm text-red-600">
@@ -1213,14 +1211,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandFirstName.value || "N/A"}
+                    {basicInformation.husbandFirstName.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                              <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeFirstName.value || "N/A"}
+                    {basicInformation.wifeFirstName.value }
                   </div>
                 </div>
               </div>
@@ -1230,14 +1228,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                                <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandLastName.value || "N/A"}
+                    {basicInformation.husbandLastName.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                                 <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeLastName.value || "N/A"}
+                    {basicInformation.wifeLastName.value }
                   </div>
                 </div>
               </div>
@@ -1247,14 +1245,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                             <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandMiddleName.value || "N/A"}
+                    {basicInformation.husbandMiddleName.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                        <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeMiddleName.value || "N/A"}
+                    {basicInformation.wifeMiddleName.value }
                   </div>
                 </div>
               </div>
@@ -1266,7 +1264,7 @@ const validateField = (name, value, required) => {
                   <div className=" whitespace-pre-line">
                     {basicInformation.husbandDateOfBirth.value
                       ? moment(basicInformation.husbandDateOfBirth.value).format("YYYY MMM DD")
-                      : "N/A"}
+                      : ""}
                   </div>
                 </div>
               </div>
@@ -1275,7 +1273,7 @@ const validateField = (name, value, required) => {
                   <div className=" whitespace-pre-line">
                     {basicInformation.wifeDateOfBirth.value
                       ? moment(basicInformation.wifeDateOfBirth.value).format("YYYY MMM DD")
-                      : "N/A"}
+                      : ""}
                   </div>
                 </div>
               </div>
@@ -1285,14 +1283,16 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                               <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandAge.value || "N/A"} Years
+                    {basicInformation.husbandAge.value} 
+                        {basicInformation.husbandAge.value ? "Years":''}
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeAge.value || "N/A"} Years
+                    {basicInformation.wifeAge.value}
+                        {basicInformation.wifeAge.value ? "Years":''}
                   </div>
                 </div>
               </div>
@@ -1302,14 +1302,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                               <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandGender.value || "N/A"}
+                    {basicInformation.husbandGender.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeGender.value || "N/A"}
+                    {basicInformation.wifeGender.value }
                   </div>
                 </div>
               </div>
@@ -1319,14 +1319,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandPermanentAddress.value || "N/A"}
+                    {basicInformation.husbandPermanentAddress.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                          <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifePermanentAddress.value || "N/A"}
+                    {basicInformation.wifePermanentAddress.value }
                   </div>
                 </div>
               </div>
@@ -1336,14 +1336,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                          <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandHomePhone.value || "N/A"}
+                    {basicInformation.husbandHomePhone.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeHomePhone.value || "N/A"}
+                    {basicInformation.wifeHomePhone.value }
                   </div>
                 </div>
               </div>
@@ -1353,14 +1353,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandMobilePhone.value || "N/A"}
+                    {basicInformation.husbandMobilePhone.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeMobilePhone.value || "N/A"}
+                    {basicInformation.wifeMobilePhone.value }
                   </div>
                 </div>
               </div>
@@ -1370,14 +1370,14 @@ const validateField = (name, value, required) => {
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.husbandEmail.value || "N/A"}
+                    {basicInformation.husbandEmail.value }
                   </div>
                 </div>
               </div>
               <div className="col-span-2">
                  <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                   <div className=" whitespace-pre-line">
-                    {basicInformation.wifeEmail.value || "N/A"}
+                    {basicInformation.wifeEmail.value }
                   </div>
                 </div>
               </div>

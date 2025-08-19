@@ -19,7 +19,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     mainComplaints: {
@@ -27,7 +27,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     pastComplaints: {
@@ -99,7 +99,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     antidepressantsCount: {
@@ -347,16 +347,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
     return isFormValid;
   };
 
-  // Generate payload for submission
-  const generateSubmitPayload = (infoObject) => {
-    const payload = {};
-    for (const key in infoObject) {
-      if (infoObject.hasOwnProperty(key)) {
-        payload[key] = infoObject[key].value;
-      }
-    }
-    return payload;
-  };
+
 
   // Handle form submission
   const handleSubmitMedicalInformation = async (e) => {
@@ -419,10 +410,10 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
         console.log("Save res:", res);
         //await loadPersonalInformationData();
         console.log("update result:", res);
-        if (res.data.responseStatus === "failed") {
+        if (res.data.outputValues.responseStatus === "failed") {
           setModal({
             isOpen: true,
-            message: res.data.outputMessage,
+            message: res.data.outputValues.outputMessage,
             type: "warning",
           });
 
@@ -464,19 +455,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
     setIsSaving(false);
   };
 
-  // const handleSubmitMedicalInformation = async (e) => {
-  //   e.preventDefault();
-  //   const isValid = validateMedicalInformation();
-  //   if (isValid) {
-  //     const submitPayload = generateSubmitPayload(medicalInformation);
-  //     console.log("Medical Information Payload:", submitPayload);
-  //     addMedicalInformationData(submitPayload);
-  //     setMode("edit");
-  //    // setActiveTab("education"); // Navigate to the next tab
-  //   }
-  // };
 
-  // Modified handleSubmit to handle section-specific saving
 
   const handleSubmitp = async (section) => {
     setIsSaving(true);
@@ -537,10 +516,10 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       //await loadPersonalInformationData();
       console.log("update result:", res);
 
-      if (res.data.responseStatus === "failed") {
+      if (res.data.outputValues.responseStatus === "failed") {
         setModal({
           isOpen: true,
-          message: res.data.outputMessage,
+          message: res.data.outputValues.outputMessage,
           type: "warning",
         });
 
@@ -582,45 +561,6 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
     }
   };
 
-  // const handleSubmitp =async (section) => {
-  //      setIsSaving(true);
-  //   const isValid = validateMedicalInformation();
-  //   if (!isValid) {
-  //        console.log("Validation failed, not saving.");
-  //           setIsSaving(false);
-  //    return false;
-  //   }
-
-  // const payload = {
-  //   };
-  //   Object.entries(medicalInformation).forEach(([key, field]) => {
-  //    // console.log("field.",field);
-  //     if (field.isTouched) {
-  //       payload[key] = field.value;
-  //     }
-  //   });
-
-  // try{
-  //    console.log("Save Payload:", payload);
-  //         const res=await updateMedicalInformationData(id,payload);
-  //       //await loadPersonalInformationData();
-  //         console.log("update result:", res);
-  //         setIsSaving(false);
-  //         return true;
-  //   }
-  //    catch (err) {
-  //      console.log("Save Payload: err", err.message);
-  //     setModal({
-  //       isOpen: true,
-  //       message: err.message,
-  //       type: "error",
-  //     });
-  //    // setMedicalInformation(initialMedicalInformation);
-  //     setIsSaving(false);
-  //     return false;
-  //   }
-
-  // };
 
   // Toggle edit mode for a specific section
   const toggleSectionEdit = async (section) => {
@@ -699,21 +639,6 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                         : "Save"
                       : "Edit"}
                   </EditButton>
-
-                  {/* <button
-                            onClick={() => toggleSectionEdit("health")}
-                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                            aria-label={
-                              editingSection === "health"
-                                ? "Save Health Details"
-                                : "Edit Health Details"
-                            }
-                            disabled={isSaving}
-                          >
-                            <FaEdit className="mr-2" />
-                           {editingSection === "health" ? (isSaving ? "Saving...": "Save") : "Edit"}
-                        
-                          </button> */}
 
                   {editingSection === "health" && (
                     <button
@@ -910,20 +835,6 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                       : "Edit"}
                   </EditButton>
 
-                  {/* <button
-                            onClick={() => toggleSectionEdit("treatment")}
-                            className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                            aria-label={
-                              editingSection === "treatment"
-                                ? "Save Treatment History"
-                                : "Edit Treatment History"
-                            }
-                                   disabled={isSaving}
-                          >
-                            <FaEdit className="mr-2" />
-                             {editingSection === "treatment" ? (isSaving ? "Saving...": "Save") : "Edit"}
-                          </button> */}
-
                   {editingSection === "treatment" && (
                     <button
                       onClick={() => handleCancel("treatment")}
@@ -1114,53 +1025,9 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                     </p>
                   )}
                 </div>
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Number of times during past year you have taken psychiatrist treatments
-                    {medicalInformation.antidepressantsCount.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    name="antidepressantsCount"
-                    value={medicalInformation.antidepressantsCount.value}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter number"
-                    aria-label="Antidepressants count"
-                  />
-                  {medicalInformationErrors.antidepressantsCount && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {medicalInformationErrors.antidepressantsCount}
-                    </p>
-                  )}
-                </div> */}
+
            </div>
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Type of psychotherapy you have mainly had
-                    {medicalInformation.psychotherapyType.required && (
-                      <span className="text-red-500">*</span>
-                    )}{" "}
-                    (briefly describe method of treatment—ex., dream analysis,
-                    free association, drugs, hypnosis, etc.)
-                  </label>
-                  <VoiceToText
-                    name="psychotherapyType"
-                    value={medicalInformation.psychotherapyType.value}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter type of psychotherapy"
-                    aria-label="Psychotherapy type"
-                  />
-                  {medicalInformationErrors.psychotherapyType && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {medicalInformationErrors.psychotherapyType}
-                    </p>
-                  )}
-                </div> */}
+  
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Additional information that you think might be helpful
@@ -1192,27 +1059,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                     {medicalInformation.individualTherapyHours.value || "N/A"}
                   </div>
                 </div>
-                {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Individual Therapy Years:</strong>{" "}
-                  <div className="text-sm text-right">
-                    {medicalInformation.individualTherapyYears.value || "N/A"}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">
-                    Individual Therapy Ended Years Ago:
-                  </strong>{" "}
-                  <div className="text-sm text-right">
-                    {medicalInformation.individualTherapyEndYears.value ||
-                      "N/A"}
-                  </div>
-                </div> */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Group Therapy Hours:</strong>{" "}
-                  <div className="text-sm text-right">
-                    {medicalInformation.groupTherapyHours.value || "N/A"}
-                  </div>
-                </div> */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
                     Psychiatric Hospitalization:
@@ -1228,22 +1075,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                     {medicalInformation.currentTreatment.value || "N/A"}
                   </div>
                 </div>
-                {/* <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">
-                    Psychiatrist Treatments Count for the Past Year:
-                  </strong>{" "}
-                  <div className="text-sm text-right">
-                    {medicalInformation.antidepressantsCount.value || "N/A"}
-                  </div>
-                </div> */}
-               {/* <div className="md:col-span-2">
-                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Psychotherapy Type:</strong>{" "}
-                  <div className="whitespace-pre-line">
-                    {medicalInformation.psychotherapyType.value || "N/A"}
-                  </div>
-                  </div>
-                </div> */}
+
                 <div className="md:col-span-2">
                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
                     <strong className="text-sm">Additional Information:</strong>{" "}

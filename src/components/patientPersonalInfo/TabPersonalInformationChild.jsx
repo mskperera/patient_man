@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
-import { FaEdit, FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import DescriptionInput from "../DescriptionInput";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageModel from "../MessageModel";
 import {
-  addPersonalInformation,
   addPersonalInformationChild,
   drpBadPoints,
   drpGoodPoints,
   drpOccupations,
   drpSocialDifficulties,
   getPatientPersonalInfo,
-  updatePersonalInformation,
   updatePersonalInformationChild,
 } from "../../functions/patient";
 import VoiceToText from "../VoiceToText";
@@ -36,71 +32,31 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     type: "error",
   });
 
-  const [isOccupationLoading, setIsOccupationLoading] = useState(false);
 
   const [personalInformation, setPersonalInformation] = useState({
-    // maritalStatus: {
-    //   label: "Present Marital Status",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: false,
-    //   required: true,
-    //   dataType: "string",
-    // },
-    // yearsMarried: {
-    //   label: "Number of Years Married to Present Spouse",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: true,
-    //   required: false,
-    //   dataType: "number",
-    // },
-    // maleChildrenAges: {
-    //   label: "Ages of Male Children",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: true,
-    //   required: false,
-    //   dataType: "string",
-    // },
-    // femaleChildrenAges: {
-    //   label: "Ages of Female Children",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: true,
-    //   required: false,
-    //   dataType: "string",
-    // },
-    // religiosity: {
-    //   label: "Religiosity",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: true,
-    //   required: true,
-    //   dataType: "number",
-    // },
+   
     thingsLiked: {
       label: "Things You Like to Do Most",
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     assets: {
       label: "Main Assets and Good Points",
-      value: "",
+         value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     badPoints: {
       label: "Main Bad Points",
-      value: "",
+         value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     socialDifficulties: {
@@ -108,23 +64,16 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
-    // loveSexDifficulties: {
-    //   label: "Main Love and Sex Difficulties",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: true,
-    //   required: true,
-    //   dataType: "string",
-    // },
+
     schoolWorkDifficulties: {
       label: "Main School or Work Difficulties",
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     lifeGoals: {
@@ -132,7 +81,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     thingsToChange: {
@@ -140,33 +89,10 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
-    // occupationTrained: {
-    //   label: "Occupation(s) Trained For",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: false,
-    //   required: true,
-    //   dataType: "string",
-    // },
-    // occupation: {
-    //   label: "Present Occupation",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: false,
-    //   required: true,
-    //   dataType: "string",
-    // },
-    // occupationFullTime: {
-    //   label: "Occupation Status",
-    //   value: "",
-    //   isTouched: false,
-    //   isValid: false,
-    //   required: true,
-    //   dataType: "string",
-    // },
+   
   });
 
   const loadPersonalInformationData = async () => {
@@ -231,24 +157,27 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
           isTouched: false,
           isValid: true,
         },
-        assets: {
+
+
+    assets: {
           ...personalInformation.assets,
-          value: patientData.assets.split(";;"),
+          value:patientData.assets?patientData.assets.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
         badPoints: {
           ...personalInformation.badPoints,
-          value: patientData.badPoints.split(";;"),
+          value:  patientData.badPoints ? patientData.badPoints.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
-          socialDifficulties: {
+       socialDifficulties: {
           ...personalInformation.socialDifficulties,
-          value: patientData.socialDifficulties.split(";;"),
+          value:patientData.socialDifficulties ? patientData.socialDifficulties.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
+
         // loveSexDifficulties: {
         //   ...personalInformation.loveSexDifficulties,
         //   value: patientData.loveSexDifficulties,
@@ -379,11 +308,11 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
       // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
       // religiosity: personalInformation.religiosity.value,
       thingsLiked: personalInformation.thingsLiked.value,
-      assets: personalInformation.assets.value.map((item) => ({ name: item })),
-      badPoints: personalInformation.badPoints.value.map((item) => ({
+          assets:personalInformation.assets.value ? personalInformation.assets.value.map((item) => ({ name: item })):null,
+      badPoints: personalInformation.badPoints.value ? personalInformation.badPoints.value.map((item) => ({
         name: item,
-      })),
-    socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+      })):null,
+ socialDifficulties:personalInformation.socialDifficulties.value ? personalInformation.socialDifficulties.value.map((item) => ({ name: item })):null,
      // loveSexDifficulties: personalInformation.loveSexDifficulties.value,
       schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
       lifeGoals: personalInformation.lifeGoals.value,
@@ -669,29 +598,18 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
     if (isValid) {
       const payload = {
         patientId: id,
-        // maritalStatus: personalInformation.maritalStatus.value,
-        // yearsMarried:
-        //   personalInformation.yearsMarried.value === ""
-        //     ? null
-        //     : personalInformation.yearsMarried.value,
-        // maleChildrenAges: personalInformation.maleChildrenAges.value,
-        // femaleChildrenAges: personalInformation.femaleChildrenAges.value,
-        // religiosity: personalInformation.religiosity.value,
+
         thingsLiked: personalInformation.thingsLiked.value,
-        assets: personalInformation.assets.value.map((item) => ({
-          name: item,
-        })),
-        badPoints: personalInformation.badPoints.value.map((item) => ({
-          name: item,
-        })),
-      socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
-       // loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+      assets:personalInformation.assets.value ? personalInformation.assets.value.map((item) => ({ name: item })):null,
+      badPoints: personalInformation.badPoints.value ? personalInformation.badPoints.value.map((item) => ({
+        name: item,
+      })):null,
+ socialDifficulties:personalInformation.socialDifficulties.value ? personalInformation.socialDifficulties.value.map((item) => ({ name: item })):null,
+
       schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
         lifeGoals: personalInformation.lifeGoals.value,
         thingsToChange: personalInformation.thingsToChange.value,
-        // occupationTrained: personalInformation.occupationTrained.value,
-        // occupation: personalInformation.occupation.value,
-        // occupationFullTime: personalInformation.occupationFullTime.value,
+
         pageName: "PatientBackgroundForm",
         isConfirm: true,
       };
@@ -726,11 +644,6 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
           setIsSaving(false);
           return;
         }
-
-        // if(section==="occupation"){
-        //   console.log('dddhhhhhhlllllll drop')
-        //     await loadDrpOccupations();
-        // }
 
         await loadPersonalInformationData();
 
@@ -938,28 +851,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                     </p>
                   )}
                 </div>
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    List your main love and sex difficulties
-                    {personalInformation.loveSexDifficulties.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <VoiceToText
-                    name="loveSexDifficulties"
-                    value={personalInformation.loveSexDifficulties.value}
-                    onChange={handleChangePersonalInfo}
-                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    rows="4"
-                    placeholder="Describe relationship challenges"
-                    aria-label="Love and sex difficulties"
-                  />
-                  {personalInformationErrors.loveSexDifficulties && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {personalInformationErrors.loveSexDifficulties}
-                    </p>
-                  )}
-                </div> */}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     List your main school difficulties
@@ -1060,16 +952,7 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab }) =>
                 
                   </div>
                 </div>
-                {/* <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">
-                    Main Love/Sex Difficulties:
-                  </strong>
-                  <div className="mt-2">
-                    <p className="text-gray-700 mt-1">
-                      {personalInformation.loveSexDifficulties.value}
-                    </p>
-                  </div>
-                </div> */}
+
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
                     Main School Difficulties:

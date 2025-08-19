@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import DescriptionInput from "../DescriptionInput";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageModel from "../MessageModel";
@@ -59,7 +58,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     yearsMarried: {
@@ -91,7 +90,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     thingsLiked: {
@@ -99,7 +98,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     assets: {
@@ -107,7 +106,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     badPoints: {
@@ -115,7 +114,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     socialDifficulties: {
@@ -123,7 +122,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     loveSexDifficulties: {
@@ -131,7 +130,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     schoolWorkDifficulties: {
@@ -139,7 +138,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     lifeGoals: {
@@ -147,7 +146,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     thingsToChange: {
@@ -155,7 +154,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     occupationTrained: {
@@ -163,7 +162,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     occupation: {
@@ -171,7 +170,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
     occupationFullTime: {
@@ -179,7 +178,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
       value: "",
       isTouched: false,
       isValid: false,
-      required: true,
+      required: false,
       dataType: "string",
     },
   });
@@ -248,19 +247,19 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
         },
         assets: {
           ...personalInformation.assets,
-          value: patientData.assets.split(";;"),
+          value:patientData.assets?patientData.assets.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
         badPoints: {
           ...personalInformation.badPoints,
-          value: patientData.badPoints.split(";;"),
+          value:  patientData.badPoints ? patientData.badPoints.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
        socialDifficulties: {
           ...personalInformation.socialDifficulties,
-          value: patientData.socialDifficulties.split(";;"),
+          value:patientData.socialDifficulties ? patientData.socialDifficulties.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
@@ -390,19 +389,19 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
           : personalInformation.yearsMarried.value,
       maleChildrenAges: personalInformation.maleChildrenAges.value,
       femaleChildrenAges: personalInformation.femaleChildrenAges.value,
-      religiosity: personalInformation.religiosity.value,
+    religiosity: personalInformation.religiosity.value===""?null:personalInformation.religiosity.value,
       thingsLiked: personalInformation.thingsLiked.value,
-      assets: personalInformation.assets.value.map((item) => ({ name: item })),
-      badPoints: personalInformation.badPoints.value.map((item) => ({
+      assets:personalInformation.assets.value ? personalInformation.assets.value.map((item) => ({ name: item })):null,
+      badPoints: personalInformation.badPoints.value ? personalInformation.badPoints.value.map((item) => ({
         name: item,
-      })),
- socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+      })):null,
+ socialDifficulties:personalInformation.socialDifficulties.value ? personalInformation.socialDifficulties.value.map((item) => ({ name: item })):null,
       loveSexDifficulties: personalInformation.loveSexDifficulties.value,
       schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
       lifeGoals: personalInformation.lifeGoals.value,
       thingsToChange: personalInformation.thingsToChange.value,
-      occupationTrained: personalInformation.occupationTrained.value,
-      occupation: personalInformation.occupation.value,
+      occupationTrained: personalInformation.occupationTrained.value===""?null:personalInformation.occupationTrained.value,
+      occupation: personalInformation.occupation.value===""?null:personalInformation.occupation.value,
       occupationFullTime: personalInformation.occupationFullTime.value,
       pageName: "PatientBackgroundForm",
       isConfirm: true,
@@ -689,22 +688,18 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
             : personalInformation.yearsMarried.value,
         maleChildrenAges: personalInformation.maleChildrenAges.value,
         femaleChildrenAges: personalInformation.femaleChildrenAges.value,
-        religiosity: personalInformation.religiosity.value,
+        religiosity: personalInformation.religiosity.value===""?null:personalInformation.religiosity.value,
         thingsLiked: personalInformation.thingsLiked.value,
-        assets: personalInformation.assets.value.map((item) => ({
-          name: item,
-        })),
-        badPoints: personalInformation.badPoints.value.map((item) => ({
-          name: item,
-        })),
-         socialDifficulties: personalInformation.socialDifficulties.value.map((item) => ({ name: item })),
+         assets:personalInformation.assets.value ? personalInformation.assets.value.map((item) => ({ name: item })):null,
+        badPoints:personalInformation.assets.value ? personalInformation.badPoints.value.map((item) => ({ name: item })):null,
+         socialDifficulties:personalInformation.socialDifficulties.value? personalInformation.socialDifficulties.value.map((item) => ({ name: item })):null,
         loveSexDifficulties: personalInformation.loveSexDifficulties.value,
         schoolWorkDifficulties:
           personalInformation.schoolWorkDifficulties.value,
         lifeGoals: personalInformation.lifeGoals.value,
         thingsToChange: personalInformation.thingsToChange.value,
-        occupationTrained: personalInformation.occupationTrained.value,
-        occupation: personalInformation.occupation.value,
+              occupationTrained: personalInformation.occupationTrained.value===""?null:personalInformation.occupationTrained.value,
+      occupation: personalInformation.occupation.value===""?null:personalInformation.occupation.value,
         occupationFullTime: personalInformation.occupationFullTime.value,
         pageName: "PatientBackgroundForm",
         isConfirm: true,
@@ -1052,7 +1047,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                                 <FaMale className="mr-1" /> {age.trim()}
                               </span>
                             ))
-                        : "N/A"}
+                        : <p className="text-gray-500 italic">N/A</p>}
                     </span>
                   </div>
 
@@ -1072,7 +1067,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                                 <FaFemale className="mr-1" /> {age.trim()}
                               </span>
                             ))
-                        : "N/A"}
+                        :  <p className="text-gray-500 italic">N/A</p>}
                     </span>
                   </div>
                 </div>
@@ -1436,7 +1431,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                   <div className="mt-2">
                     <p className="text-gray-700 mt-1 whitespace-pre-line">
                       {personalInformation.schoolWorkDifficulties.value ||
-                        "N/A"}
+                         <p className="text-gray-500 italic">N/A</p>}
                     </p>
                   </div>
                 </div>
@@ -1721,7 +1716,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                       What occupation(s) have you mainly been trained for?
                     </span>
                     <span className="text-gray-700 text-sm w-1/2 text-right">
-                      {personalInformation.occupationTrained.value}
+                      {personalInformation.occupationTrained.value ? personalInformation.occupationTrained.value : <p className="text-gray-500 italic">N/A</p>}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
@@ -1729,7 +1724,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                       Present Occupation
                     </span>
                     <span className="text-gray-700 text-sm w-2/3 text-right">
-                      {personalInformation.occupation.value}
+                      {personalInformation.occupation.value ? personalInformation.occupation.value :  <p className="text-gray-500 italic">N/A</p>}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
@@ -1737,7 +1732,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                       Occupation Status
                     </span>
                     <span className="text-gray-700 text-sm w-2/3 text-right">
-                      {personalInformation.occupationFullTime.value}
+                      {personalInformation.occupationFullTime.value ? personalInformation.occupationFullTime.value:  <p className="text-gray-500 italic">N/A</p>}
                     </span>
                   </div>
                 </div>

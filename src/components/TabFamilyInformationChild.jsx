@@ -52,7 +52,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     ageWhenMotherDied: {
@@ -68,7 +68,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     ageWhenFatherDied: {
@@ -84,7 +84,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     fatherOccupation: {
@@ -92,7 +92,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     motherReligion: {
@@ -100,7 +100,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     fatherReligion: {
@@ -108,31 +108,31 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     raisedBy: {
       label: "Raised By",
-      value: [],
+      value: '',
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     motherDescription: {
       label: "Mother Description",
-      value: [],
+      value: '',
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     fatherDescription: {
       label: "Father Description",
-      value: [],
+      value: '',
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "array",
     },
     parentalSeparationAge: {
@@ -156,7 +156,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     fatherDivorceCount: {
@@ -164,7 +164,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     livingBrothers: {
@@ -172,7 +172,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     livingSisters: {
@@ -180,7 +180,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     brothersAges: {
@@ -188,7 +188,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     sistersAges: {
@@ -196,7 +196,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     childNumber: {
@@ -204,7 +204,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     familyChildren: {
@@ -212,7 +212,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     adopted: {
@@ -220,7 +220,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     brotherDisturbances: {
@@ -228,7 +228,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     sisterDisturbances: {
@@ -236,7 +236,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "string",
     },
     maleRelativesDisturbed: {
@@ -244,7 +244,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     maleRelativesHospitalized: {
@@ -252,7 +252,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     femaleRelativesDisturbed: {
@@ -260,7 +260,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
     femaleRelativesHospitalized: {
@@ -268,7 +268,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       value: "",
       isTouched: false,
       isValid: true,
-      required: true,
+      required: false,
       dataType: "number",
     },
   });
@@ -398,19 +398,19 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
         },
         raisedBy: {
           ...familyInformation.raisedBy,
-          value: patientData.raisedBy.split(";;") || "",
+          value:patientData.raisedBy ? patientData.raisedBy.split(";;") :'',
           isTouched: false,
           isValid: true,
         },
         motherDescription: {
           ...familyInformation.motherDescription,
-          value: patientData.motherDescription.split(";;") || "",
+          value: patientData.motherDescription ? patientData.motherDescription.split(";;") : '',
           isTouched: false,
           isValid: true,
         },
         fatherDescription: {
           ...familyInformation.fatherDescription,
-          value: patientData.fatherDescription.split(";;"),
+          value:patientData.fatherDescription ? patientData.fatherDescription.split(";;"):'',
           isTouched: false,
           isValid: true,
         },
@@ -646,23 +646,6 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
     }));
   };
 
-  // Handle spouse occupation status
-  const handleOccupationStatusChange = (e) => {
-    const value = e.target.value;
-    setFamilyInformation((prev) => ({
-      ...prev,
-      spouseOccupationFullTime: {
-        ...prev.spouseOccupationFullTime,
-        value,
-        isTouched: true,
-        isValid: true,
-      },
-    }));
-    setFamilyInformationErrors((prev) => ({
-      ...prev,
-      spouseOccupationFullTime: "",
-    }));
-  };
 
   // Validate entire form
   const validateFamilyInformation = () => {
@@ -698,17 +681,6 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
     return isFormValid;
   };
 
-  // Generate payload for submission
-  const generateSubmitPayload = (infoObject) => {
-    const payload = {};
-    for (const key in infoObject) {
-      if (infoObject.hasOwnProperty(key)) {
-        const value = infoObject[key].value;
-        payload[key] = Array.isArray(value) ? value.join(";;") : value;
-      }
-    }
-    return payload;
-  };
 
   // Handle form submission
   const handleSubmitFamilyInformation = async (e) => {
@@ -723,12 +695,12 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
         spouseOccupation: familyInformation.spouseOccupation.value,
         spouseOccupationFullTime:
           familyInformation.spouseOccupationFullTime.value,
-        motherAge: familyInformation.motherAge.value,
-        ageWhenMotherDied:
-          familyInformation.ageWhenMotherDied.value === ""
-            ? null
-            : familyInformation.ageWhenMotherDied.value,
-        fatherAge: familyInformation.fatherAge.value,
+           motherAge:familyInformation.motherAge.value ? familyInformation.motherAge.value:null,
+      ageWhenMotherDied:
+        familyInformation.ageWhenMotherDied.value === ""
+          ? null
+          : familyInformation.ageWhenMotherDied.value,
+      fatherAge:  familyInformation.fatherAge.value ? familyInformation.fatherAge.value:null,
         ageWhenFatherDied:
           familyInformation.ageWhenFatherDied.value === ""
             ? null
@@ -737,15 +709,15 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
         fatherOccupation: familyInformation.fatherOccupation.value,
         motherReligion: familyInformation.motherReligion.value,
         fatherReligion: familyInformation.fatherReligion.value,
-        raisedBy: familyInformation.raisedBy.value.map((item) => ({
+        raisedBy: familyInformation.raisedBy.value ? familyInformation.raisedBy.value.map((item) => ({
           name: item,
-        })),
-        motherDescription: familyInformation.motherDescription.value.map(
+        })):null,
+        motherDescription:familyInformation.motherDescription.value ? familyInformation.motherDescription.value.map(
           (item) => ({ name: item })
-        ),
-        fatherDescription: familyInformation.fatherDescription.value.map(
+        ):null,
+        fatherDescription: familyInformation.fatherDescription.value ? familyInformation.fatherDescription.value.map(
           (item) => ({ name: item })
-        ),
+        ):null,
         parentalSeparationAge:
           familyInformation.parentalSeparationAge.value === ""
             ? null
@@ -772,8 +744,8 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
             : familyInformation.livingSisters.value,
         brothersAges: familyInformation.brothersAges.value,
         sistersAges: familyInformation.sistersAges.value,
-        childNumber: familyInformation.childNumber.value,
-        familyChildren: familyInformation.familyChildren.value,
+        childNumber: familyInformation.childNumber.value ? familyInformation.childNumber.value:null,
+        familyChildren:familyInformation.familyChildren.value ? familyInformation.familyChildren.value:null,
         adopted: familyInformation.adopted.value,
         brotherDisturbances: familyInformation.brotherDisturbances.value,
         sisterDisturbances: familyInformation.sisterDisturbances.value,
@@ -820,10 +792,10 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
           return;
         }
 
-        if (res.data.responseStatus === "failed") {
+        if (res.data.outputValues.responseStatus === "failed") {
           setModal({
             isOpen: true,
-            message: res.data.outputMessage,
+            message: res.data.outputValues.outputMessage,
             type: "warning",
           });
 
@@ -868,12 +840,12 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       spouseOccupation: familyInformation.spouseOccupation.value,
       spouseOccupationFullTime:
         familyInformation.spouseOccupationFullTime.value,
-      motherAge: familyInformation.motherAge.value,
+      motherAge:familyInformation.motherAge.value ? familyInformation.motherAge.value:null,
       ageWhenMotherDied:
         familyInformation.ageWhenMotherDied.value === ""
           ? null
           : familyInformation.ageWhenMotherDied.value,
-      fatherAge: familyInformation.fatherAge.value,
+      fatherAge:  familyInformation.fatherAge.value ? familyInformation.fatherAge.value:null,
       ageWhenFatherDied:
         familyInformation.ageWhenFatherDied.value === ""
           ? null
@@ -882,15 +854,15 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       fatherOccupation: familyInformation.fatherOccupation.value,
       motherReligion: familyInformation.motherReligion.value,
       fatherReligion: familyInformation.fatherReligion.value,
-      raisedBy: familyInformation.raisedBy.value.map((item) => ({
-        name: item,
-      })),
-      motherDescription: familyInformation.motherDescription.value.map(
-        (item) => ({ name: item })
-      ),
-      fatherDescription: familyInformation.fatherDescription.value.map(
-        (item) => ({ name: item })
-      ),
+      raisedBy: familyInformation.raisedBy.value ? familyInformation.raisedBy.value.map((item) => ({
+          name: item,
+        })):null,
+        motherDescription:familyInformation.motherDescription.value ? familyInformation.motherDescription.value.map(
+          (item) => ({ name: item })
+        ):null,
+        fatherDescription: familyInformation.fatherDescription.value ? familyInformation.fatherDescription.value.map(
+          (item) => ({ name: item })
+        ):null,
       parentalSeparationAge:
         familyInformation.parentalSeparationAge.value === ""
           ? null
@@ -917,8 +889,8 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
           : familyInformation.livingSisters.value,
       brothersAges: familyInformation.brothersAges.value,
       sistersAges: familyInformation.sistersAges.value,
-      childNumber: familyInformation.childNumber.value,
-      familyChildren: familyInformation.familyChildren.value,
+       childNumber: familyInformation.childNumber.value ? familyInformation.childNumber.value:null,
+        familyChildren:familyInformation.familyChildren.value ? familyInformation.familyChildren.value:null,
       adopted: familyInformation.adopted.value,
       brotherDisturbances: familyInformation.brotherDisturbances.value,
       sisterDisturbances: familyInformation.sisterDisturbances.value,
@@ -961,10 +933,10 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
         return;
       }
 
-      if (res.data.responseStatus === "failed") {
+      if (res.data.outputValues.responseStatus === "failed") {
         setModal({
           isOpen: true,
-          message: res.data.outputMessage,
+          message: res.data.outputValues.outputMessage,
           type: "warning",
         });
 

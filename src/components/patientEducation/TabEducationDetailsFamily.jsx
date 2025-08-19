@@ -3,7 +3,6 @@ import TypeableDropdown from "../TypeableDropdown";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageModel from "../MessageModel";
 import {
-  addEducation,
   drpALStreams,
   drpInstitutions,
   drpUniversitySubjects,
@@ -485,7 +484,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
 
   const validateAllFields = () => {
     return [
-      _validateEducationYears(),
+    //  _validateEducationYears(),
       _validateOL(),
       _validateALStream(),
       _validateUniversity(),
@@ -744,7 +743,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
     if (isAllValidated && isFormValid()) {
       const transformedPayload = {
         patientId: id,
-        educationYearsHusband: education.educationYearsHusband,
+        educationYearsHusband: education.educationYearsHusband ?  education.educationYearsHusband:null,
         isOLHusband: education.olHusband.enabled,
         isOLPassedHusband: education.olHusband.isPassed,
         olRemarkHusband: education.olHusband.remark,
@@ -761,7 +760,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
         universityRemarkHusband: education.universityHusband.remark,
         isEdexcelHusband: education.internationalCurriculumHusband.isEdexcel,
         isCambridgeHusband: education.internationalCurriculumHusband.isCambridge,
-        educationYearsWife: education.educationYearsWife,
+        educationYearsWife: education.educationYearsWife ? education.educationYearsWife:null,
         isOLWife: education.olWife.enabled,
         isOLPassedWife: education.olWife.isPassed,
         olRemarkWife: education.olWife.remark,
@@ -878,7 +877,6 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       disabled={editingSection !== "educationYears" && mode !== "add"}
                       aria-label="Husband Years of Formal Education"
-                      required
                     >
                       <option value="">Select years</option>
                       {[...Array(21)].map((_, i) => (
@@ -901,7 +899,6 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
                       className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       disabled={editingSection !== "educationYears" && mode !== "add"}
                       aria-label="Wife Years of Formal Education"
-                      required
                     >
                       <option value="">Select years</option>
                       {[...Array(21)].map((_, i) => (
@@ -1004,8 +1001,6 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
                   </div>
 
                    <div className="col-span-2">
-
-                 {JSON.stringify(education.olWife.enabled)}
                     <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -1206,17 +1201,17 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
          <label className="block font-medium text-gray-700">Remark</label>:null}
 </div>
          <div className="col-span-2">
-      {education.olHusband.remark && (
+      {education.olHusband.remark ? (
                       <div className="mt-4">
                         <div className="bg-white border border-gray-200 rounded-lg p-3 mt-1 whitespace-pre-line">
                           {education.olHusband.remark}
                         </div>
                       </div>
-                    )}
+                    ):''}
 </div>
 
          <div className="col-span-2">
-                    {education.olWife.remark && (                   
+                    {education.olWife.remark ? (                   
                       <div className="mt-4">
                    
                         <div className="bg-white border border-gray-200 rounded-lg p-3 mt-1 whitespace-pre-line">
@@ -1224,7 +1219,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails }) => {
                         </div>
                       </div>
                   
-                    )}
+                    ):''}
 </div>
                         </div>
 

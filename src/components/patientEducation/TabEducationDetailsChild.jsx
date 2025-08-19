@@ -220,7 +220,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
     await loadScholarshipData();
     await loadOLData();
     await loadALData();
-    await loadUniversityData();
+   // await loadUniversityData();
     await loadInternationalCurriculumData();
     setIsLoading(false);
   };
@@ -264,6 +264,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
         isUniversity: education.university.enabled || false,
         universitySubjects:
           education.university.subjects.map((subject) => ({
+            educationUniversityId:subject.educationUniversityId,
             name: subject.name,
             institution: subject.institutionName,
             marks: subject.marks,
@@ -302,11 +303,11 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
         await loadDrpALSubjects();
         await loadALData();
       }
-      if (section === "university") {
-        await loadDrpUniversitySubjects();
-        await loadDrpInstitutions();
-        await loadUniversityData();
-      }
+      // if (section === "university") {
+      //   await loadDrpUniversitySubjects();
+      //   await loadDrpInstitutions();
+      //   await loadUniversityData();
+      // }
       if (section === "internationalCurriculum") {
         await loadInternationalCurriculumData();
       }
@@ -545,27 +546,27 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
           delete newErrors[`qualification_${index}_name`];
         }
       }
-      if (field === "institution") {
-        if (!value?.trim()) {
-          newErrors[`qualification_${index}_institution`] =
-            "Institution is required.";
-        } else {
-          delete newErrors[`qualification_${index}_institution`];
-        }
-      }
-      if (field === "marks") {
-        if (
-          value === undefined ||
-          value === null ||
-          (typeof value === "string" && !value.trim()) ||
-          (typeof value === "number" && !value.toString().trim())
-        ) {
-          newErrors[`qualification_${index}_marks`] =
-            "Marks/Grade is required.";
-        } else {
-          delete newErrors[`qualification_${index}_marks`];
-        }
-      }
+      // if (field === "institution") {
+      //   if (!value?.trim()) {
+      //     newErrors[`qualification_${index}_institution`] =
+      //       "Institution is required.";
+      //   } else {
+      //     delete newErrors[`qualification_${index}_institution`];
+      //   }
+      // }
+      // if (field === "marks") {
+      //   if (
+      //     value === undefined ||
+      //     value === null ||
+      //     (typeof value === "string" && !value.trim()) ||
+      //     (typeof value === "number" && !value.toString().trim())
+      //   ) {
+      //     newErrors[`qualification_${index}_marks`] =
+      //       "Marks/Grade is required.";
+      //   } else {
+      //     delete newErrors[`qualification_${index}_marks`];
+      //   }
+      // }
       return newErrors;
     });
     return !!value;
@@ -613,7 +614,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
       return false;
     }
     setALSubjectListError("");
-    validations.push(validateEducationYears(education.educationYears));
+    //validations.push(validateEducationYears(education.educationYears));
     validations.push(validateALStream(undefined, education.al.alStreamName));
     education.al.subjects.forEach((s, index) => {
       validations.push(validateALSubject(index, "name", s.name));
@@ -635,18 +636,18 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
     setUniversitySubjectListError("");
     education.university.subjects.forEach((s, index) => {
       validations.push(validateUniversity(index, "degree", s.name));
-      validations.push(
-        validateUniversity(index, "institution", s.institutionName)
-      );
-      validations.push(validateUniversity(index, "marks", s.marks));
+      // validations.push(
+      //   validateUniversity(index, "institution", s.institutionName)
+      // );
+      // validations.push(validateUniversity(index, "marks", s.marks));
     });
     return validations.every((v) => v === true);
   };
 
   const validateAllFields = () => {
     const isValid = [];
-    isValid.push(_validateEducationYears());
-    isValid.push(_validateScholarship());
+   // isValid.push(_validateEducationYears());
+   // isValid.push(_validateScholarship());
     isValid.push(_validateOLSubject());
     isValid.push(_validateALSubject());
     isValid.push(_validateUniversity());
@@ -843,7 +844,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
         ...prev,
         educationYears: value,
       }));
-      validateEducationYears(value);
+      //validateEducationYears(value);
     }
   };
 
@@ -922,7 +923,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
   };
 
   const addCustomSubject = (level) => {
-    const newSubject = { value: "", marks: "", year: currentYear, isNew: true };
+    const newSubject = { value: "", marks: "", year: 1900, isNew: true };
     setEducation((prev) => {
       if (level === "ol") {
         const newSubjects = [...prev.ol.subjects, newSubject];
@@ -945,7 +946,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
       institutionName: "",
       institutionId: "",
       marks: "",
-      year: currentYear,
+      year: "",
       isNew: true,
     };
     setEducation((prev) => {
@@ -1034,6 +1035,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
         isUniversity: education.university.enabled || false,
         universitySubjects:
           education.university.subjects.map((subject) => ({
+               educationUniversityId:subject.educationUniversityId,
             name: subject.name,
             institution: subject.institutionName,
             marks: subject.marks,
@@ -1147,7 +1149,6 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                       editingSection !== "educationYears" && mode !== "add"
                     }
                     aria-label="Years of formal education"
-                    required
                   >
                     <option value="">Select years</option>
                     {[...Array(21)].map((_, i) => (
@@ -1244,7 +1245,6 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                       placeholder="Enter marks (e.g., 180)"
                       disabled={education.scholarship.enabled === false}
                       aria-label="Scholarship Marks"
-                      required
                     />
                     {scholarshipErrors.marks && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1264,7 +1264,6 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                       placeholder="Enter school name"
                       disabled={education.scholarship.enabled === false}
                       aria-label="School Admitted"
-                      required
                     />
                     {scholarshipErrors.schoolAdmitted && (
                       <p className="mt-1 text-sm text-red-600">
@@ -1287,7 +1286,6 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                           className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300"
                           disabled={education.scholarship.enabled === false}
                           aria-label="Scholarship Result Pass"
-                          required
                         />
                         <span className="ml-2 text-sm text-gray-700">Pass</span>
                       </label>
@@ -1349,12 +1347,12 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                       {education.scholarship.result || "N/A"}
                     </div>
                     <div className="col-span-3">
-                      <div className="">
+                     {education.scholarship.remark ? <div className="">
                         <strong>Remark:</strong>{" "}
                         <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                          {education.scholarship.remark || "N/A"}
+                          {education.scholarship.remark}
                         </div>
-                      </div>
+                      </div> :''}
                     </div>
                   </div>
                 )}
@@ -1445,7 +1443,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                         </p>
                       )}
                     </div>
-                    <div className="w-1/4">
+                    {/* <div className="w-1/4">
                       <label className="block text-sm font-medium text-gray-700">
                         Year{<span className="text-red-500">*</span>}
                       </label>
@@ -1463,7 +1461,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                           </option>
                         ))}
                       </select>
-                    </div>
+                    </div> */}
                     <div className="w-1/4">
                       <label className="block text-sm font-medium text-gray-700">
                         Grade{<span className="text-red-500">*</span>}
@@ -1539,7 +1537,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                 
                 {!education.ol.enabled ? 
                  <div className="flex items-center space-x-2 text-gray-500 font-semibold">
-                                        <FaInfoCircle className="text-xl" /><span>No University qualifications</span>
+                                        <FaInfoCircle className="text-xl" /><span>No O/L qualifications</span>
                                       </div>:null
                                       }
                                       
@@ -1553,9 +1551,9 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
                             Subject
                           </th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                          {/* <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
                             Year
-                          </th>
+                          </th> */}
                           <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
                             Grade
                           </th>
@@ -1567,9 +1565,9 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                             <td className="border border-gray-300 p-2">
                               {subject.name || "N/A"}
                             </td>
-                            <td className="border border-gray-300 p-2">
+                            {/* <td className="border border-gray-300 p-2">
                               {subject.year || "N/A"}
-                            </td>
+                            </td> */}
                             <td className="border border-gray-300 p-2">
                               {subject.marks || "N/A"}
                             </td>
@@ -1578,12 +1576,13 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                       </tbody>
                     </table>
                     <div className="mt-5">
-                      <div className="">
-                        <strong>Remark:</strong>
-                        <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                          {education.ol.remark || "N/A"}
-                        </div>
-                      </div>
+                     
+                        {education.ol.remark ?    <div className="">
+                            <strong>Remark:</strong>{" "}
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
+                              {education.ol.remark}
+                            </div>
+                          </div>:''}
                     </div>
                   </div>
                 ) :  null}
@@ -1796,7 +1795,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                         </p>
                       )}
                     </div>
-                    <div className="w-1/4">
+                    {/* <div className="w-1/4">
                       <label className="block text-sm font-medium text-gray-700">
                         Year{<span className="text-red-500">*</span>}
                       </label>
@@ -1814,7 +1813,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                           </option>
                         ))}
                       </select>
-                    </div>
+                    </div> */}
                     <div className="w-1/4">
                       <label className="block text-sm font-medium text-gray-700">
                         Grade{<span className="text-red-500">*</span>}
@@ -1890,7 +1889,7 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                
                
                 {! education.al.enabled ? <div className="flex items-center space-x-2 text-gray-500 font-semibold">
-                                       <FaInfoCircle className="text-xl" /><span>No University qualifications</span>
+                                       <FaInfoCircle className="text-xl" /><span>No A/L qualifications</span>
                                      </div> :null}
 
                 {education.al.enabled ? (
@@ -1908,9 +1907,9 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                               <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
                                 Subject
                               </th>
-                              <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
+                              {/* <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
                                 Year
-                              </th>
+                              </th> */}
                               <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
                                 Grade
                               </th>
@@ -1922,9 +1921,9 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                                 <td className="border border-gray-300 p-2">
                                   {subject.name || "N/A"}
                                 </td>
-                                <td className="border border-gray-300 p-2">
+                                {/* <td className="border border-gray-300 p-2">
                                   {subject.year || "N/A"}
-                                </td>
+                                </td> */}
                                 <td className="border border-gray-300 p-2">
                                   {subject.marks || "N/A"}
                                 </td>
@@ -1933,12 +1932,12 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
                           </tbody>
                         </table>
                         <div className="mt-5">
-                          <div className="">
+                       {education.al.remark ?    <div className="">
                             <strong>Remark:</strong>{" "}
                             <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                              {education.al.remark || "N/A"}
+                              {education.al.remark}
                             </div>
-                          </div>
+                          </div>:''}
                         </div>
                       </div>
                     ) : (
