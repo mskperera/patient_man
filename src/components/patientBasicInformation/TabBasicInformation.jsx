@@ -662,7 +662,9 @@ const TabBasicInformation = ({
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
-                        Date of Birth <span className="text-red-500">*</span>
+                        Date of Birth  {basicInformation.dateOfBirth.required && (
+                  <span className="text-red-500">*</span>
+                )}
                       </label>
                       <input
                         type="date"
@@ -681,7 +683,9 @@ const TabBasicInformation = ({
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">
-                        Age <span className="text-red-500">*</span>
+                        Age {basicInformation.dateOfBirth.required && (
+                  <span className="text-red-500">*</span>
+                )}
                       </label>
                       {basicInformation.dateOfBirth.value && (
                         <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-lg bg-gray-50">
@@ -743,7 +747,9 @@ const TabBasicInformation = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
-                        Home Phone <span className="text-red-500">*</span>
+                        Home Phone {basicInformation.homePhone.required && (
+                  <span className="text-red-500">*</span>
+                )}
                       </label>
                       <input
                         name="homePhone"
@@ -800,7 +806,9 @@ const TabBasicInformation = ({
                     <div className="md:col-span-2 lg:col-span-3">
                       <label className="block text-sm font-medium text-gray-600">
                         Permanent Address{" "}
-                        <span className="text-red-500">*</span>
+                   {basicInformation.permanentAddress.required && (
+                  <span className="text-red-500">*</span>
+                )}
                       </label>
                       <textarea
                         name="permanentAddress"
@@ -830,7 +838,9 @@ const TabBasicInformation = ({
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Who referred you to the Institute?{" "}
-                        <span className="text-red-500">*</span>
+                           {basicInformation.referralSource.required && (
+                  <span className="text-red-500">*</span>
+                )}
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                         {[
@@ -882,7 +892,9 @@ const TabBasicInformation = ({
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Has this party been here?{" "}
-                        <span className="text-red-500">*</span>
+                          {basicInformation.referralPartyPresent.required && (
+                  <span className="text-red-500">*</span>
+                )}
                       </label>
                       <div className="flex space-x-4 mt-2">
                         <label className="flex items-center">
