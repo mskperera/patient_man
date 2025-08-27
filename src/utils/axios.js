@@ -27,7 +27,7 @@ customAxios.interceptors.request.use(
     
     
       if (error.request.status ===401 || error.request.status ===400) {
-       // window.location.href = '/login';
+        window.location.href = '/login';
        }
       
     

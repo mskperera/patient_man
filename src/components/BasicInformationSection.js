@@ -13,9 +13,9 @@ const BasicInformationSection = ({ isLoading, basicInformation, patientTypeId })
         // Family Patient (patientTypeId === 3)
         <div className="mx-4">
           <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-6">
               {/* Husband Information */}
-              <div className="space-y-2 col-span-2">
+              <div className="space-y-2 col-span-7">
 
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div></div>
@@ -87,15 +87,21 @@ const BasicInformationSection = ({ isLoading, basicInformation, patientTypeId })
 
          
 
-              {/* Record Information and Actions */}
-              <div className="space-y-4 flex flex-col items-start lg:items-end">
-                <div className="space-y-4 w-full">
+              <div className="space-y-2 flex flex-col items-start mt-7 col-span-3">
+             
                   <div className="flex items-center gap-3">
                     <strong className="text-gray-600 font-medium">Patient No:</strong>
                     <span className="text-gray-800">{basicInformation.patientNo || "N/A"}</span>
                   </div>
-                 
                   <div className="flex items-center gap-3">
+                    <strong className="text-gray-600 font-medium">Created:</strong>
+                    <span className="text-sky-600">
+                      {basicInformation.createdDate
+                        ? moment(basicInformation.createdDate).format("YYYY MMM DD hh:mm A")
+                        : "N/A"}
+                    </span>
+                  </div>
+                     <div className="flex items-center gap-3">
                     <strong className="text-gray-600 font-medium">Last Modified:</strong>
                     <span className="text-sky-600">
                       {basicInformation.lastModified
@@ -104,15 +110,18 @@ const BasicInformationSection = ({ isLoading, basicInformation, patientTypeId })
                     </span>
                   </div>
 
-  <div className="flex items-start gap-3">
+  {/* <div className="flex items-start gap-3">
       <strong className="text-gray-600 font-medium">Handled by:</strong>
       <span className="text-sky-600 max-w-[200px] lg:max-w-[250px] break-words">
         Dr. Chaminda Weerasiriwardane
       </span>
-    </div>
+    </div> */}
 
-                </div>
-                <div className="flex flex-col items-start lg:items-end space-y-4">
+          
+             
+              </div>
+
+                 <div className="flex flex-col items-start lg:items-end space-y-4 col-span-2">
                   
                   <button
                     className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md"
@@ -122,7 +131,6 @@ const BasicInformationSection = ({ isLoading, basicInformation, patientTypeId })
                     Print Summary
                   </button>
                 </div>
-              </div>
             </div>
           </div>
         </div>
@@ -175,13 +183,20 @@ const BasicInformationSection = ({ isLoading, basicInformation, patientTypeId })
                     </span>
                 </div>
 
-                  <div className="flex items-start gap-3">
+                  {/* <div className="flex items-start gap-3">
       <strong className="text-gray-600 font-medium">Handled by:</strong>
       <span className="text-sky-600 max-w-[200px] lg:max-w-[250px] break-words">
         Dr. Chaminda Weerasiriwardane
       </span>
-    </div>
-
+    </div> */}
+  <div className="flex items-center gap-3">
+                    <strong className="text-gray-600 font-medium">Created:</strong>
+                    <span className="text-sky-600">
+                      {basicInformation.createdDate
+                        ? moment(basicInformation.createdDate).format("YYYY MMM DD hh:mm A")
+                        : "N/A"}
+                    </span>
+                  </div>
               </div>
 
               {/* Actions and Handled By */}

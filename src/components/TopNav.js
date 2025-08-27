@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // Assuming React Router for navigation
+import { FaUserCircle, FaBars, FaTimes, FaSignInAlt, FaPowerOff } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom'; // Assuming React Router for navigation
 import logo from '../assets/logo.png'; // Adjust the path to your logo file
 
 function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+
+  const navigate=useNavigate();
 
   return (
     <nav className="bg-sky-600 text-white  fixed top-0 left-0 right-0 z-50">
@@ -41,26 +42,41 @@ function TopNav() {
         </div>
 
         {/* Profile Dropdown */}
+    {/* Profile Dropdown */}
         <div className="relative">
           <button
             onClick={toggleProfile}
-            className="flex items-center space-x-2 focus:outline-none"
+            className="flex items-center space-x-2 focus:outline-none hover:bg-sky-700 p-2 rounded-full transition-colors duration-200"
             aria-label="Profile menu"
           >
             <FaUserCircle size={28} />
           </button>
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-2">
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+            <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl py-2 z-50">
+            {!localStorage.getItem('token') ?  <button
+                className="flex items-center w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+                onClick={() => {
+                  navigate('/login');
+                  toggleProfile();
+                }}
+              >
+                <FaSignInAlt size={20} className="mr-3 text-gray-600" />
                 Login
-              </button>
-              <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+              </button>:
+              <button
+                className="flex items-center w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+                onClick={() => {
+                  localStorage.removeItem('token');
+                  navigate('/');
+                  toggleProfile();
+                }}
+              >
+                <FaPowerOff size={20} className="mr-3 text-red-600" />
                 Logout
-              </button>
+              </button>}
             </div>
           )}
         </div>
-
         {/* Mobile Menu Button */}
         <button
           className="md:hidden focus:outline-none"

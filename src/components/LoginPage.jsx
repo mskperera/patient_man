@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock } from 'react-icons/fa';
+import LogoForLogin from '../assets/logo.png';
+import loginBack from '../assets/loginback.png';
+import { userLogin } from '../functions/patient';
+import { parseJwt } from '../utils/jwt';
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -23,16 +27,36 @@ function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsLoading(true);
     try {
+
+
+      const payload={loginUsername:credentials.username,password:credentials.password}
+ const authRes = await userLogin(payload);
+
+       const accessToken = authRes.data.accessToken;
+    localStorage.setItem('token', accessToken);
+
+       const plaindata = parseJwt(accessToken);
+
+    localStorage.setItem('userId', plaindata.userId);
+    localStorage.setItem('user', JSON.stringify(plaindata));
+
+    console.log('authRes:',authRes)
+    if(authRes.data.exception){
+      setErrors({ form: authRes.data.exception.message });
+    }
       // Simulated API call (replace with actual authentication logic)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+     // await new Promise((resolve) => setTimeout(resolve, 1000));
       // On success, navigate to patient type selection
-      navigate('/patient-type-selection');
+      navigate('/home');
     } catch (error) {
       setErrors({ form: 'Invalid username or password' });
     } finally {
@@ -47,19 +71,20 @@ function LoginPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-cover bg-center"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(31, 41, 55, 0.5), rgba(31, 41, 55, 0.5)), url('https://via.placeholder.com/1920x1080?text=Medical+Background')`,
-      }}
-    >
-      <div className="max-w-md w-full bg-white border border-gray-200 rounded-xl shadow-md p-8">
+   <div
+   className="min-h-screen flex items-center justify-around py-12 px-4 sm:px-6 lg:px-8 bg-cover bg-center"
+  style={{ backgroundImage: `url(${loginBack})` }} 
+>
+
+<div></div>
+      
+      <div className="max-w-md w-full bg-white border border-gray-200 rounded-xl p-8 shadow-xl">
         {/* Avatar Image */}
         <div className="flex justify-center mb-6">
           <img
-            src="https://via.placeholder.com/64x64?text=User"
-            alt="User Avatar"
-            className="h-16 w-16 rounded-full border-2 border-teal-600 object-cover"
+            src={LogoForLogin}
+            alt="login logo"
+            className="h-16"
           />
         </div>
 
@@ -68,7 +93,7 @@ function LoginPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Welcome Back
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-lg text-gray-600">
             Log in to manage patient records
           </p>
         </div>
@@ -83,13 +108,13 @@ function LoginPage() {
             <div>
               <label
                 htmlFor="username"
-                className="block text-sm font-medium text-gray-600"
+                className="block text-md font-medium text-gray-600"
               >
                 Username
               </label>
               <div className="mt-1 relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <FaUser className="text-teal-600" size={16} />
+                  <FaUser className="text-sky-600" size={16} />
                 </span>
                 <input
                   id="username"
@@ -97,7 +122,7 @@ function LoginPage() {
                   type="text"
                   value={credentials.username}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200"
+                  className="w-full pl-10 pr-3 py-2 text-md border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter your username"
                   aria-label="Username"
                   disabled={isLoading}
@@ -112,13 +137,13 @@ function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-600"
+                className="block text-md font-medium text-gray-600"
               >
                 Password
               </label>
               <div className="mt-1 relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                  <FaLock className="text-teal-600" size={16} />
+                  <FaLock className="text-sky-600" size={16} />
                 </span>
                 <input
                   id="password"
@@ -126,14 +151,14 @@ function LoginPage() {
                   type="password"
                   value={credentials.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all duration-200"
+                  className="w-full pl-10 pr-3 py-2 text-md border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                   placeholder="Enter your password"
                   aria-label="Password"
                   disabled={isLoading}
                 />
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-md text-red-600">{errors.password}</p>
               )}
             </div>
 
@@ -142,7 +167,7 @@ function LoginPage() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full flex justify-center items-center bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                className="w-full flex justify-center items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all duration-200 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                 aria-label="Log in to your account"
                 disabled={isLoading}
               >

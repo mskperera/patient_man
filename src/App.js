@@ -11,19 +11,25 @@ import AppointmentCalendar from './components/appoinments/AppointmentCalendar';
 import PatientTypeSelection from './pages/PatientTypeSelection';
 import AddAppointment from './components/appoinments/AddAppointment';
 import LoginPage from './components/LoginPage';
+import MainLayout from './components/layout/MainLayout';
 // import OccupationManager from './components/OccupationManager';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <TopNav />
-        <div className="flex pt-16 pb-12">
-          <Sidebar />
-          <main className="flex-1 ml-16 md:ml-64 p-0 overflow-auto">
-            <div className="container mx-auto">
-              <Routes>
-                <Route path="/" element={<Home />} />
+      <div className="">
+        {/* <TopNav /> */}
+        {/* <div className="flex pt-16 pb-12">
+          <Sidebar /> */}
+           <React.Suspense fallback={<>Loading...</>}>
+       
+    
+         
+                  <Routes>
+              <Route path="/login" element={<LoginPage mode="add" />} />
+                   <Route path="/" element={<LoginPage mode="add" />} />
+                  <Route element={<MainLayout />}>
+                {/* <Route path="/" element={<Home />} /> */}
                 <Route path="/home" element={<Home />} />
                 <Route path="/patients" element={<PatientList />} />
                  <Route path="/patientType" element={<PatientTypeSelection />} />
@@ -32,20 +38,21 @@ function App() {
                 {/* <Route path="/add-note" element={<Notes />} /> */}
                 {/* <Route path="/edit-patient/:id" element={<PatientInfoEdit />} /> */}
                 <Route path="/add-patient" element={<PatientInfoEdit mode="add" />} />
-      <Route path="/login" element={<LoginPage mode="add" />} />
+      
                  {/* <Route path="/occupation-man" element={<OccupationManager />} /> */}
                 {/* <Route path="/notes" element={<Notes />} /> */}
                 
                 <Route path="/patients/report/:id" element={<PatientReport />} />
                 <Route path="/appointments" element={<AppointmentCalendar />} />
                 <Route path="/add-appointment" element={<AddAppointment />} />
-               
+               </Route>
               </Routes>
-            </div>
-          </main>
+              
+
+          </React.Suspense>
         </div>
-        <BottomBar />
-      </div>
+        {/* <BottomBar /> */}
+      {/* </div> */}
     </BrowserRouter>
   );
 }

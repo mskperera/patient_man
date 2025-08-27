@@ -1230,74 +1230,22 @@ export const updateMentalStatusExamFamily = async (id,data) => {
   }
 };
 
-
-// export const addContact = async (data) => {
-//   try {
-//     const tenantId = getTenantId();
-//     const token = getToken();
-
-//     return await customAxios
-//       .post(`/contacts`, data, {
-//         headers: {
-//           "Content-Type": "application/json",
-//           authorization: `Bearer ${token}`,
-//           tenantid: tenantId,
-//         },
-//       })
-//       .then((res) => {
-//         return res;
-//       })
-//       .catch((err) => {
-//         return err.response;
-//       });
-//   } catch (err) {
-//     return err;
-//   }
-// };
-
-// export const updateCustomer = async (id, data) => {
-//   try {
-//     const tenantId = getTenantId();
-//     const token = getToken();
-
-//     return await customAxios
-//       .put(`/contacts/${id}`, data, {
-//         headers: {
-//           "Content-Type": "application/json",
-//           authorization: `Bearer ${token}`,
-//           tenantid: tenantId,
-//         },
-//       })
-//       .then((res) => {
-//         return res;
-//       })
-//       .catch((err) => {
-//         return err.response;
-//       });
-//   } catch (err) {
-//     return err;
-//   }
-// };
-
-// export const deleteCustomer = async (id, isConfirm) => {
-//   try {
-//     const tenantId = getTenantId();
-//     const token = getToken();
-//     return await customAxios
-//       .delete(`/contacts?contactId=${id}&isConfirm=${isConfirm}`, {
-//         headers: {
-//           "Content-Type": "application/json",
-//           authorization: `Bearer ${token}`,
-//           tenantid: tenantId,
-//         },
-//       })
-//       .then((res) => {
-//         return res;
-//       })
-//       .catch((err) => {
-//         return err.response;
-//       });
-//   } catch (err) {
-//     return err;
-//   }
-// };
+  export const userLogin = async (data) => {
+    try {
+  
+      return await customAxios
+        .post(`/auth/login`, data, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          return err.response;
+        });
+    } catch (err) {
+      return err;
+    }
+  };

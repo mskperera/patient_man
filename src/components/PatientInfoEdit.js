@@ -107,7 +107,7 @@ if(id===null){
      {isLoading ? <LoadingSpinner/> : <>
       
     
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4 ">
         {patientType === "1" && (
           <h2 className="flex items-center text-xl font-bold text-gray-800  pb-2">
             <FaUser className="mr-3" size={28} />
@@ -128,6 +128,13 @@ if(id===null){
             Patient Biographical Information - Family
           </h2>
         )}
+
+          {/* <div className="flex items-center gap-2">
+      <strong className="text-gray-600 font-medium">Handled by:</strong>
+      <span className="text-sky-600 max-w-[200px] lg:max-w-[250px] break-words">
+        Dr. Chaminda Weerasiriwardane
+      </span>
+    </div> */}
       </div>
       {/* {JSON.stringify(patientType)} */}
       {/* {JSON.stringify(basicInfomation)} */}
