@@ -367,27 +367,6 @@ export const addAppointment = async (data) => {
   }
 };
 
-export const updateAppointment = async (id,data) => {
-  try {
-    const token = getToken();
-
-    return await customAxios
-      .put(`/appointment/${id}`, data, {
-        headers: {
-          "Content-Type": "application/json",
-          // authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        return res;
-      })
-      .catch((err) => {
-        return err.response;
-      });
-  } catch (err) {
-    return err;
-  }
-};
 
 export const addBasicInformation = async (data) => {
   try {

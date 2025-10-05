@@ -21,7 +21,7 @@ import EditButton from "../EditButton";
 import VoiceToText from "../VoiceToText";
 import { FaGraduationCap, FaInfoCircle } from "react-icons/fa";
 
-const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
+const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
   const currentYear = 2025;
   const yearOptions = Array.from(
     { length: 21 },
@@ -89,7 +89,7 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
 
   const loadDrpALStreams = async () => {
     const alStrems = await drpALStreams();
-    setAlStremsOptions(alStrems.data?.results[0]);
+    setAlStremsOptions(alStrems.data.results[0]);
   };
   const loadDrpALSubjects = async () => {
     const alSubjects = await drpALSubjects();
@@ -220,7 +220,7 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
     await loadScholarshipData();
     await loadOLData();
     await loadALData();
-    await loadUniversityData();
+   // await loadUniversityData();
     await loadInternationalCurriculumData();
     setIsLoading(false);
   };
@@ -303,11 +303,11 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
         await loadDrpALSubjects();
         await loadALData();
       }
-      if (section === "university") {
-        await loadDrpUniversitySubjects();
-        await loadDrpInstitutions();
-        await loadUniversityData();
-      }
+      // if (section === "university") {
+      //   await loadDrpUniversitySubjects();
+      //   await loadDrpInstitutions();
+      //   await loadUniversityData();
+      // }
       if (section === "internationalCurriculum") {
         await loadInternationalCurriculumData();
       }
@@ -1576,7 +1576,8 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
                       </tbody>
                     </table>
                     <div className="mt-5">
-                       {education.ol.remark ?    <div className="">
+                     
+                        {education.ol.remark ?    <div className="">
                             <strong>Remark:</strong>{" "}
                             <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
                               {education.ol.remark}
@@ -1931,7 +1932,7 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
                           </tbody>
                         </table>
                         <div className="mt-5">
-                               {education.al.remark ?    <div className="">
+                       {education.al.remark ?    <div className="">
                             <strong>Remark:</strong>{" "}
                             <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
                               {education.al.remark}
@@ -1949,288 +1950,6 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
           </section>
 
 
-
-          {/* University Qualifications */}
-          <section className="mb-10 mt-10">
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center space-x-3">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="university.enabled"
-                    checked={education.university.enabled}
-                    onChange={handleCheckboxChange}
-                    className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
-                    disabled={editingSection !== "university" && mode !== "add"}
-                    aria-label="Has University Qualifications"
-                  />
-                  <span className="ml-2 text-sm text-gray-700"></span>
-                </label>
-                <h3 className="text-xl font-semibold text-gray-800">
-                  University Qualifications
-                </h3>
-              </div>
-              {mode !== "add" && (
-                <div className="flex space-x-4">
-                  <EditButton
-                    onClick={() => toggleSectionEdit("university")}
-                    ariaLabel={
-                      editingSection === "university"
-                        ? "Save University Qualifications"
-                        : "Edit University Qualifications"
-                    }
-                    disabled={isSaving}
-                  >
-                    {editingSection === "university"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </EditButton>
-                  {editingSection === "university" && (
-                    <button
-                      onClick={() => handleCancel("university")}
-                      className="flex items-center bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200"
-                      aria-label="Cancel Editing"
-                      disabled={isSaving}
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            {editingSection === "university" || mode === "add" ? (
-              <div className="space-y-4">
-                {universitySubjectListError && (
-                  <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">
-                    {universitySubjectListError}
-                  </p>
-                )}
-                {education.university.subjects.map((qualification, index) => (
-                  <div key={index} className="flex items-center space-x-4">
-                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 flex-1">
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Degree{<span className="text-red-500">*</span>}
-                        </label>
-                        <TypeableDropdown
-                          options={degreeOptions}
-                          value={{
-                            value: qualification.value,
-                            name: qualification.name,
-                          }}
-                          onChange={(option) =>
-                            handleSubjectChange(
-                              "university",
-                              index,
-                              option,
-                              "degree"
-                            )
-                          }
-                          placeholder="Select or type degree"
-                          isDisabled={!qualification.isNew === true}
-                          className="mt-1"
-                          classNamePrefix="select"
-                          aria-label={`Degree ${index + 1}`}
-                        />
-                        {universityErrors[`qualification_${index}_name`] && (
-                          <p className="mt-1 text-sm text-red-600">
-                            {universityErrors[`qualification_${index}_name`]}
-                          </p>
-                        )}
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Institution
-                        </label>
-                        <TypeableDropdown
-                          options={institutionsOptions}
-                          value={{
-                            value: qualification.institutionId,
-                            name: qualification.institutionName,
-                          }}
-                          onChange={(option) =>
-                            handleSubjectChange(
-                              "university",
-                              index,
-                              option,
-                              "institution"
-                            )
-                          }
-                          placeholder="e.g., University of Colombo"
-                          //isDisabled={!qualification.isNew === true}
-                          className="mt-1"
-                          classNamePrefix="select"
-                          aria-label={`Institution ${index + 1}`}
-                        />
-                        {universityErrors[
-                          `qualification_${index}_institution`
-                        ] && (
-                          <p className="mt-1 text-sm text-red-600">
-                            {
-                              universityErrors[
-                                `qualification_${index}_institution`
-                              ]
-                            }
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Year
-                        </label>
-                            <input
-                          name={`education.university.subjects.${index}.year`}
-                           value={qualification.year}
-                          onChange={handleTextInputChange}
-                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                          placeholder="e.g.2015"
-                           aria-label={`University Qualification ${
-                            index + 1
-                          } year`}
-
-                             //  disabled={!qualification.isNew === true}
-                        />
-
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Marks/Grade
-                        </label>
-                        <input
-                          name={`education.university.subjects.${index}.marks`}
-                          value={qualification.marks || ""}
-                          onChange={handleTextInputChange}
-                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                          placeholder="e.g., First Class, 3.8 GPA"
-                          aria-label={`University Qualification ${
-                            index + 1
-                          } marks`}
-                        />
-                        {universityErrors[`qualification_${index}_marks`] && (
-                          <p className="mt-1 text-sm text-red-600">
-                            {universityErrors[`qualification_${index}_marks`]}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeItem("university", index)}
-                      className="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition-all duration-200 mt-5"
-                      disabled={education.university.enabled === false}
-                      aria-label="Remove University Qualification"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5-4h4m-4 0a1 1 0 00-1 1v1H5a1 1 0 00-1 1v1h16V5a1 1 0 00-1-1h-4a1 1 0 00-1-1zM8 10v8m4-8v8m4-8v8"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addUniversityQualification}
-                  className="mt-2 bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-all duration-200"
-                  disabled={
-                    education.university.enabled === false ||
-                    !canAddUniversityQualification()
-                  }
-                  aria-label="Add University Qualification"
-                >
-                  Add University Qualification
-                </button>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Remark
-                  </label>
-                  <VoiceToText
-                    name="university.remark"
-                    value={education.university.remark || ""}
-                    onChange={handleTextInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter any additional remarks"
-                    disabled={education.university.enabled === false}
-                    aria-label="University Remark"
-                    rows="4"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div>
-               
-                 {!education.university.enabled ?  <div className="flex items-center space-x-2 text-gray-500 font-semibold">
-                    <FaInfoCircle className="text-xl" /><span>No University qualifications</span>
-                      </div>
-:null}
-                </div>
-                
-                {education.university.enabled !== false &&
-                education.university.subjects.length > 0 ? (
-                  <div>
-                    <strong>Qualifications:</strong>
-                    <table className="w-full border-collapse border bg-white mt-2 border-gray-200">
-                      <thead>
-                        <tr className="bg-gray-200">
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
-                            Degree
-                          </th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
-                            Institution
-                          </th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
-                            Year
-                          </th>
-                          <th className="border border-gray-300 p-2 text-left text-sm font-bold text-gray-700">
-                            Marks/Grade
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {education.university.subjects.map(
-                          (qualification, index) => (
-                            <tr key={index}>
-                              <td className="border border-gray-300 p-2">
-                                {qualification.name || "N/A"}
-                              </td>
-                              <td className="border border-gray-300 p-2">
-                                {qualification.institutionName || "N/A"}
-                              </td>
-                              <td className="border border-gray-300 p-2">
-                                {qualification.year || "N/A"}
-                              </td>
-                              <td className="border border-gray-300 p-2">
-                                {qualification.marks || "N/A"}
-                              </td>
-                            </tr>
-                          )
-                        )}
-                      </tbody>
-                    </table>
-                 {education.university.remark ? <div className="mt-5">
-                      <strong>Remark:</strong>
-                      <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                        {education.university.remark}
-                      </div>
-                    </div>:''}
-                  </div>
-                )   
-                :null}
-              </div>
-            )}
-          </section>
 
           {/* Save Button for Add Mode */}
           {mode === "add" && (
@@ -2255,4 +1974,4 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails }) => {
   );
 };
 
-export default TabEducationDetailsIndividual;
+export default TabEducationDetailsChild;
