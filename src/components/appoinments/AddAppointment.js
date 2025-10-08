@@ -325,10 +325,10 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
   );
 };
 
-const AddAppointment = () => {
+const AddAppointment = ({selectedDate,onHide,refreshPatientList,setAppointmentSuccessDialog}) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedDate = location.state?.selectedDate || new Date();
+  //const selectedDate = location.state?.selectedDate || new Date();
 
   // Destructure the state
   const { appointment } = location.state || {};
@@ -366,15 +366,7 @@ const AddAppointment = () => {
   });
   const [patientFormErrors, setPatientFormErrors] = useState({});
   const [doctorAppointments, setDoctorAppointments] = useState([]);
-  const [appointmentSuccessDialog, setAppointmentSuccessDialog] = useState({
-    isOpen: false,
-    doctorName: '',
-    patientName: '',
-    appointmentNo: '',
-    referenceNo: '',
-    date: '',
-    time: '',
-  });
+
   const [doctorOptions, setDoctorOptions] = useState([]);
 
   const isEditMode=appointment?true:false;
@@ -494,12 +486,6 @@ setNewAppointment({
     }
   };
 
-  useEffect(() => {
-    setNewAppointment((prev) => ({
-      ...prev,
-      appointmentDate: moment(selectedDate).format('YYYY-MM-DD'),
-    }));
-  }, [selectedDate]);
 
   useEffect(() => {
     if (newAppointment.doctor && newAppointment.appointmentDate) {
@@ -650,7 +636,10 @@ setNewAppointment({
   };
 
   const handleAddAppointment = async (e) => {
+
+  
     e.preventDefault();
+
 
     const isValid=validateForm();
         console.log('sssssssssssssssssssssssssssss:',isValid);
@@ -691,6 +680,8 @@ setNewAppointment({
         return;
       }
 
+refreshPatientList()
+
       setAppointmentSuccessDialog({
         isOpen: true,
         doctorName: newAppointment.doctor,
@@ -700,6 +691,7 @@ setNewAppointment({
         date: moment(newAppointment.appointmentDate).format('MMMM D, YYYY'),
         time: moment(newAppointment.appointmentTime, 'HH:mm').format('h:mm A'),
       });
+
       setNewAppointment({
         patientNo: '',
         appointmentDate: moment(selectedDate).format('YYYY-MM-DD'),
@@ -711,6 +703,8 @@ setNewAppointment({
         notes: '',
         duration: '30',
       });
+
+
     }
     else{
 
@@ -743,6 +737,7 @@ setNewAppointment({
       setSearchQuery('');
       setTriggerSearch(0);
       setDoctorAppointments([]);
+      onHide()
     } catch (err) {
       setModal({
         isOpen: true,
@@ -774,72 +769,10 @@ setNewAppointment({
         message={modal.message}
         type={modal.type}
       />
-      <DialogModel
-        header="Appointment Confirmed"
-        visible={appointmentSuccessDialog.isOpen}
-        onHide={() => setAppointmentSuccessDialog({ isOpen: false, doctorName: '', patientName: '', appointmentNo: '', date: '', time: '' })}
-        width="500px"
-      >
-        <div className="space-y-6">
-          <div className="flex items-center justify-center gap-2">
-            <FaCheckCircle className="text-green-500" size={24} />
-            <h3 className="text-lg font-semibold text-gray-800">
-              Appointment Successfully Scheduled
-            </h3>
-          </div>
-          <p className="text-md text-gray-600 text-center">
-            The appointment for <span className="font-medium">{appointmentSuccessDialog.doctorName}</span> with{' '}
-            <span className="font-medium">{appointmentSuccessDialog.patientName}</span> has been placed successfully.
-          </p>
-          <div>
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <h3 className="text-lg text-gray-700 font-semibold">Appointment Details:</h3>
-              <div className="space-y-2 text-md text-gray-600 mt-2">
-                <p>
-                  <span className="font-medium">Reference No. :</span> {appointmentSuccessDialog.referenceNo}
-                </p>
-                <p>
-                  <span className="font-medium">Appointment No. :</span> {appointmentSuccessDialog.appointmentNo}
-                </p>
-                <p>
-                  <span className="font-medium">Doctor:</span> {appointmentSuccessDialog.doctorName}
-                </p>
-                <p>
-                  <span className="font-medium">Patient:</span> {appointmentSuccessDialog.patientName}
-                </p>
-                <p>
-                  <span className="font-medium">Date:</span> {appointmentSuccessDialog.date}
-                </p>
-                <p>
-                  <span className="font-medium">Time:</span> {appointmentSuccessDialog.time}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => setAppointmentSuccessDialog({ isOpen: false, doctorName: '', patientName: '', appointmentNo: '', date: '', time: '' })}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all duration-200 text-sm"
-              aria-label="Close success dialog"
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAppointmentSuccessDialog({ isOpen: false, doctorName: '', patientName: '', appointmentNo: '', date: '', time: '' });
-                navigate('/appointments');
-              }}
-              className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-all duration-200 flex items-center gap-2 text-sm"
-              aria-label="Back to appointments"
-            >
-              Back to Appointments
-            </button>
-          </div>
-        </div>
-      </DialogModel>
-      <DialogModel
+  
+
+      <div className="bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col items-center min-w-full">
+              <DialogModel
         header={showNewPatientForm ? 'Add New Patient' : 'Select Patient'}
         visible={isPatientDialogOpen}
         onHide={() => {
@@ -851,6 +784,7 @@ setNewAppointment({
           setError('');
           setTriggerSearch(0);
         }}
+        
       >
         {showNewPatientForm ? (
           <form onSubmit={handleAddPatient} className="space-y-4">
@@ -1015,19 +949,32 @@ setNewAppointment({
           </div>
         )}
       </DialogModel>
-      <div className="">
-        <div className=" ">
+        <div className=" bg-white rounded-2xl p-8">
           <div className="flex items-center gap-5 mb-6">
-            <button
+            {/* <button
               onClick={() => navigate('/appointments')}
               className="flex items-center gap-2 text-sky-600 font-semibold hover:text-sky-700 transition-colors"
               aria-label="Back to appointments"
             >
               <FaChevronCircleLeft size={20} />
               Back
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800">{!appointment ? "Add New Appointment":"Update Appoinment"}</h2>
+            </button> */}
+            {/* <h2 className="text-2xl font-bold text-gray-800">{!appointment ? "Add New Appointment":"Update Appoinment"}</h2> */}
           </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
           <div>
 
@@ -1071,7 +1018,8 @@ setNewAppointment({
                     name="doctor"
                     value={selectedDoctor}
                     onChange={(e)=>{
-                      setSelectedDoctor(e.target.value)
+                      setSelectedDoctor(e.target.value);
+
                     }}
 
                     disabled={!selectedPatient}
@@ -1212,7 +1160,9 @@ setNewAppointment({
               <div className="flex justify-end gap-4">
                 <button
                   type="button"
-                  onClick={() => navigate('/appointments')}
+                  onClick={() =>{
+                    onHide()
+                  }}
                   className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all duration-200 text-sm sm:text-base"
                   aria-label="Cancel adding appointment"
                 >

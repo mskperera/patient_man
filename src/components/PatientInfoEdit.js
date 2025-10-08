@@ -32,6 +32,7 @@ import TabMentalHealthIndividual from "./patientMentalHealth/TabMentalHealthIndi
 import TabEducationDetailsIndividual from "./patientEducation/TabEducationDetailsIndividual";
 import LoadingSpinner from "./LoadingSpinner";
 import TabMentalStatusExamFamily from "./mentalStatusExam/TabMentalStatusExamFamily";
+import PsychiatricNotesTab from "./PsychiatricNotesTab";
 
 function PatientInfoEdit({ mode = "view" }) {
 
@@ -268,6 +269,22 @@ if(id===null){
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
             </button>
+
+    <button
+              className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                activeTab === "psychiatricNotes"
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
+              onClick={() => setActiveTab("psychiatricNotes")}
+                  disabled={tabDetails.isBasicInfo? false : true}
+            >
+              <FaBookMedical className="mr-2" size={16} />
+              Psychiatric Notes
+            </button>
+
+ 
+
           </div>
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -305,6 +322,11 @@ if(id===null){
             {activeTab === "mentalExam" && <TabMentalStatusExam 
                     refreshTabDetails={refreshTabDetailsHandler}
             id={id || newId} />}
+
+
+               {activeTab === "psychiatricNotes" && <PsychiatricNotesTab patientId={id || newId} userId={userId} />}
+
+
           </form>
         </>
       )}
@@ -427,6 +449,19 @@ if(id===null){
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
             </button>
+                <button
+              className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                activeTab === "psychiatricNotes"
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
+              onClick={() => setActiveTab("psychiatricNotes")}
+                  disabled={tabDetails.isBasicInfo? false : true}
+            >
+              <FaBookMedical className="mr-2" size={16} />
+              Psychiatric Notes
+            </button>
+
           </div>
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -468,6 +503,11 @@ if(id===null){
             {activeTab === "mentalExam" && <TabMentalStatusExam 
                     refreshTabDetails={refreshTabDetailsHandler}
             id={id || newId} />}
+
+            {activeTab === "psychiatricNotes" && <PsychiatricNotesTab patientId={id || newId} userId={userId} />}
+
+
+
           </form>
         </>
       )}
@@ -589,6 +629,19 @@ if(id===null){
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
             </button>
+
+                <button
+              className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
+                activeTab === "psychiatricNotes"
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+              } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
+              onClick={() => setActiveTab("psychiatricNotes")}
+                  disabled={tabDetails.isBasicInfo? false : true}
+            >
+              <FaBookMedical className="mr-2" size={16} />
+              Psychiatric Notes
+            </button>
           </div>
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -630,6 +683,10 @@ if(id===null){
             {activeTab === "mentalExam" && <TabMentalStatusExamFamily 
                     refreshTabDetails={refreshTabDetailsHandler}
                      id={id || newId} />}
+
+                        {activeTab === "psychiatricNotes" && <PsychiatricNotesTab patientId={id || newId} userId={userId} />}
+
+
           </form>
         </>
       )}

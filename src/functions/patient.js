@@ -1426,3 +1426,150 @@ export const drpDoctors = async () => {
     return err;
   }
 };
+
+
+export const saveSummaryNote = async (patientId, doctorId, data) => {
+  try {
+    console.log('Sending saveSummaryNote request:', { patientId, doctorId, data });
+    const response = await customAxios.put(
+      `/saveSummaryNote?patientId=${patientId}&doctorId=${doctorId}`,
+      { note: data },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    console.log('saveSummaryNote response:', response.data);
+    return response;
+  } catch (error) {
+    console.error('saveSummaryNote error:', error.response || error);
+    return error.response || { error: { message: error.message } };
+  }
+};
+
+export const getSummaryNote = async (patientId,doctorId) => {
+  try {
+    const token = getToken();
+    return await customAxios
+      .get(`/summaryNote/get?patientId=${patientId}&doctorId=${doctorId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  export const addPsyNote = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/psy_notes/add`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const updatePsyNote = async (noteId, data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/psy_notes/update/${noteId}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getPsyNotes = async (patientId) => {
+  try {
+    const token = getToken();
+    return await customAxios
+      .post(`/psy_notes/get`, { patientId }, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+export const deletePsyNote = async (noteId) => {
+  try {
+    const token = getToken();
+    return await customAxios
+      .post(`/psy_notes/delete/${noteId}`, {}, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};

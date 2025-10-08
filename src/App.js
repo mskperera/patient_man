@@ -44,7 +44,7 @@ function App() {
                 
                 <Route path="/patients/report/:id" element={<PatientReport />} />
                 <Route path="/appointments" element={<AppointmentCalendar />} />
-                <Route path="/add-appointment" element={<AddAppointment />} />
+                {/* <Route path="/add-appointment" element={<AddAppointment />} /> */}
                </Route>
               </Routes>
               

@@ -4,7 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import moment from 'moment';
 import LoadingSpinner from '../LoadingSpinner';
 import MessageModel from '../MessageModel';
-import { FaCalendarAlt, FaFilter, FaPlus } from 'react-icons/fa';
+import { FaCalendarAlt, FaCheckCircle, FaFilter, FaPlus } from 'react-icons/fa';
 import { drpDoctors, getPatientAppointments, updateAppointment } from '../../functions/patient';
 import ConfirmDialog from '../dialog/ConfirmDialog';
 import DialogModel from '../DialogModel';
@@ -25,7 +25,28 @@ const AppointmentCalendar = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isAddAppointmentOpen, setIsAddAppointmentOpen] = useState(false);
 
+    const [refreshPatientList, setRefreshPatientList] = useState('');
+      const [appointmentSuccessDialog, setAppointmentSuccessDialog] = useState({
+        isOpen: false,
+        doctorName: '',
+        patientName: '',
+        appointmentNo: '',
+        referenceNo: '',
+        date: '',
+        time: '',
+      });
+
   const [loadList,setLoadlist]=useState('')
+
+
+
+
+  const _refreshPatientList=()=>{
+    
+    console.log('refresshinggg..')
+    setRefreshPatientList(Math.random());
+
+  }
   const confirmCancelAppointment = async () => {
     await updateAppointmentStatus(3, selectedAppointment);
     setConfirmCancelStatus(false);
@@ -162,7 +183,7 @@ const AppointmentCalendar = () => {
 
   useEffect(() => {
     fetchAppointments(selectedDate);
-  }, [moment(selectedDate).format('YYYY-MM'), statusFilter, selectedDoctor,loadList]);
+  }, [moment(selectedDate).format('YYYY-MM'), statusFilter, selectedDoctor,loadList,refreshPatientList]);
 
   const tileContent = ({ date, view }) => {
     if (view === 'month') {
@@ -240,16 +261,84 @@ const AppointmentCalendar = () => {
         header="Add New Appointment"
         visible={isAddAppointmentOpen}
         onHide={() => setIsAddAppointmentOpen(false)}
-      //  width="80%"
-      //  height="90%"
+       // width="80%"
+       // height="90%"
       >
         <AddAppointment
           selectedDate={selectedDate}
-          setIsAddAppointmentOpen={setIsAddAppointmentOpen}
-          fetchAppointments={() => fetchAppointments(selectedDate)}
-          setLoadlist={setLoadlist}
+           onHide={() => setIsAddAppointmentOpen(false)}
+         // setIsAddAppointmentOpen={setIsAddAppointmentOpen}
+         // fetchAppointments={() => fetchAppointments(selectedDate)}
+         setAppointmentSuccessDialog={setAppointmentSuccessDialog}
+          refreshPatientList={()=>_refreshPatientList()}
         />
       </DialogModel>
+          <DialogModel
+        header="Appointment Confirmed"
+        visible={appointmentSuccessDialog.isOpen}
+        onHide={() => setAppointmentSuccessDialog({ isOpen: false, doctorName: '', patientName: '', appointmentNo: '', date: '', time: '' })}
+        width="500px"
+      >
+        <div className="space-y-6">
+          <div className="flex items-center justify-center gap-2">
+            <FaCheckCircle className="text-green-500" size={24} />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Appointment Successfully Scheduled
+            </h3>
+          </div>
+          <p className="text-md text-gray-600 text-center">
+            The appointment for <span className="font-medium">{appointmentSuccessDialog.doctorName}</span> with{' '}
+            <span className="font-medium">{appointmentSuccessDialog.patientName}</span> has been placed successfully.
+          </p>
+          <div>
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <h3 className="text-lg text-gray-700 font-semibold">Appointment Details:</h3>
+              <div className="space-y-2 text-md text-gray-600 mt-2">
+                <p>
+                  <span className="font-medium">Reference No. :</span> {appointmentSuccessDialog.referenceNo}
+                </p>
+                <p>
+                  <span className="font-medium">Appointment No. :</span> {appointmentSuccessDialog.appointmentNo}
+                </p>
+                <p>
+                  <span className="font-medium">Doctor:</span> {appointmentSuccessDialog.doctorName}
+                </p>
+                <p>
+                  <span className="font-medium">Patient:</span> {appointmentSuccessDialog.patientName}
+                </p>
+                <p>
+                  <span className="font-medium">Date:</span> {appointmentSuccessDialog.date}
+                </p>
+                <p>
+                  <span className="font-medium">Time:</span> {appointmentSuccessDialog.time}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => setAppointmentSuccessDialog({ isOpen: false, doctorName: '', patientName: '', appointmentNo: '', date: '', time: '' })}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all duration-200 text-sm"
+              aria-label="Close success dialog"
+            >
+              Close
+            </button>
+            {/* <button
+              type="button"
+              onClick={() => {
+                setAppointmentSuccessDialog({ isOpen: false, doctorName: '', patientName: '', appointmentNo: '', date: '', time: '' });
+                navigate('/appointments');
+              }}
+              className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-all duration-200 flex items-center gap-2 text-sm"
+              aria-label="Back to appointments"
+            >
+              Back to Appointments
+            </button> */}
+          </div>
+        </div>
+      </DialogModel>
+
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-start justify-center px-4 sm:px-6 lg:px-8 py-4">
         <div className="w-full bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="px-4 py-4 bg-gradient-to-r from-sky-600 to-sky-500 text-white flex items-center justify-between">
@@ -257,6 +346,7 @@ const AppointmentCalendar = () => {
               <FaCalendarAlt size={24} />
               <h2 className="text-xl font-bold">Appointment Calendar</h2>
             </div>
+            {/* {JSON.stringify(refreshPatientList)} */}
             <div className="flex items-center gap-4">
               <div className='flex justify-start items-center gap-4'>
                 <select
@@ -359,7 +449,7 @@ const AppointmentCalendar = () => {
                       {dailyAppointments.map((appt) => (
                         <tr
                           key={appt.appointmentId}
-                          className={`transition-all duration-200 transform hover:-translate-y-0.5 ${getRowBackgroundColor(appt.status)}`}
+                          className={`transition-all duration-200 hover:cursor-pointer ${getRowBackgroundColor(appt.status)}`}
                         >
                           <td className="py-3 px-4 border-b text-gray-800 text-sm">
                             {appt.referenceNo}
