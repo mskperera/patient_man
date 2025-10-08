@@ -802,7 +802,7 @@ function PsychiatricNotesTab({ patientId, userId }) {
                     </div>
                   ))}
                 </div>
-              ) : <p>Notes not found...</p>}
+              ) : <p className='text-center mt-10 rounded-lg p-2 text-gray-500'>Notes not found...</p>}
             </>
           )}
         </div>
