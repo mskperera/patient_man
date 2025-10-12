@@ -47,12 +47,12 @@ return;
     const endOfMonth = moment(date).endOf('month').format('YYYY-MM-DD');
 
     const payload = {
-      startDate: startOfMonth,
-      endDate: endOfMonth,
+      appointmentDateStart: startOfMonth,
+      appointmentDateEnd: endOfMonth,
       status: statusFilter !== 'all' ? statusFilter : null,
       doctorId:selectedDoctor?selectedDoctor:null
     };
-
+     console.log('payload',payload)
     try {
       const response = await getPatientAppointments(payload);
       console.log('getPatientAppointments',response)

@@ -363,7 +363,7 @@ const AddAppointment = ({ selectedDate, onHide, refreshPatientList, setAppointme
     notes: '',
     duration: '30',
   });
-  const [scheduleStart, setScheduleStart] = useState('8:00');
+  const [scheduleStart, setScheduleStart] = useState('08:00');
   const [scheduleEnd, setScheduleEnd] = useState('23:59');
   const [formErrors, setFormErrors] = useState({});
   const [newPatient, setNewPatient] = useState({
@@ -901,6 +901,7 @@ const endOfDay = moment(newAppointment.appointmentDate).endOf('day').format('YYY
                   )}
                 </div>
                    <div className='flex justify-start items-center gap-5'>
+                    <div className='flex justify-start items-center gap-5'>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Date <span className="text-red-500">*</span>
@@ -941,6 +942,9 @@ const endOfDay = moment(newAppointment.appointmentDate).endOf('day').format('YYY
                       <p className="mt-1 text-sm text-red-600">{formErrors.appointmentTime}</p>
                     )}
                   </div>
+
+                  </div>
+
                         <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Status <span className="text-red-500">*</span>
