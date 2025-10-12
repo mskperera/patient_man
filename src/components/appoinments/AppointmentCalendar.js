@@ -4,7 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import moment from 'moment';
 import LoadingSpinner from '../LoadingSpinner';
 import MessageModel from '../MessageModel';
-import { FaCalendarAlt, FaCheckCircle, FaFilter, FaPlus } from 'react-icons/fa';
+import { FaCalendarAlt, FaCheckCircle, FaFilter, FaPlus, FaUserMd } from 'react-icons/fa';
 import { drpDoctors, getPatientAppointments, updateAppointment } from '../../functions/patient';
 import ConfirmDialog from '../dialog/ConfirmDialog';
 import DialogModel from '../DialogModel';
@@ -349,7 +349,7 @@ const AppointmentCalendar = () => {
             </div>
             {/* {JSON.stringify(refreshPatientList)} */}
             <div className="flex items-center gap-4">
-              <div className='flex justify-start items-center gap-4'>
+          <div className='flex justify-start items-center gap-4'>
                 <select
                   name="doctor"
                   value={selectedDoctor}
@@ -365,6 +365,7 @@ const AppointmentCalendar = () => {
                   ))}
                 </select>
               </div>
+
               <button
                 onClick={() => setIsAddAppointmentOpen(true)}
                 className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
@@ -376,6 +377,18 @@ const AppointmentCalendar = () => {
             </div>
           </div>
           <div className="flex flex-col lg:flex-row">
+
+
+{!selectedDoctor ?     <div className="p-6 w-full">
+<div className='flex flex-col gap-2 items-center'>
+      <FaUserMd className="text-sky-600 text-4xl mb-4" aria-hidden="true" />
+      <p className="text-gray-700 text-base font-medium text-center">
+        Please select a doctor to view their appointment calendar.
+      </p>
+      </div>
+    </div> 
+              :
+            <>
             <div className="lg:w-2/5 p-6 border-r border-gray-100">
               {isLoading ? (
                 <div className="flex justify-center items-center h-96">
@@ -501,6 +514,10 @@ const AppointmentCalendar = () => {
                 </div>
               )}
             </div>
+</>
+}
+
+
           </div>
         </div>
       </div>
