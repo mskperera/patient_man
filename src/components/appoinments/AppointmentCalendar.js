@@ -271,6 +271,7 @@ const AppointmentCalendar = () => {
          // fetchAppointments={() => fetchAppointments(selectedDate)}
          setAppointmentSuccessDialog={setAppointmentSuccessDialog}
           refreshPatientList={()=>_refreshPatientList()}
+          reloadAddAppoinmentPanel={isAddAppointmentOpen}
         />
       </DialogModel>
           <DialogModel

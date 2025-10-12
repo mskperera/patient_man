@@ -5,99 +5,102 @@ import moment from 'moment';
 import MessageModel from '../MessageModel';
 import AppoinmentPatientList from '../AppoinmentPatientList';
 import DialogModel from '../DialogModel';
-import { addApPatient, addAppointment, drpDoctors, getapPatients, updateAppointment } from '../../functions/patient';
+import { addApPatient, addAppointment, drpDoctors, getapPatients, getPatientAppointments, updateAppointment } from '../../functions/patient';
 
-const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, setAppointmentTime, slotDurationComp, doctorId }) => {
+const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, setAppointmentTime, slotDurationComp, doctorId, scheduleStart, scheduleEnd }) => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [newDuration, setNewDuration] = useState('');
 
-  const durationMinutes = parseInt(duration) || 30; // Default to 30 minutes if duration is not set
-  const currentTime = moment(); // Current time for comparison
+  const durationMinutes = parseInt(duration) || 30;
+  const currentTime = moment();
 
-  // Function to build time slots with appointment numbers
-  const buildTimeSlots = () => {
-    const startTime = moment(selectedDate).hour(8).minute(0);
-    const endTime = moment(selectedDate).hour(24).minute(0);
-    let currentTime = startTime.clone();
-    const slots = [];
+const buildTimeSlots = () => {
+  const startHour = moment(scheduleStart, 'HH:mm').hour();
+  const startMinute = moment(scheduleStart, 'HH:mm').minute();
+  const endHour = moment(scheduleEnd, 'HH:mm').hour();
+  const endMinute = moment(scheduleEnd, 'HH:mm').minute();
+  const startTime = moment(selectedDate).hour(startHour).minute(startMinute);
+  const endTime = moment(selectedDate).hour(endHour).minute(endMinute);
+  let currentTime = startTime.clone();
+  const slots = [];
 
-    // Create a sorted list of booked and completed appointments
-    const bookedAppointments = appointments
-      .filter((appt) => ['Scheduled', 'Completed'].includes(appt.status))
-      .map((appt) => ({
-        start: moment(appt.appointmentDate),
-        duration: appt.duration,
-        patient: appt.patientName,
-        status: appt.status,
-        appointmentNo: appt.appointmentNo,
-      }))
-      .sort((a, b) => a.start.diff(b.start));
+  const bookedAppointments = appointments
+    .filter((appt) => ['Scheduled', 'Completed'].includes(appt.status))
+    .map((appt) => ({
+      start: moment(appt.appointmentDate),
+      duration: appt.duration,
+      patient: appt.patientName,
+      status: appt.status,
+      appointmentNo: appt.appointmentNo,
+    }))
+    .sort((a, b) => a.start.diff(b.start));
 
-    // Debug: Log booked appointments
-    console.log('Booked Appointments:', bookedAppointments);
+  // Avoid slot generation for past days
+  if (moment(selectedDate).isBefore(moment(), 'day')) {
+    console.log('Past date selected — skipping slot generation.');
+    return [];
+  }
 
-    // Calculate the next available appointment number
-    const maxAppointmentNo = bookedAppointments.length > 0
-      ? Math.max(...bookedAppointments.map((appt) => appt.appointmentNo))
-      : 0;
-    let nextAppointmentNo = maxAppointmentNo + 1;
+  // Keep a simple appointment number counter in time order
+  let appointmentCounter = 1;
 
-    // If the selected date is today, start from the current time for available slots
-    if (moment(selectedDate).isSame(moment(), 'day') && currentTime.isBefore(currentTime)) {
-      currentTime = moment.max(currentTime, moment());
-    }
+  while (currentTime.isBefore(endTime)) {
+    const bookedSlot = bookedAppointments.find((appt) =>
+      appt.start.isSame(currentTime)
+    );
 
-    // Generate time slots
-    while (currentTime.isBefore(endTime)) {
-      const nextBooked = bookedAppointments.find((appt) => appt.start.isSame(currentTime));
-      if (nextBooked) {
+    if (bookedSlot) {
+      slots.push({
+        time: bookedSlot.start.format('h:mm A'),
+        isBooked: true,
+        patient: bookedSlot.patient,
+        duration: bookedSlot.duration,
+        status: bookedSlot.status,
+        startMoment: bookedSlot.start.clone(),
+        appointmentNo: appointmentCounter++,
+      });
+
+      currentTime = bookedSlot.start.clone().add(bookedSlot.duration, 'minutes');
+    } else {
+      const nextBookedStart = bookedAppointments.find((appt) =>
+        appt.start.isAfter(currentTime)
+      )?.start || endTime;
+
+      const gapMinutes = nextBookedStart.diff(currentTime, 'minutes');
+      const slotDuration = Math.min(gapMinutes, durationMinutes);
+
+      if (slotDuration > 0) {
         slots.push({
-          time: nextBooked.start.format('h:mm A'),
-          isBooked: true,
-          patient: nextBooked.patient,
-          duration: nextBooked.duration,
-          status: nextBooked.status,
-          startMoment: nextBooked.start.clone(),
-          appointmentNo: nextBooked.appointmentNo, // Preserve fixed appointmentNo
+          time: currentTime.format('h:mm A'),
+          isBooked: false,
+          patient: null,
+          duration: slotDuration,
+          status: null,
+          startMoment: currentTime.clone(),
+          appointmentNo: appointmentCounter++,
         });
-        currentTime = nextBooked.start.clone().add(nextBooked.duration, 'minutes');
-      } else {
-      
-        const gapEnd = bookedAppointments.find((appt) => appt.start.isAfter(currentTime))?.start || endTime;
-        const gapMinutes = gapEnd.diff(currentTime, 'minutes');
-        const slotDuration = Math.min(gapMinutes, durationMinutes);
-        if (slotDuration > 0) {
-          slots.push({
-            time: currentTime.format('h:mm A'),
-            isBooked: false,
-            patient: null,
-            duration: slotDuration,
-            status: null,
-            startMoment: currentTime.clone(),
-            appointmentNo: nextAppointmentNo++, // Assign tentative appointmentNo
-          });
-        }
-        currentTime.add(slotDuration, 'minutes');
       }
+
+      currentTime.add(slotDuration, 'minutes');
     }
+  }
 
-    // Debug: Log generated time slots
-    console.log('Generated Time Slots:', slots);
+  // Ensure proper ordering
+  return slots.sort((a, b) => a.startMoment.diff(b.startMoment));
+};
 
-    return slots;
-  };
+const [selectedSlot, setSelectedSlot] = useState(null);
 
   useEffect(() => {
     if (!isLoading) {
       setTimeSlots(buildTimeSlots());
     }
-  }, [appointments, selectedDate, durationMinutes, isLoading]);
+    console.log('appointments',appointments)
+  }, [appointments, selectedDate, durationMinutes, isLoading, scheduleStart, scheduleEnd]);
 
   const handleDurationClick = (index) => {
-    if (timeSlots[index].status === 'Completed') {
-      return;
-    }
+    if (timeSlots[index].status === 'Completed') return;
     setEditingIndex(index);
     setNewDuration(timeSlots[index].duration.toString());
   };
@@ -106,6 +109,7 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
     setNewDuration(e.target.value);
   };
 
+  
   const handleSetDuration = (index) => {
     const newDurationValue = parseInt(newDuration);
     if (isNaN(newDurationValue) || newDurationValue <= 0) {
@@ -137,7 +141,6 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
       return;
     }
 
-    // Recalculate appointment numbers for available slots only
     const bookedAppointmentNos = newTimeSlots
       .filter((slot) => slot.isBooked)
       .map((slot) => slot.appointmentNo);
@@ -148,7 +151,6 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
     let currentTime = currentSlot.startMoment.clone().add(newDurationValue, 'minutes');
     for (let i = index + 1; i < newTimeSlots.length; i++) {
       if (newTimeSlots[i].isBooked) {
-        // Skip booked/completed slots, preserving their appointmentNo
         currentTime = newTimeSlots[i].startMoment.clone().add(newTimeSlots[i].duration, 'minutes');
         continue;
       }
@@ -164,12 +166,11 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
         newTimeSlots[i].startMoment = currentTime.clone();
         newTimeSlots[i].time = currentTime.format('h:mm A');
         newTimeSlots[i].duration = Math.min(gapMinutes, durationMinutes);
-        newTimeSlots[i].appointmentNo = nextAppointmentNo++; // Update tentative appointmentNo
+        newTimeSlots[i].appointmentNo = nextAppointmentNo++;
         currentTime.add(newTimeSlots[i].duration, 'minutes');
       }
     }
 
-    // Fill any gaps after the modified slot
     const updatedSlots = [];
     let currentTimeFill = moment(selectedDate).hour(8).minute(0);
     const endTime = moment(selectedDate).hour(24).minute(0);
@@ -177,7 +178,6 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
       ? Math.max(...bookedAppointmentNos) + 1
       : 1;
 
-    // If the selected date is today, start filling from the current time
     if (moment(selectedDate).isSame(moment(), 'day') && currentTimeFill.isBefore(currentTime)) {
       currentTimeFill = moment.max(currentTimeFill, currentTime);
     }
@@ -202,10 +202,10 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
             }
             currentTimeFill.add(slotDuration, 'minutes');
           }
-          updatedSlots.push(slot); // Preserve booked slot with original appointmentNo
+          updatedSlots.push(slot);
           currentTimeFill = slot.startMoment.clone().add(slot.duration, 'minutes');
         } else {
-          slot.appointmentNo = nextAppointmentNo++; // Assign tentative appointmentNo
+          slot.appointmentNo = nextAppointmentNo++;
           updatedSlots.push(slot);
           currentTimeFill = slot.startMoment.clone().add(slot.duration, 'minutes');
         }
@@ -233,12 +233,14 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
     setNewDuration('');
   };
 
-  const handleSetTime = (time, appointmentNo) => {
-    setAppointmentTime(time, appointmentNo);
-  };
+const handleSetTime = (time, appointmentNo) => {
+  setSelectedSlot(appointmentNo);
+  setAppointmentTime(time, appointmentNo);
+};
+
 
   return (
-    <div className="mt-6">
+    <div className="mt-0">
       <div className='flex justify-between items-center'>
         <h3 className="text-lg font-semibold text-gray-700 mb-2">Doctor's Schedule</h3>
         <div className='mb-4'>
@@ -247,9 +249,10 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-gray-500">Loading schedule...</p>
+        <p className="text-sm text-gray-500 ">Loading schedule...</p>
       ) : (
         <div className="relative flex overflow-x-auto pb-4">
+          
           <div className="flex space-x-2">
             {timeSlots.length === 0 ? (
               <p className="text-sm text-gray-500">No appointments available for this doctor and date.</p>
@@ -257,18 +260,22 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
               timeSlots.map((slot, index) => (
                 <div
                   key={index}
-                  className={`flex-shrink-0 w-36 p-3 rounded-lg text-center transition-all duration-200 ${
-                    slot.isBooked
-                      ? slot.status === 'Completed'
-                        ? 'bg-sky-100 border-sky-300 text-sky-700'
-                        : 'bg-red-100 border-red-300 text-red-700'
-                      : 'bg-green-100 border-green-300 text-green-700'
-                  } border shadow-sm hover:shadow-md`}
+        className={`flex-shrink-0 w-36 rounded-lg text-center transition-all duration-200 border shadow-sm hover:shadow-md
+  ${
+    slot.isBooked
+      ? slot.status === 'Completed'
+        ? 'bg-sky-100 border-sky-300 text-sky-700'
+        : 'bg-red-100 border-red-300 text-red-700'
+      : 'bg-green-100 border-green-300 text-green-700'
+  }
+
+`}
                 >
+                  <div className={`${selectedSlot === slot.appointmentNo ? 'border-4 border-blue-500' : ''} p-3 rounded-lg`}>
                   <p className="text-sm font-semibold">{slot.time}</p>
                   <p className="text-xs">
                     {slot.isBooked
-                      ? `${slot.status === 'Completed' ? 'Completed' : 'Booked'}: ${slot.patient}`
+                      ? `${slot.status === 'Completed' ? 'Completed' : 'Booked'}`
                       : 'Available'}
                   </p>
                   <p className="text-xs font-medium">
@@ -299,7 +306,7 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
                     ) : (
                       <span
                         className="cursor-pointer underline"
-                        onClick={() => handleDurationClick(index)}
+                      //  onClick={() => handleDurationClick(index)}
                       >
                         ({slot.duration} min)
                       </span>
@@ -309,15 +316,17 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
                     <button
                       onClick={() => handleSetTime(slot.time, slot.appointmentNo)}
                       type="button"
-                      className="mt-2 px-2 py-1 bg-sky-600 text-white text-sm rounded hover:bg-sky-700"
+                      className="mt-2 px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                       aria-label={`Set appointment time to ${slot.time} with appointment number ${slot.appointmentNo}`}
                     >
                       <span className='flex gap-1 items-center'> <FaClock size={12} /> Select</span>
                     </button>
                   )}
                 </div>
+                 </div>
               ))
             )}
+           
           </div>
         </div>
       )}
@@ -325,12 +334,9 @@ const AppointmentTimeline = ({ appointments, selectedDate, duration, isLoading, 
   );
 };
 
-const AddAppointment = ({selectedDate,onHide,refreshPatientList,setAppointmentSuccessDialog}) => {
+const AddAppointment = ({ selectedDate, onHide, refreshPatientList, setAppointmentSuccessDialog,reloadAddAppoinmentPanel }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  //const selectedDate = location.state?.selectedDate || new Date();
-
-  // Destructure the state
   const { appointment } = location.state || {};
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -338,7 +344,7 @@ const AddAppointment = ({selectedDate,onHide,refreshPatientList,setAppointmentSu
   const [triggerSearch, setTriggerSearch] = useState(0);
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [error, setError] = useState('');
   const [modal, setModal] = useState({ isOpen: false, message: '', type: 'error' });
   const [isLoading, setIsLoading] = useState(false);
@@ -351,12 +357,14 @@ const AddAppointment = ({selectedDate,onHide,refreshPatientList,setAppointmentSu
     appointmentTime: '',
     appointmentNo: '',
     status: 'Scheduled',
-    statusId:1,
+    statusId: 1,
     doctor: '',
     doctorId: '',
     notes: '',
     duration: '30',
   });
+  const [scheduleStart, setScheduleStart] = useState('8:00');
+  const [scheduleEnd, setScheduleEnd] = useState('23:59');
   const [formErrors, setFormErrors] = useState({});
   const [newPatient, setNewPatient] = useState({
     firstName: '',
@@ -366,142 +374,55 @@ const AddAppointment = ({selectedDate,onHide,refreshPatientList,setAppointmentSu
   });
   const [patientFormErrors, setPatientFormErrors] = useState({});
   const [doctorAppointments, setDoctorAppointments] = useState([]);
-
   const [doctorOptions, setDoctorOptions] = useState([]);
 
-  const isEditMode=appointment?true:false;
+  const isEditMode = appointment ? true : false;
+
   const loadDrpDoctors = async () => {
     const occupations = await drpDoctors();
     setDoctorOptions(occupations.data.results[0]);
   };
 
+  const fetchAppointments = async () => {
+    if (!selectedDoctor || !newAppointment.appointmentDate) return;
 
-useEffect(()=>{
-  if(appointment){
- setSelectedPatient({ fullName: `${appointment.firstName} ${appointment.lastName}` });
- setSelectedDoctor(appointment.doctorId);
+    setIsTimelineLoading(true);
+const startOfDay = moment(newAppointment.appointmentDate).startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+const endOfDay = moment(newAppointment.appointmentDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss');
 
- const appointmentDateObj = new Date(appointment.appointmentDate);
+    const payload = {
+      doctorId: selectedDoctor,
+      appointmentDateStart: startOfDay,
+      appointmentDateEnd: endOfDay,
+    };
 
-// Convert to local date (yyyy-mm-dd)
-const formattedDate = appointmentDateObj.toISOString().split('T')[0];
-
-// Convert to local time (hh:mm)
-const formattedTime = appointmentDateObj.toISOString().split('T')[1].slice(0, 5);
-
-// Now set it
-setNewAppointment({
-  appointmentDate: formattedDate,
-  appointmentTime: formattedTime,
-  statusId: appointment.status_id,
-  notes:appointment.notes
-});
-
-  }
-  
-},[appointment])
-
-
-  useEffect(() => {
-    loadDrpDoctors();
-  }, []);
-
-  const fetchDoctorAppointments = async (doctor, date) => {
     try {
-      setIsTimelineLoading(true);
-      const mockAppointments = [
-        {
-          id: 1,
-          doctorId: 1,
-          appointmentDate: moment(date).hour(9).minute(0).toISOString(),
-          patientName: 'Alice Brown',
-          duration: 30,
-          status: 'Completed',
-          appointmentNo: 1,
-        },
-        {
-          id: 2,
-          doctorId: 1,
-          appointmentDate: moment(date).hour(16).minute(30).toISOString(),
-          patientName: 'Bob Wilson',
-          duration: 45,
-          status: 'Scheduled',
-          appointmentNo: 2,
-        },
-        {
-          id: 3,
-          doctorId: 1,
-          appointmentDate: moment(date).hour(11).minute(30).toISOString(),
-          patientName: 'Ethan Walker',
-          duration: 30,
-          status: 'Scheduled',
-          appointmentNo: 3,
-        },
-        {
-          id: 4,
-          doctorId: 2,
-          appointmentDate: moment(date).hour(8).minute(0).toISOString(),
-          patientName: 'Clara Davis',
-          duration: 30,
-          status: 'Scheduled',
-          appointmentNo: 1,
-        },
-        {
-          id: 5,
-          doctorId: 2,
-          appointmentDate: moment(date).hour(10).minute(0).toISOString(),
-          patientName: 'Mia Lewis',
-          duration: 60,
-          status: 'Completed',
-          appointmentNo: 2,
-        },
-        {
-          id: 6,
-          doctorId: 3,
-          appointmentDate: moment(date).hour(13).minute(0).toISOString(),
-          patientName: 'Sophie Clark',
-          duration: 60,
-          status: 'Scheduled',
-          appointmentNo: 1,
-        },
-        {
-          id: 7,
-          doctorId: 3,
-          appointmentDate: moment(date).hour(14).minute(30).toISOString(),
-          patientName: 'Liam Harris',
-          duration: 30,
-          status: 'Completed',
-          appointmentNo: 2,
-        },
-      ];
-      const filteredAppointments = mockAppointments.filter(
-        (appt) =>
-          appt.doctorId == doctor &&
-          moment(appt.appointmentDate).isSame(moment(date), 'day')
-      );
-      console.log('Fetched Appointments for', doctor, date, ':', filteredAppointments);
-      return filteredAppointments;
+      const response = await getPatientAppointments(payload);
+      const results = response.data.results[0];
+      setDoctorAppointments(results);
+    } catch (err) {
+      setModal({
+        isOpen: true,
+        message: 'Failed to load appointments. Please try again.',
+        type: 'error',
+      });
+      console.error('Error fetching appointments:', err);
     } finally {
       setIsTimelineLoading(false);
     }
   };
 
+  useEffect(() => {
+    setSelectedDoctor('');
+
+    loadDrpDoctors();
+    console.log('reload apponment panel')
+  }, [reloadAddAppoinmentPanel]);
 
   useEffect(() => {
-    if (newAppointment.doctor && newAppointment.appointmentDate) {
-      const loadAppointments = async () => {
-        console.log('Loading appointments for:', newAppointment.doctor, newAppointment.appointmentDate);
-        const appointments = await fetchDoctorAppointments(
-          newAppointment.doctor,
-          newAppointment.appointmentDate
-        );
-        setDoctorAppointments(appointments);
-      };
-      loadAppointments();
-    } else {
-      setDoctorAppointments([]);
-    }
-  }, [newAppointment.doctor, newAppointment.appointmentDate]);
+    fetchAppointments();
+    validateForm();
+  }, [selectedDoctor, newAppointment.appointmentDate]);
 
   const handleSelectPatient = (patient) => {
     setSelectedPatient({ ...patient, fullName: `${patient.firstName} ${patient.lastName}` });
@@ -516,12 +437,19 @@ setNewAppointment({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log('name:',name,'value:',value)
     setNewAppointment((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     setFormErrors((prev) => ({ ...prev, [name]: '' }));
+  };
+
+  const handleScheduleStartChange = (e) => {
+    setScheduleStart(e.target.value);
+  };
+
+  const handleScheduleEndChange = (e) => {
+    setScheduleEnd(e.target.value);
   };
 
   const handlePatientInputChange = (e) => {
@@ -531,13 +459,12 @@ setNewAppointment({
   };
 
   const validateForm = () => {
+    console.log('selectedPatient vali',selectedPatient)
     const newErrors = {};
     if (!newAppointment.appointmentDate) newErrors.appointmentDate = 'Date is required.';
     if (!newAppointment.appointmentTime) newErrors.appointmentTime = 'Time is required.';
     if (!selectedDoctor) newErrors.doctor = 'Please select a doctor.';
-    // if (!newAppointment.duration || isNaN(parseInt(newAppointment.duration)) || parseInt(newAppointment.duration) <= 0) {
-    //   newErrors.duration = 'Please enter a valid duration (positive number).';
-    // }
+    if (!selectedPatient) newErrors.patientNo = 'Please select a patient.';
     setFormErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -624,6 +551,7 @@ setNewAppointment({
       setIsPatientDialogOpen(false);
       setShowNewPatientForm(false);
       setNewPatient({ firstName: '', lastName: '', email: '', phone: '' });
+      validateForm();
     } catch (err) {
       setModal({
         isOpen: true,
@@ -636,14 +564,8 @@ setNewAppointment({
   };
 
   const handleAddAppointment = async (e) => {
-
-  
     e.preventDefault();
-
-
-    const isValid=validateForm();
-        console.log('sssssssssssssssssssssssssssss:',isValid);
-    if (!isValid) return;
+    if (!validateForm()) return;
 
     const payload = {
       patientId: selectedPatient.patientId,
@@ -652,92 +574,86 @@ setNewAppointment({
       doctorId: selectedDoctor,
       notes: newAppointment.notes,
       duration: parseInt(newAppointment.duration),
+      appointmentNo: newAppointment.appointmentNo, // Include appointmentNo from selected time slot
     };
 
+    console.log('apppppoooo payload', payload);
     try {
       setIsLoading(true);
 
-      if (!isEditMode)
-      {
-      const res = await addAppointment(payload);
-      if (res.data.error) {
-        setModal({
+      if (!isEditMode) {
+        const res = await addAppointment(payload);
+        if (res.data.error) {
+          setModal({
+            isOpen: true,
+            message: res.data.error.message,
+            type: 'error',
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        if (res.data.outputValues.responseStatus === 'failed') {
+          setModal({
+            isOpen: true,
+            message: res.data.outputValues.outputMessage,
+            type: 'warning',
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        refreshPatientList();
+
+        setAppointmentSuccessDialog({
           isOpen: true,
-          message: res.data.error.message,
-          type: 'error',
+          doctorName: newAppointment.doctor,
+          patientName: `${selectedPatient.fullName}`,
+          appointmentNo: res.data.outputValues?.appointmentNo || newAppointment.appointmentNo,
+          referenceNo: res.data.outputValues?.referenceNo,
+          date: moment(newAppointment.appointmentDate).format('MMMM D, YYYY'),
+          time: moment(newAppointment.appointmentTime, 'HH:mm').format('h:mm A'),
         });
-        setIsLoading(false);
-        return;
-      }
 
-      if (res.data.outputValues.responseStatus === 'failed') {
-        setModal({
-          isOpen: true,
-          message: res.data.outputValues.outputMessage,
-          type: 'warning',
+        setNewAppointment({
+          patientNo: '',
+          appointmentDate: moment(selectedDate).format('YYYY-MM-DD'),
+          appointmentTime: '',
+          appointmentNo: '',
+          status: 'Scheduled',
+          doctor: '',
+          doctorId: '',
+          notes: '',
+          duration: '30',
         });
-        setIsLoading(false);
-        return;
+      } else {
+        const res = await updateAppointment(appointment.appointmentId, payload);
+        if (res.data.error) {
+          setModal({
+            isOpen: true,
+            message: res.data.error.message,
+            type: 'error',
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        if (res.data.outputValues.responseStatus === 'failed') {
+          setModal({
+            isOpen: true,
+            message: res.data.outputValues.outputMessage,
+            type: 'warning',
+          });
+          setIsLoading(false);
+          return;
+        }
       }
-
-refreshPatientList()
-
-      setAppointmentSuccessDialog({
-        isOpen: true,
-        doctorName: newAppointment.doctor,
-        patientName: `${selectedPatient.fullName}`,
-        appointmentNo: res.data.outputValues?.appointmentNo || newAppointment.appointmentNo,
-        referenceNo: res.data.outputValues?.referenceNo,
-        date: moment(newAppointment.appointmentDate).format('MMMM D, YYYY'),
-        time: moment(newAppointment.appointmentTime, 'HH:mm').format('h:mm A'),
-      });
-
-      setNewAppointment({
-        patientNo: '',
-        appointmentDate: moment(selectedDate).format('YYYY-MM-DD'),
-        appointmentTime: '',
-        appointmentNo: '',
-        status: 'Scheduled',
-        doctor: '',
-        doctorId: '',
-        notes: '',
-        duration: '30',
-      });
-
-
-    }
-    else{
-
-      
-     const res = await updateAppointment(appointment.appointmentId,payload);
-      if (res.data.error) {
-        setModal({
-          isOpen: true,
-          message: res.data.error.message,
-          type: 'error',
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (res.data.outputValues.responseStatus === 'failed') {
-        setModal({
-          isOpen: true,
-          message: res.data.outputValues.outputMessage,
-          type: 'warning',
-        });
-        setIsLoading(false);
-        return;
-      }
-
-
-    }
       setSelectedPatient(null);
       setPatients([]);
       setSearchQuery('');
       setTriggerSearch(0);
       setDoctorAppointments([]);
-      onHide()
+      onHide();
     } catch (err) {
       setModal({
         isOpen: true,
@@ -769,216 +685,191 @@ refreshPatientList()
         message={modal.message}
         type={modal.type}
       />
-  
 
-      <div className="bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col items-center min-w-full">
-              <DialogModel
-        header={showNewPatientForm ? 'Add New Patient' : 'Select Patient'}
-        visible={isPatientDialogOpen}
-        onHide={() => {
-          setIsPatientDialogOpen(false);
-          setShowNewPatientForm(false);
-          setNewPatient({ firstName: '', lastName: '', email: '', phone: '' });
-          setPatientFormErrors({});
-          setSearchQuery('');
-          setError('');
-          setTriggerSearch(0);
-        }}
-        
-      >
-        {showNewPatientForm ? (
-          <form onSubmit={handleAddPatient} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                First Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={newPatient.firstName}
-                onChange={handlePatientInputChange}
-                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                aria-label="Patient first name"
-              />
-              {patientFormErrors.firstName && (
-                <p className="mt-1 text-sm text-red-600">{patientFormErrors.firstName}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Last Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={newPatient.lastName}
-                onChange={handlePatientInputChange}
-                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                aria-label="Patient last name"
-              />
-              {patientFormErrors.lastName && (
-                <p className="mt-1 text-sm text-red-600">{patientFormErrors.lastName}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={newPatient.email}
-                onChange={handlePatientInputChange}
-                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                aria-label="Patient email"
-              />
-              {patientFormErrors.email && (
-                <p className="mt-1 text-sm text-red-600">{patientFormErrors.email}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Phone
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={newPatient.phone}
-                onChange={handlePatientInputChange}
-                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                aria-label="Patient phone"
-              />
-              {patientFormErrors.phone && (
-                <p className="mt-1 text-sm text-red-600">{patientFormErrors.phone}</p>
-              )}
-            </div>
-            <div className="flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={() => setShowNewPatientForm(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all duration-200 text-sm"
-                aria-label="Back to patient search"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-all duration-200 flex items-center gap-2 text-sm"
-                aria-label="Save patient"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="space-y-4">
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div className="flex flex-wrap gap-4 justify-center mb-4">
-                {[
-                  { value: 'patientNo', label: 'Patient No' },
-                  { value: 'patientName', label: 'Patient Name' },
-                  { value: 'email', label: 'Email' },
-                  { value: 'mobile', label: 'Mobile' },
-                ].map((option) => (
-                  <label key={option.value} className="flex items-center gap-2 text-gray-700 text-sm">
-                    <input
-                      type="radio"
-                      value={option.value}
-                      checked={filterType === option.value}
-                      onChange={(e) => {
-                        setFilterType(e.target.value);
-                        setError('');
-                      }}
-                      className="form-radio text-sky-600 focus:ring-sky-500 h-4 w-4"
-                      aria-label={`Search by ${option.label}`}
-                    />
-                    {option.label}
-                  </label>
-                ))}
+      <div className="bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col items-center min-w-[800px]">
+        <DialogModel
+          header={showNewPatientForm ? 'Add New Patient' : 'Select Patient'}
+          visible={isPatientDialogOpen}
+          onHide={() => {
+            setIsPatientDialogOpen(false);
+            setShowNewPatientForm(false);
+            setNewPatient({ firstName: '', lastName: '', email: '', phone: '' });
+            setPatientFormErrors({});
+            setSearchQuery('');
+            setError('');
+            setTriggerSearch(0);
+          }}
+        >
+          {showNewPatientForm ? (
+            <form onSubmit={handleAddPatient} className="space-y-4">
+              <div className='grid grid-cols-2 gap-5'>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  First Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={newPatient.firstName}
+                  onChange={handlePatientInputChange}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                  aria-label="Patient first name"
+                />
+                {patientFormErrors.firstName && (
+                  <p className="mt-1 text-sm text-red-600">{patientFormErrors.firstName}</p>
+                )}
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setError('');
-                    }}
-                    placeholder={`Search by ${filterType.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition text-sm"
-                    aria-label={`Search patients by ${filterType.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={newPatient.lastName}
+                  onChange={handlePatientInputChange}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                  aria-label="Patient last name"
+                />
+                {patientFormErrors.lastName && (
+                  <p className="mt-1 text-sm text-red-600">{patientFormErrors.lastName}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={newPatient.email}
+                  onChange={handlePatientInputChange}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                  aria-label="Patient email"
+                />
+                {patientFormErrors.email && (
+                  <p className="mt-1 text-sm text-red-600">{patientFormErrors.email}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Phone
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={newPatient.phone}
+                  onChange={handlePatientInputChange}
+                  className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                  aria-label="Patient phone"
+                />
+                {patientFormErrors.phone && (
+                  <p className="mt-1 text-sm text-red-600">{patientFormErrors.phone}</p>
+                )}
+              </div>
+
+          
+              </div>
+                  <div className="flex justify-center">
+                {/* <button
+                  type="button"
+                  onClick={() => setShowNewPatientForm(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all duration-200 text-sm"
+                  aria-label="Back to patient search"
+                >
+                  Back
+                </button> */}
                 <button
                   type="submit"
-                  className="mt-2 sm:mt-0 bg-sky-600 text-white py-2 px-4 rounded-md hover:bg-sky-700 transition flex items-center justify-center gap-2 text-sm"
-                  aria-label="Search patients"
+                  className="px-8 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-all duration-200 flex items-center gap-2"
+                  aria-label="Save patient"
+                  disabled={isLoading}
                 >
-                  Search
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowNewPatientForm(true)}
-                  className="mt-2 sm:mt-0 bg-sky-600 text-white py-2 px-4 rounded-md hover:bg-sky-700 transition flex items-center justify-center gap-2 text-sm"
-                  aria-label="Add new patient for appointment"
-                >
-                  <FaUserPlus size={16} />
-                  New patient
+                  {isLoading ? 'Saving...' : 'Save'}
                 </button>
               </div>
-              {error && (
-                <p id="search-error" className="text-sm text-red-600 mt-2">
-                  {error}
-                </p>
-              )}
             </form>
-            {triggerSearch > 0 && (
-              <div className="mt-6">
-                <AppoinmentPatientList
-                  searchQuery={searchQuery}
-                  filterType={filterType}
-                  triggerSearch={triggerSearch}
-                  setPatients={setPatients}
-                  onSelectPatient={handleSelectPatient}
-                  hidePaginationIfTotalPagesIsOne={true}
-                />
-              </div>
-            )}
-          </div>
-        )}
-      </DialogModel>
-        <div className=" bg-white rounded-2xl p-8">
-          <div className="flex items-center gap-5 mb-6">
-            {/* <button
-              onClick={() => navigate('/appointments')}
-              className="flex items-center gap-2 text-sky-600 font-semibold hover:text-sky-700 transition-colors"
-              aria-label="Back to appointments"
-            >
-              <FaChevronCircleLeft size={20} />
-              Back
-            </button> */}
-            {/* <h2 className="text-2xl font-bold text-gray-800">{!appointment ? "Add New Appointment":"Update Appoinment"}</h2> */}
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          ) : (
+            <div className="space-y-4">
+              <form onSubmit={handleSearch} className="space-y-4">
+                <div className="flex flex-wrap gap-4 justify-center mb-4">
+                  {[
+                    { value: 'patientNo', label: 'Patient No' },
+                    { value: 'patientName', label: 'Patient Name' },
+                    { value: 'email', label: 'Email' },
+                    { value: 'mobile', label: 'Mobile' },
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center gap-2 text-gray-700 text-sm">
+                      <input
+                        type="radio"
+                        value={option.value}
+                        checked={filterType === option.value}
+                        onChange={(e) => {
+                          setFilterType(e.target.value);
+                          setError('');
+                        }}
+                        className="form-radio text-sky-600 focus:ring-sky-500 h-4 w-4"
+                        aria-label={`Search by ${option.label}`}
+                      />
+                      {option.label}
+                    </label>
+                  ))}
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setError('');
+                      }}
+                      placeholder={`Search by ${filterType.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition text-sm"
+                      aria-label={`Search patients by ${filterType.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="mt-2 sm:mt-0 bg-sky-600 text-white py-2 px-4 rounded-md hover:bg-sky-700 transition flex items-center justify-center gap-2 text-sm"
+                    aria-label="Search patients"
+                  >
+                    Search
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPatientForm(true)}
+                    className="mt-2 sm:mt-0 bg-sky-600 text-white py-2 px-4 rounded-md hover:bg-sky-700 transition flex items-center justify-center gap-2 text-sm"
+                    aria-label="Add new patient for appointment"
+                  >
+                    <FaUserPlus size={16} />
+                    New patient
+                  </button>
+                </div>
+                {error && (
+                  <p id="search-error" className="text-sm text-red-600 mt-2">
+                    {error}
+                  </p>
+                )}
+              </form>
+              {triggerSearch > 0 && (
+                <div className="mt-6">
+                  <AppoinmentPatientList
+                    searchQuery={searchQuery}
+                    filterType={filterType}
+                    triggerSearch={triggerSearch}
+                    setPatients={setPatients}
+                    onSelectPatient={handleSelectPatient}
+                    hidePaginationIfTotalPagesIsOne={true}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </DialogModel>
+        <div className="bg-white rounded-2xl">
+  
           <div>
-
-            
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               Appointment Details
             </h3>
@@ -987,45 +878,15 @@ refreshPatientList()
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Patient <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex items-center">
-                    <input
-                      type="text"
-                      value={selectedPatient ? `${selectedPatient.fullName}` : 'No patient selected'}
-                      disabled
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md bg-gray-100 focus:ring-0"
-                      aria-label="Selected patient"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setIsPatientDialogOpen(true)}
-                      className="ml-2 p-2 text-sky-600 hover:text-sky-700 transition-colors"
-                      aria-label="Select patient"
-                    >
-                      <FaUserPlus size={20} />
-                    </button>
-                  </div>
-                  {formErrors.patientNo && (
-                    <p className="mt-1 text-sm text-red-600">{formErrors.patientNo}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
                     Doctor <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="doctor"
                     value={selectedDoctor}
-                    onChange={(e)=>{
+                    onChange={(e) => {
                       setSelectedDoctor(e.target.value);
-
                     }}
-
-                    disabled={!selectedPatient}
-                    className={`mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 ${
-                      !selectedPatient ? 'bg-gray-100 cursor-not-allowed' : ''
-                    }`}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     aria-label="Select doctor"
                   >
                     <option value="">Select a doctor</option>
@@ -1039,9 +900,7 @@ refreshPatientList()
                     <p className="mt-1 text-sm text-red-600">{formErrors.doctor}</p>
                   )}
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className='flex justify-start items-center gap-5'>
+                   <div className='flex justify-start items-center gap-5'>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Date <span className="text-red-500">*</span>
@@ -1050,11 +909,15 @@ refreshPatientList()
                       type="date"
                       name="appointmentDate"
                       value={newAppointment.appointmentDate}
-                      onChange={handleInputChange}
-                      disabled={!selectedPatient}
-                      className={`mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 ${
-                        !selectedPatient ? 'bg-gray-100 cursor-not-allowed' : ''
-                      }`}
+                      onChange={(e) => {
+                        setNewAppointment((prev) => ({
+                          ...prev,
+                          appointmentDate: e.target.value,
+                        }));
+                      }}
+                      disabled={!selectedDoctor}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       aria-label="Appointment date"
                     />
                     {formErrors.appointmentDate && (
@@ -1070,18 +933,15 @@ refreshPatientList()
                       name="appointmentTime"
                       value={newAppointment.appointmentTime}
                       onChange={handleInputChange}
-                      disabled={!selectedPatient}
-                      className={`mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 ${
-                        !selectedPatient ? 'bg-gray-100 cursor-not-allowed' : ''
-                      }`}
+                      disabled={!selectedDoctor}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       aria-label="Appointment time"
                     />
                     {formErrors.appointmentTime && (
                       <p className="mt-1 text-sm text-red-600">{formErrors.appointmentTime}</p>
                     )}
                   </div>
-                </div>
-                <div>
+                        <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Status <span className="text-red-500">*</span>
                   </label>
@@ -1100,47 +960,43 @@ refreshPatientList()
                     <option value="Cancelled">Cancelled</option>
                   </select>
                 </div>
+                </div>
+
+              
               </div>
-              {/* <div className="grid grid-cols-2 gap-6">
-                <div className="col-span-2">
-                  {selectedDoctor && newAppointment.appointmentDate && (
-                    <div>
-                      <AppointmentTimeline
-                        appointments={doctorAppointments}
-                        selectedDate={newAppointment.appointmentDate}
-                        duration={newAppointment.duration}
-                        isLoading={isTimelineLoading}
-                        setAppointmentTime={setAppointmentTime}
-                        slotDurationComp={
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">
-                              Appointment Slot Duration (minutes)
-                            </label>
-                            <input
-                              type="number"
-                              name="duration"
-                              value={newAppointment.duration}
-                              onChange={handleInputChange}
-                              disabled={!selectedPatient}
-                              className={`mt-1 w-full p-3 border text-xs border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 ${
-                                !selectedPatient ? 'bg-gray-100 cursor-not-allowed' : ''
-                              }`}
-                              min="1"
-                              aria-label="Appointment duration"
-                            />
-                            {formErrors.duration && (
-                              <p className="mt-1 text-xs text-red-600">{formErrors.duration}</p>
-                            )}
-                          </div>
-                        }
-                        doctorId={newAppointment.doctorId}
-                      />
-                    </div>
+              <div className="grid grid-cols-2 gap-6">
+             
+            <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Patient <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center">
+                    <input
+                      type="text"
+                      value={selectedPatient ? `${selectedPatient.fullName}` : 'No patient selected'}
+                      readOnly
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md bg-gray-100 focus:ring-0"
+                      aria-label="Selected patient"
+                    />
+                   <button
+  type="button"
+  onClick={() => setIsPatientDialogOpen(true)}
+  className={`ml-2 p-2 text-sky-600 hover:text-sky-700 transition-colors 
+              disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:text-gray-400`}
+  aria-label="Select patient"
+  disabled={!selectedDoctor}
+>
+  <FaUserPlus size={20} />
+</button>
+                  </div>
+
+                  {formErrors.patientNo && selectedDoctor && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.patientNo}</p>
                   )}
                 </div>
-              </div> */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className='col-span-2'>
+
+
+     <div className=''>
                   <label className="block text-sm font-medium text-gray-700">
                     Notes
                   </label>
@@ -1148,33 +1004,99 @@ refreshPatientList()
                     name="notes"
                     value={newAppointment.notes}
                     onChange={handleInputChange}
-                    disabled={!selectedPatient}
-                    className={`mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 ${
-                      !selectedPatient ? 'bg-gray-100 cursor-not-allowed' : ''
-                    }`}
+                  //  disabled={!selectedPatient}
+                    className={`mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200`}
                     rows="2"
                     aria-label="Appointment notes"
                   />
                 </div>
+
+
               </div>
-              <div className="flex justify-end gap-4">
-                <button
+              <div className="grid grid-cols-2 gap-6">
+                <div className="col-span-2">
+                  {selectedDoctor && newAppointment.appointmentDate && (
+                    <div className='w-full'>
+                 
+                      {isTimelineLoading ? <p>Loading...</p> : <AppointmentTimeline
+                        appointments={doctorAppointments}
+                        selectedDate={newAppointment.appointmentDate}
+                        duration={newAppointment.duration}
+                        isLoading={isTimelineLoading}
+                        setAppointmentTime={setAppointmentTime}
+                        slotDurationComp={
+                               <div className="flex gap-4 mb-2">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Schedule Start
+                          </label>
+                          <input
+                            type="time"
+                            value={scheduleStart}
+                            onChange={handleScheduleStartChange}
+                            className="mt-1 w-full p-2 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                            aria-label="Schedule start time"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Schedule End
+                          </label>
+                          <input
+                            type="time"
+                            value={scheduleEnd}
+                            onChange={handleScheduleEndChange}
+                            className="mt-1 w-full p-2 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                            aria-label="Schedule end time"
+                          />
+                        </div>
+
+                              <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                              Set Appointment Duration
+                            </label>
+                            <input
+                              type="number"
+                              name="duration"
+                              value={newAppointment.duration}
+                              onChange={handleInputChange}
+                             // disabled={!selectedPatient}
+                              className={`mt-1 w-full p-3 border text-xs border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200`}
+                              min="1"
+                              aria-label="Appointment duration"
+                            />
+                            {formErrors.duration && (
+                              <p className="mt-1 text-xs text-red-600">{formErrors.duration}</p>
+                            )}
+                          </div>
+                      </div>
+                    
+                        }
+                        doctorId={newAppointment.doctorId}
+                        scheduleStart={scheduleStart}
+                        scheduleEnd={scheduleEnd}
+                      />}
+                    </div>
+                  )}
+                </div>
+              </div>
+     
+              <div className="flex justify-center gap-4">
+                {/* <button
                   type="button"
-                  onClick={() =>{
-                    onHide()
-                  }}
+                  onClick={() => onHide()}
                   className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-all duration-200 text-sm sm:text-base"
                   aria-label="Cancel adding appointment"
                 >
                   Cancel
-                </button>
+                </button> */}
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
+                  className="px-10 py-4 bg-sky-600 hover:cursor-pointer text-white rounded-md hover:bg-sky-700 transition-all duration-200 flex items-center gap-2 text-lg sm:text-base"
                   aria-label="Save appointment"
-                  disabled={isLoading || !selectedPatient}
+                  disabled={isLoading}
                 >
-                  {isLoading ? 'Saving...' : 'Save'}
+                  {isLoading ? 'Booking ...' : 'Book Appointment'}
                 </button>
               </div>
             </form>
