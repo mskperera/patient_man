@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay } from 'react-icons/fa';
+import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner } from 'react-icons/fa';
 import { addNote, deleteNote, getNotes, updateNote } from '../functions/patient';
 import ConfirmDialog from './dialog/ConfirmDialog';
 import LoadingSpinner from './LoadingSpinner';
-import { commitFile, uploadFile } from '../functions/assets';
+import { commitFile, markFileAsTobeDeleted, uploadFile } from '../functions/assets';
+import MessageModel from './MessageModel';
 
 const VoiceToText = ({ 
   disabled, 
@@ -150,9 +151,17 @@ function Notes({ patientId, userId }) {  // Assume passed as props
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
+  const [isUploadingAttachement,setIsUploadingAttachement]=useState(false);
+
   const [deletingNoteId, setDeletingNoteId] = useState(null);
 const [newNoteIds, setNewNoteIds] = useState(new Set());
 
+
+  const [modal, setModal] = useState({
+    isOpen: false,
+    message: "",
+    type: "error",
+  });
 
   const [isSaving, setIsSaving]=useState(false);
     const [isLoadingNotes, setIsLoadingNotes]=useState(false);
@@ -342,9 +351,23 @@ useEffect(() => {
 
   const saveAttachmentWithDescription =async () => {
     if (pendingAttachment) {
-      
+      setIsUploadingAttachement(true);
+      try{
            const response = await uploadFile(pendingAttachment.file);
+  
+           console.log(' uploadFile response',response)
+      
+              if(response.status===500){    
+     setModal({
+          isOpen: true,
+          message: "Oops! Something went wrong while processing your request.",
+          type: "warning",
+        });
+ setShowDescriptionModal(false);
+        return;
+              }
 
+          if(response){       
       setAttachments([
         ...attachments,
         {
@@ -354,7 +377,29 @@ useEffect(() => {
         },
       ]);
     }
+    else{
+      
+        setModal({
+          isOpen: true,
+          message: "Oops! The file is too big. Please upload a file smaller than 10 MB.",
+          type: "warning",
+        });
+      
+    }
+  }
+  catch(err){
+             console.log(' uploadFile err:',err);
+                    setModal({
+          isOpen: true,
+          message: err.message,
+          type: "danger",
+        });
+      
+  }
+
+    }
     setShowDescriptionModal(false);
+         setIsUploadingAttachement(false);
     setPendingAttachment(null);
     setAttachmentDescription('');
   };
@@ -368,9 +413,7 @@ useEffect(() => {
     }
   };
 
-  const handleDeleteAttachment = (attachId) => {
-    setAttachments(attachments.filter((att) => att.id !== attachId));
-  };
+  
 
   const handleSaveNotes = async () => {
   if (!notes.trim() && attachments.length === 0) return;
@@ -589,11 +632,34 @@ useEffect(() => {
       }
   }
 
+    const handleDeleteAttachment = (attachId) => {
+    setAttachments(attachments.filter((att) => att.id !== attachId));
+  };
+
+
 const confirmDelete = async () => {
   try {
     setShowConfirm(false);
     setDeletingNoteId(noteToDelete); // Trigger deletion animation
-    await deleteNote(noteToDelete);
+  const delteNoteRes=  await deleteNote(noteToDelete);
+     console.log(' delteNoteRes',delteNoteRes.data.success);
+
+     if(delteNoteRes.data.success){
+  const deletingNote= savedNotes.filter(n => n.id === noteToDelete);
+  const attachments=deletingNote[0].attachments;
+
+  if(attachments){
+  attachments.forEach(async a => {
+     const markfileasDeltedRes=await markFileAsTobeDeleted(a.hash);
+      console.log(' markfileasDeltedRes',markfileasDeltedRes);
+  });
+}
+     }
+
+
+  // const notes=savedNotes;
+
+  
     setTimeout(() => {
       setSavedNotes(savedNotes.filter(n => n.id !== noteToDelete));
       setDeletingNoteId(null);
@@ -628,17 +694,15 @@ const confirmDelete = async () => {
   };
 
 
-  const [isFileSelectLoading, setIsFileSelectLoading] = useState(false);
-  const [uploadResponse, setUploadResponse] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-
-
-
-
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-
+  <MessageModel
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+        message={modal.message}
+        type={modal.type}
+      />
          {/* Editor Panel (shown when showEditor is true) */}
       {showEditor && (
         <>
@@ -763,7 +827,8 @@ const confirmDelete = async () => {
                     key={att.id}
                     className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm"
                   >
-                    {JSON.stringify(att)}
+                
+                    {/* {JSON.stringify(att)} */}
                     <div className="text-2xl mb-2 text-sky-600">
                       {att.type === 'image' && <FaCamera />}
                       {att.type === 'file' && <FaFile />}
@@ -862,37 +927,48 @@ const confirmDelete = async () => {
                   />
                   {note.attachments && note.attachments.length > 0 && (
                     <div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className="flex flex-wrap gap-4">
                         {note.attachments.map((att) => (
                           <div
                             key={att.id}
-                            className="border rounded-lg p-1 text-center relative"
+                            className="border rounded-lg p-2 text-center relative"
                           >
+                                   {/* {JSON.stringify(att)} */}
                             <p className="text-sm font-medium text-gray-900 truncate">
                               {att.name}
                             </p>
                             {/* <p className="text-xs text-gray-600 mt-1">{att.description}</p> */}
                             {att.type === 'image' && (
-                              <img
-                                src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
-                                alt={att.name}
-                                className="mt-2 max-w-full h-auto rounded-md"
-                              />
+                           <a
+  href={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <img
+    src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+    alt={att.name}
+    className="mt-2 w-40 rounded-md cursor-pointer"
+  />
+</a>
+
                             )}
                             {att.type === 'audio' && (
                               <audio controls className="mt-2 w-full">
-                                <source src={att.url} type="audio/webm" />
+                                <source src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`} type="audio/webm" />
                               </audio>
                             )}
-                            {att.type === 'file' && (
-                              <a
-                                href={att.url}
-                                download
-                                className="text-sky-600 hover:underline mt-2 block"
-                              >
-                                {att.name}
-                              </a>
-                            )}
+                        {att.type === 'file' && (
+  <a
+    href={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+    download
+    target="_blank"       // Opens in new tab
+    rel="noopener noreferrer" // Security best practice
+    className="text-sky-600 hover:underline mt-2 block"
+  >
+    {att.name}
+  </a>
+)}
+
                           </div>
                         ))}
                       </div>
@@ -1005,20 +1081,33 @@ const confirmDelete = async () => {
           aria-label="Add Attachment Description"
         >
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-semibold mb-4">Add Description</h3>
-            <input
+           <h3 className="text-lg font-semibold mb-4">Upload Attachment</h3>
+           <p><span className='font-bold'>File name:  </span>{pendingAttachment.name}</p>
+             {/* <input
               placeholder="Enter description for the attachment"
               value={attachmentDescription}
               onChange={(e) => setAttachmentDescription(e.target.value)}
               className="w-full p-2 border rounded-md mb-4 focus:ring-sky-500 focus:border-sky-500"
-            />
-            <div className="flex gap-4 justify-end">
-              <button
-                onClick={saveAttachmentWithDescription}
-                className="bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition"
-              >
-                Save
-              </button>
+            /> */}
+            <div className="flex gap-4 justify-end mt-2">
+           <button
+  onClick={saveAttachmentWithDescription}
+  className={`flex items-center justify-center px-4 py-2 rounded-md text-white transition ${
+    isUploadingAttachement
+      ? 'bg-sky-500 cursor-not-allowed'
+      : 'bg-sky-600 hover:bg-sky-700'
+  }`}
+  disabled={isUploadingAttachement}
+>
+  {isUploadingAttachement ? (
+    <>
+      <FaSpinner className="animate-spin mr-2" />
+      Uploading...
+    </>
+  ) : (
+    'Upload'
+  )}
+</button>
               <button
                 onClick={cancelAttachment}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
