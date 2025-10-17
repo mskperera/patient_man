@@ -363,7 +363,6 @@ useEffect(() => {
           message: "Oops! Something went wrong while processing your request.",
           type: "warning",
         });
- setShowDescriptionModal(false);
         return;
               }
 
@@ -396,12 +395,16 @@ useEffect(() => {
         });
       
   }
-
-    }
-    setShowDescriptionModal(false);
+  finally{
          setIsUploadingAttachement(false);
+           setShowDescriptionModal(false);
+
     setPendingAttachment(null);
     setAttachmentDescription('');
+  }
+
+    }
+  
   };
 
   const cancelAttachment = () => {
