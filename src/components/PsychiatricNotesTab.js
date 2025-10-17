@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaEdit, FaCircle, FaPause, FaPlay } from 'react-icons/fa';
+import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner } from 'react-icons/fa';
 import { getSummaryNote, saveSummaryNote, addPsyNote, deletePsyNote, getPsyNotes, updatePsyNote } from '../functions/patient';
 import ConfirmDialog from './dialog/ConfirmDialog';
 import LoadingSpinner from './LoadingSpinner';
+import { commitFile, markFileAsTobeDeleted, uploadPsyNoteAttachments } from '../functions/assets';
+import MessageModel from './MessageModel';
 
 const VoiceToText = ({ 
   disabled, 
@@ -156,6 +158,14 @@ function PsychiatricNotesTab({ patientId, userId }) {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
+    const [isUploadingAttachement,setIsUploadingAttachement]=useState(false);
+    const [modal, setModal] = useState({
+      isOpen: false,
+      message: "",
+      type: "error",
+    });
+  
+
   useEffect(() => {
     if (newNoteIds.size > 0) {
       const timers = Array.from(newNoteIds).map(noteId => (
@@ -171,30 +181,50 @@ function PsychiatricNotesTab({ patientId, userId }) {
     }
   }, [newNoteIds]);
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        setIsLoadingNotes(true);
-        const fetchRes = await getPsyNotes(patientId);
-        setSavedNotes(fetchRes.data.map(n => ({
-          id: n.noteId,
-          content: n.note,
-          timestamp: new Date(n.createdDate).toLocaleString(),
-          attachments: n.attachments.map(a => ({
+
+  
+    const loadNotes=async()=>{
+    try{
+    setIsLoadingNotes(true);
+    const fetchRes = await getPsyNotes(patientId);
+    console.log('fetchRes',fetchRes)
+    
+    const notes=[];
+    fetchRes.data.map(n =>{
+  
+       const attachments=n.attachments && JSON.parse(n.attachments).map(a => ({
             id: a.attachmentId,
             name: a.attachmentName,
             type: a.attachmentType,
-            url: `/Uploads/notes/${a.attachmentPath}`,
-            path: a.attachmentPath,
-            description: a.description
-          }))
-        })));
-        setIsLoadingNotes(false);
-      } catch (err) {
-        setIsLoadingNotes(false);
-        console.error('Failed to fetch notes:', err);
+            description: a.description,
+            hash:a.hash,
+          }));
+  
+          console.log('attachmiiints',n.attachments)
+      const note= {
+          id: n.noteId,
+          content: n.note,
+          timestamp: new Date(n.createdDate).toLocaleString(),
+          attachments
+        }
+  
+            notes.push(note);
       }
-    };
+      );
+  
+        setSavedNotes(notes);
+  
+        setIsLoadingNotes(false);
+          } catch (err) {
+             setIsLoadingNotes(false);
+          console.error('Failed to fetch notes:', err);
+        }
+    }
+
+  useEffect(() => {
+
+     loadNotes();
+ 
 
     const fetchSummaryNote = async () => {
       try {
@@ -206,7 +236,7 @@ function PsychiatricNotesTab({ patientId, userId }) {
       }
     };
 
-    fetchNotes();
+
     fetchSummaryNote();
   }, [patientId, userId]);
 
@@ -360,17 +390,57 @@ function PsychiatricNotesTab({ patientId, userId }) {
     audioChunksRef.current = [];
   };
 
-  const saveAttachmentWithDescription = () => {
+  const saveAttachmentWithDescription =async () => {
     if (pendingAttachment) {
+      setIsUploadingAttachement(true);
+      try{
+           const response = await uploadPsyNoteAttachments(pendingAttachment.file);
+  
+           console.log(' uploadFile response',response)
+      
+              if(response.status===500){    
+     setModal({
+          isOpen: true,
+          message: "Oops! Something went wrong while processing your request.",
+          type: "warning",
+        });
+ setShowDescriptionModal(false);
+        return;
+              }
+
+          if(response){       
       setAttachments([
         ...attachments,
         {
           ...pendingAttachment,
           description: attachmentDescription,
+          uploadRes:response
         },
       ]);
     }
+    else{
+      
+        setModal({
+          isOpen: true,
+          message: "Oops! The file is too big. Please upload a file smaller than 10 MB.",
+          type: "warning",
+        });
+      
+    }
+  }
+  catch(err){
+             console.log(' uploadFile err:',err);
+                    setModal({
+          isOpen: true,
+          message: err.message,
+          type: "danger",
+        });
+      
+  }
+
+    }
     setShowDescriptionModal(false);
+         setIsUploadingAttachement(false);
     setPendingAttachment(null);
     setAttachmentDescription('');
   };
@@ -389,85 +459,91 @@ function PsychiatricNotesTab({ patientId, userId }) {
   };
 
   const handleSaveNotes = async () => {
-    if (!notes.trim() && attachments.length === 0) return;
+  if (!notes.trim() && attachments.length === 0) return;
 
-    setIsSaving(true);
-    const formData = new FormData();
-    formData.append('note', notes);
-    formData.append('patientId', patientId);
-    formData.append('doctorId', 2);
+  setIsSaving(true);
 
-    const newAtts = attachments.filter(att => att.file);
-    const oldAtts = attachments.filter(att => !att.file);
+  const _attachments=[];
 
-    newAtts.forEach(att => {
-      formData.append('newFiles', att.file);
-      formData.append('newTypes', att.type);
-      formData.append('newNames', att.name);
-      formData.append('newDescriptions', att.description || '');
-    });
+  attachments.forEach(att => {
+ _attachments.push({description:att.description,name:att.name,
+  type:att.type,hash:att.uploadRes.hash})
+  });
 
-    oldAtts.forEach(att => {
-      formData.append('oldPaths', att.path);
-      formData.append('oldTypes', att.type);
-      formData.append('oldNames', att.name);
-      formData.append('oldDescriptions', att.description || '');
-    });
+ console.log('aaattt:',_attachments)
 
-    try {
-      let res;
-      if (editingNoteId) {
-        res = await updatePsyNote(editingNoteId, formData);
-        if (res.data.outputValues.ResponseStatus === 'success') {
-          setSavedNotes(savedNotes.map(note =>
-            note.id === editingNoteId
-              ? {
-                  ...note,
-                  content: notes,
-                  timestamp: new Date().toLocaleString(),
-                  attachments: attachments.map(att => ({
-                    id: att.id,
-                    name: att.name,
-                    type: att.type,
-                    url: att.url || `/Uploads/notes/${att.path}`,
-                    path: att.path || att.name,
-                    description: att.description
-                  }))
-                }
-              : note
-          ));
-          setNewNoteIds(prev => new Set(prev).add(editingNoteId));
-        }
-      } else {
-        res = await addPsyNote(formData);
-        if (res.data.outputValues.ResponseStatus === 'success') {
-          const newNote = {
-            id: res.data.outputValues.noteId_out,
-            content: notes,
-            timestamp: new Date().toLocaleString(),
-            attachments: attachments.map(att => ({
-              id: att.id,
-              name: att.name,
-              type: att.type,
-              url: att.url || `/Uploads/notes/${att.path}`,
-              path: att.path || att.name,
-              description: att.description
-            }))
-          };
-          setSavedNotes([newNote, ...savedNotes]);
-          setNewNoteIds(prev => new Set(prev).add(newNote.id));
-        }
+
+  const payload={notes,patientId,userId,attachments:_attachments}
+  
+ console.log('payload:',payload)
+  try {
+    let res;
+    if (editingNoteId) {
+      res = await updatePsyNote(editingNoteId, payload);
+      if (res.data.outputValues.ResponseStatus === 'success') {
+        setSavedNotes(savedNotes.map(note =>
+          note.id === editingNoteId
+            ? {
+                ...note,
+                content: notes,
+                timestamp: new Date().toLocaleString(),
+                attachments: attachments.map(att => ({
+                 // id: att.id,
+                  name: att.name,
+                  type: att.type,
+                  url: att.url,
+                  path: att.path || att.name,
+                  description: att.description,
+                  hash:att.uploadRes.hash
+                }))
+              }
+            : note
+        ));
+        setNewNoteIds(prev => new Set(prev).add(editingNoteId));
       }
-      setNotes('');
-      setAttachments([]);
-      setEditingNoteId(null);
-      setShowEditor(false);
-      setIsSaving(false);
-    } catch (err) {
-      setIsSaving(false);
-      console.error('Failed to save note:', err);
+    } else {
+      res = await addPsyNote(payload);
+      
+        attachments.forEach(async att => {
+          try{
+         const attachmentCommitRes=await commitFile(att.uploadRes.hash);
+         console.log('attachmentCommitRes',attachmentCommitRes)
+          }catch(err){
+            console.log("Error commiting attachment:",err);
+            return;
+          }
+        });
+
+      if (res.data.outputValues.ResponseStatus === 'success') {
+        const newNote = {
+          id: res.data.outputValues.noteId_out,
+          content: notes,
+          timestamp: new Date().toLocaleString(),
+          attachments: attachments.map(att => ({
+            id: att.id,
+            name: att.name,
+            type: att.type,
+            description: att.description,
+               hash:att.uploadRes.hash
+          }))
+        };
+        setSavedNotes([newNote, ...savedNotes]);
+        setNewNoteIds(prev => new Set(prev).add(newNote.id));
+
+        
+      }
     }
-  };
+    setNotes('');
+    setAttachments([]);
+    setEditingNoteId(null);
+    setShowEditor(false);
+    setIsSaving(false);
+  } catch (err) {
+    setIsSaving(false);
+    console.error('Failed to save note:', err);
+    // Handle error modal
+  }
+};
 
   const handleEditNote = (note) => {
     setEditingNoteId(note.id);
@@ -481,23 +557,51 @@ function PsychiatricNotesTab({ patientId, userId }) {
     setShowConfirm(true);
   };
 
-  const confirmDelete = async () => {
-    try {
-      setShowConfirm(false);
-      setDeletingNoteId(noteToDelete);
-      await deletePsyNote(noteToDelete);
-      setTimeout(() => {
-        setSavedNotes(savedNotes.filter(n => n.id !== noteToDelete));
-        setDeletingNoteId(null);
-        setNoteToDelete(null);
-      }, 500);
-    } catch (err) {
-      console.error('Failed to delete note:', err);
+const confirmDelete = async () => {
+  try {
+    setShowConfirm(false);
+    setDeletingNoteId(noteToDelete); // Trigger deletion animation
+  const delteNoteRes=  await deletePsyNote(noteToDelete);
+     console.log(' delteNoteRes',delteNoteRes.data);
+
+     if(delteNoteRes.data.error){
+
+ setModal({
+          isOpen: true,
+          message: 'Something went wrong',
+          type: "danger",
+        });
+
+      return;
+     }
+     if(delteNoteRes.data.success){
+  const deletingNote= savedNotes.filter(n => n.id === noteToDelete);
+  const attachments=deletingNote[0].attachments;
+
+  if(attachments){
+  attachments.forEach(async a => {
+     const markfileasDeltedRes=await markFileAsTobeDeleted(a.hash);
+      console.log(' markfileasDeltedRes',markfileasDeltedRes);
+  });
+}
+     }
+
+
+  // const notes=savedNotes;
+
+  
+    setTimeout(() => {
+      setSavedNotes(savedNotes.filter(n => n.id !== noteToDelete));
       setDeletingNoteId(null);
-      setShowConfirm(false);
       setNoteToDelete(null);
-    }
-  };
+    }, 500); // Match animation duration
+  } catch (err) {
+    console.error('Failed to delete note:', err);
+    setDeletingNoteId(null);
+    setShowConfirm(false);
+    setNoteToDelete(null);
+  }
+};
 
   const cancelDelete = () => {
     setShowConfirm(false);
@@ -536,6 +640,13 @@ function PsychiatricNotesTab({ patientId, userId }) {
 
   return (
     <div className="sm:px-6 flex gap-6">
+        <MessageModel
+              isOpen={modal.isOpen}
+              onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
+              message={modal.message}
+              type={modal.type}
+            />
+
       {/* Main Content */}
       <div className="flex-1">
         {/* Editor Panel */}
@@ -650,53 +761,62 @@ function PsychiatricNotesTab({ patientId, userId }) {
               </button>
             </div>
 
-            {/* Current Attachments Preview */}
-            {attachments.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Current Attachments</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {attachments.map((att) => (
-                    <div
-                      key={att.id}
-                      className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm"
-                    >
-                      <div className="text-2xl mb-2 text-sky-600">
-                        {att.type === 'image' && <FaCamera />}
-                        {att.type === 'file' && <FaFile />}
-                        {att.type === 'audio' && <FaMicrophone />}
-                      </div>
-                      <p className="text-sm font-medium text-gray-900 truncate">{att.name}</p>
-                      <p className="text-xs text-gray-600 mt-1">{att.description}</p>
-                      {att.type === 'image' && (
-                        <img src={att.url} alt={att.name} className="mt-2 max-w-full h-auto rounded-md" />
-                      )}
-                      {att.type === 'audio' && (
-                        <audio controls className="mt-2 w-full">
-                          <source src={att.url} type="audio/webm" />
-                        </audio>
-                      )}
-                      {att.type === 'file' && (
-                        <a
-                          href={att.url}
-                          download
-                          className="text-sky-600 hover:underline mt-2 block"
-                        >
-                          {att.name}
-                        </a>
-                      )}
-                      <button
-                        onClick={() => handleDeleteAttachment(att.id)}
-                        className="absolute top-2 right-2 text-red-600 hover:text-red-700"
-                        title="Delete Attachment"
-                        aria-label={`Delete attachment ${att.name}`}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              {/* Current Attachments Preview */}
+                   {attachments.length > 0 && (
+                     <div className="mb-6">
+                       <h3 className="text-sm font-medium text-gray-700 mb-2">Current Attachments</h3>
+                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                         {attachments.map((att) => (
+                           <div
+                             key={att.id}
+                             className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm"
+                           >
+                         
+                             {/* {JSON.stringify(att)} */}
+                             <div className="text-2xl mb-2 text-sky-600">
+                               {att.type === 'image' && <FaCamera />}
+                               {att.type === 'file' && <FaFile />}
+                               {att.type === 'audio' && <FaMicrophone />}
+                             </div>
+                             <p className="text-sm font-medium text-gray-900 truncate">{att.name}</p>
+                             {/* <p className="text-xs text-gray-600 mt-1">{att.description}</p> */}
+                             {att.type === 'image' && (
+                               <img src={`https://clpos.legendbyte.com/api/v1/asset/${att.uploadRes.hash}`} alt={att.name} className="mt-2 max-w-full h-auto rounded-md" />
+                               // <a
+                               //   href={att.url}
+                               //   download
+                               //   className="text-sky-600 hover:underline mt-2 block"
+                               // >
+                               //   {att.name}
+                               // </a>
+                           )}
+                             {att.type === 'audio' && (
+                               <audio controls className="mt-2 w-full">
+                                 <source src={att.url} type="audio/webm" />
+                               </audio>
+                             )}
+                             {att.type === 'file' && (
+                               <a
+                                 href={att.url}
+                                 download
+                                 className="text-sky-600 hover:underline mt-2 block"
+                               >
+                                 {att.name}
+                               </a>
+                             )}
+                             <button
+                               onClick={() => handleDeleteAttachment(att.id)}
+                               className="absolute top-2 right-2 text-red-600 hover:text-red-700"
+                               title="Delete Attachment"
+                               aria-label={`Delete attachment ${att.name}`}
+                             >
+                               <FaTrash />
+                             </button>
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
           </>
         )}
 
@@ -716,100 +836,103 @@ function PsychiatricNotesTab({ patientId, userId }) {
             )}
           </div>
 
-          {isLoadingNotes ? <LoadingSpinner /> : (
-            <>
-              {savedNotes.length > 0 ? (
-         <div
-          className="relative max-h-[400px] overflow-y-auto pr-4"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: '#4b5563 #e5e7eb' }}
-        >
-                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-sky-600"></div>
-                  {savedNotes.map((note) => (
-                    <div
-                      key={note.id}
-                      className={`mb-6 flex items-start transition-opacity duration-500 ${
-                        deletingNoteId === note.id ? 'opacity-0' : 'opacity-100'
-                      } ${newNoteIds.has(note.id) ? 'animate-pulse bg-yellow-100' : ''}`}
-                    >
-                      <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-sky-600"></div>
-                      </div>
-                      <div className="ml-4 bg-gray-50 border rounded-lg p-4 w-full shadow-sm">
-                        <div className="flex justify-between items-center mb-2">
-                          <p className="text-sm text-gray-500">{note.timestamp}</p>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEditNote(note)}
-                              className="text-sky-600 hover:text-sky-700"
-                              title="Edit Note"
-                              aria-label={`Edit note from ${note.timestamp}`}
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteNote(note.id)}
-                              className="text-red-600 hover:text-red-700"
-                              title="Delete Note"
-                              aria-label={`Delete note from ${note.timestamp}`}
-                            >
-                              <FaTrash />
-                            </button>
+       {isLoadingNotes ? <LoadingSpinner /> :
+      <>
+        {savedNotes.length > 0 ? (
+          <div className="relative">
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-sky-600"></div>
+            {savedNotes.map((note) => (
+              <div key={note.id} className="mb-6 flex items-start">
+                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-sky-600"></div>
+                </div>
+                <div className="ml-4 bg-gray-50 border rounded-lg p-4 w-full shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-gray-500">{note.timestamp}</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditNote(note)}
+                        className="text-sky-600 hover:text-sky-700"
+                        title="Edit Note"
+                        aria-label={`Edit note from ${note.timestamp}`}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteNote(note.id)}
+                        className="text-red-600 hover:text-red-700"
+                        title="Delete Note"
+                        aria-label={`Delete note from ${note.timestamp}`}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="prose max-w-none mb-4"
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                  />
+                  {note.attachments && note.attachments.length > 0 && (
+                    <div>
+                      <div className="flex flex-wrap gap-4">
+                        {note.attachments.map((att) => (
+                          <div
+                            key={att.id}
+                            className="border rounded-lg p-2 text-center relative"
+                          >
+                                   {/* {JSON.stringify(att)} */}
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {att.name}
+                            </p>
+                            {/* <p className="text-xs text-gray-600 mt-1">{att.description}</p> */}
+                            {att.type === 'image' && (
+                           <a
+  href={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <img
+    src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+    alt={att.name}
+    className="mt-2 w-40 rounded-md cursor-pointer"
+  />
+</a>
+
+                            )}
+                            {att.type === 'audio' && (
+                              <audio controls className="mt-2 w-full">
+                                <source src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`} type="audio/webm" />
+                              </audio>
+                            )}
+                        {att.type === 'file' && (
+  <a
+    href={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+    download
+    target="_blank"       // Opens in new tab
+    rel="noopener noreferrer" // Security best practice
+    className="text-sky-600 hover:underline mt-2 block"
+  >
+    {att.name}
+  </a>
+)}
+
                           </div>
-                        </div>
-                        <div
-                          className="prose max-w-none mb-4"
-                          dangerouslySetInnerHTML={{ __html: note.content }}
-                        />
-                        {note.attachments && note.attachments.length > 0 && (
-                          <div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                              {note.attachments.map((att) => (
-                                <div
-                                  key={att.id}
-                                  className="border rounded-lg p-1 text-center relative"
-                                >
-                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                    {att.name}
-                                  </p>
-                                  <p className="text-xs text-gray-600 mt-1">{att.description}</p>
-                                  {att.type === 'image' && (
-                                    <img
-                                      src={att.url}
-                                      alt={att.name}
-                                      className="mt-2 max-w-full h-auto rounded-md"
-                                    />
-                                  )}
-                                  {att.type === 'audio' && (
-                                    <audio controls className="mt-2 w-full">
-                                      <source src={att.url} type="audio/webm" />
-                                    </audio>
-                                  )}
-                                  {att.type === 'file' && (
-                                    <a
-                                      href={att.url}
-                                      download
-                                      className="text-sky-600 hover:underline mt-2 block"
-                                    >
-                                      {att.name}
-                                    </a>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
-              ) : <p className='text-center mt-10 rounded-lg p-2 text-gray-500'>Notes not found...</p>}
-            </>
-          )}
+              </div>
+            ))}
+          </div>
+        ):<p>Notes not found...</p>}
+</> }
+
         </div>
       </div>
 
       {/* Static Summary Note Panel */}
-      <div className="w-[40%] sticky top-4 self-start">
+        {isLoadingNotes ? <LoadingSpinner /> : <div className="w-[40%] sticky top-4 self-start">
 <div className=" border-sky-400 rounded-lg shadow-sm border-4">
           <div className="flex justify-between items-center p-2 bg-gray-100 rounded-t-lg">
             <h3 className="text-sm font-medium text-gray-700">Summary Note</h3>
@@ -857,7 +980,7 @@ function PsychiatricNotesTab({ patientId, userId }) {
             </div>
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Camera Modal */}
       {showCamera && (
@@ -946,39 +1069,52 @@ function PsychiatricNotesTab({ patientId, userId }) {
         </div>
       )}
 
-      {/* Description Modal */}
-      {showDescriptionModal && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Add Attachment Description"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-medium text-gray-700 mb-4">Add Description</h3>
-            <input
-              placeholder="Enter description for the attachment"
-              value={attachmentDescription}
-              onChange={(e) => setAttachmentDescription(e.target.value)}
-              className="w-full p-2 border rounded-md mb-4 focus:ring-sky-500 focus:border-sky-500"
-            />
-            <div className="flex gap-4 justify-end">
+         {/* Description Modal */}
+         {showDescriptionModal && (
+           <div
+             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Add Attachment Description"
+           >
+             <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+              <h3 className="text-lg font-semibold mb-4">Upload Attachment</h3>
+              <p><span className='font-bold'>File name:  </span>{pendingAttachment.name}</p>
+                {/* <input
+                 placeholder="Enter description for the attachment"
+                 value={attachmentDescription}
+                 onChange={(e) => setAttachmentDescription(e.target.value)}
+                 className="w-full p-2 border rounded-md mb-4 focus:ring-sky-500 focus:border-sky-500"
+               /> */}
+               <div className="flex gap-4 justify-end mt-2">
               <button
-                onClick={saveAttachmentWithDescription}
-                className="bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition"
-              >
-                Save
-              </button>
-              <button
-                onClick={cancelAttachment}
-                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     onClick={saveAttachmentWithDescription}
+     className={`flex items-center justify-center px-4 py-2 rounded-md text-white transition ${
+       isUploadingAttachement
+         ? 'bg-sky-500 cursor-not-allowed'
+         : 'bg-sky-600 hover:bg-sky-700'
+     }`}
+     disabled={isUploadingAttachement}
+   >
+     {isUploadingAttachement ? (
+       <>
+         <FaSpinner className="animate-spin mr-2" />
+         Uploading...
+       </>
+     ) : (
+       'Upload'
+     )}
+   </button>
+                 <button
+                   onClick={cancelAttachment}
+                   className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
+                 >
+                   Cancel
+                 </button>
+               </div>
+             </div>
+           </div>
+         )}
 
       <ConfirmDialog
         isVisible={showConfirm}

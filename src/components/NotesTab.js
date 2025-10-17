@@ -501,86 +501,6 @@ useEffect(() => {
     // Handle error modal
   }
 };
-// // Note Handlers
-// const handleSaveNotes = async () => {
-//   if (!notes.trim() && attachments.length === 0) return;
-
-//   setIsSaving(true);
-//   const formData = new FormData();
-//   formData.append('note', notes);
-//   formData.append('patientId', patientId);
-//   formData.append('userId', userId);
-
-//   const newAtts = attachments.filter(att => att.file);
-//   const oldAtts = attachments.filter(att => !att.file);
-
-//   newAtts.forEach(att => {
-//     formData.append('newFiles', att.file);
-//     formData.append('newTypes', att.type);
-//     formData.append('newNames', att.name);
-//     formData.append('newDescriptions', att.description || '');
-//   });
-
-//   oldAtts.forEach(att => {
-//     formData.append('oldPaths', att.path);
-//     formData.append('oldTypes', att.type);
-//     formData.append('oldNames', att.name);
-//     formData.append('oldDescriptions', att.description || '');
-//   });
-
-//   try {
-//     let res;
-//     if (editingNoteId) {
-//       res = await updateNote(editingNoteId, formData);
-//       if (res.data.outputValues.ResponseStatus === 'success') {
-//         setSavedNotes(savedNotes.map(note =>
-//           note.id === editingNoteId
-//             ? {
-//                 ...note,
-//                 content: notes,
-//                 timestamp: new Date().toLocaleString(),
-//                 attachments: attachments.map(att => ({
-//                   id: att.id,
-//                   name: att.name,
-//                   type: att.type,
-//                   url: att.url || `/Uploads/notes/${att.path}`,
-//                   path: att.path || att.name,
-//                   description: att.description
-//                 }))
-//               }
-//             : note
-//         ));
-//       }
-//     } else {
-//       res = await addNote(formData);
-//       if (res.data.outputValues.ResponseStatus === 'success') {
-//         const newNote = {
-//           id: res.data.outputValues.noteId_out,
-//           content: notes,
-//           timestamp: new Date().toLocaleString(),
-//           attachments: attachments.map(att => ({
-//             id: att.id,
-//             name: att.name,
-//             type: att.type,
-//             url: att.url || `/Uploads/notes/${att.path}`,
-//             path: att.path || att.name,
-//             description: att.description
-//           }))
-//         };
-//         setSavedNotes([newNote, ...savedNotes]);
-//       }
-//     }
-//     setNotes('');
-//     setAttachments([]);
-//     setEditingNoteId(null);
-//     setShowEditor(false);
-//     setIsSaving(false);
-//   } catch (err) {
-//     setIsSaving(false);
-//     console.error('Failed to save note:', err);
-//     // Handle error modal
-//   }
-// };
 
   const handleEditNote = (note) => {
     setEditingNoteId(note.id);
@@ -643,6 +563,17 @@ const confirmDelete = async () => {
     setDeletingNoteId(noteToDelete); // Trigger deletion animation
   const delteNoteRes=  await deleteNote(noteToDelete);
      console.log(' delteNoteRes',delteNoteRes.data.success);
+
+          if(delteNoteRes.data.error){
+
+ setModal({
+          isOpen: true,
+          message: 'Something went wrong',
+          type: "danger",
+        });
+
+      return;
+     }
 
      if(delteNoteRes.data.success){
   const deletingNote= savedNotes.filter(n => n.id === noteToDelete);
