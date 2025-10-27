@@ -60,7 +60,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       isTouched: false,
       isValid: true,
       required: false,
-      dataType: "number",
+      dataType: "string",
     },
     individualTherapyYears: {
       label: "Individual Therapy Years",
@@ -86,14 +86,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       required: false,
       dataType: "number",
     },
-    psychiatricHospitalizationMonths: {
-      label: "Psychiatric Hospitalization Months",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "number",
-    },
+
     currentTreatment: {
       label: "Current Treatment",
       value: "",
@@ -209,12 +202,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
           isTouched: false,
           isValid: true,
         },
-        psychiatricHospitalizationMonths: {
-          ...medicalInformation.psychiatricHospitalizationMonths,
-          value: patientData.psychiatricHospitalizationMonths,
-          isTouched: false,
-          isValid: true,
-        },
+
         currentTreatment: {
           ...medicalInformation.currentTreatment,
           value: patientData.currentTreatment,
@@ -379,10 +367,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
           medicalInformation.groupTherapyHours.value === ""
             ? null
             : medicalInformation.groupTherapyHours.value,
-        psychiatricHospitalizationMonths:
-          medicalInformation.psychiatricHospitalizationMonths.value === ""
-            ? null
-            : medicalInformation.psychiatricHospitalizationMonths.value,
+
         currentTreatment:
           medicalInformation.currentTreatment.value === ""
             ? null
@@ -488,10 +473,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
         medicalInformation.groupTherapyHours.value === ""
           ? null
           : medicalInformation.groupTherapyHours.value,
-      psychiatricHospitalizationMonths:
-        medicalInformation.psychiatricHospitalizationMonths.value === ""
-          ? null
-          : medicalInformation.psychiatricHospitalizationMonths.value,
+
       currentTreatment:
         medicalInformation.currentTreatment.value === ""
           ? null
@@ -863,49 +845,22 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                           <span className="text-red-500">*</span>
                         )}
                       </label>
-                      <input
-                        type="number"
-                        min="0"
-                        name="individualTherapyHours"
-                        value={medicalInformation.individualTherapyHours.value}
-                        onChange={handleChange}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="Enter hours"
-                        aria-label="Individual therapy hours"
-                      />
+                             <VoiceToText
+                    name="individualTherapyHours"
+                    value={medicalInformation.individualTherapyHours.value}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    rows="4"
+                    placeholder="Past history of psychiatric treatment or councelling"
+                    aria-label="Past history of psychiatric treatment or councelling"
+                  />
                       {medicalInformationErrors.individualTherapyHours && (
                         <p className="mt-1 text-sm text-red-600">
                           {medicalInformationErrors.individualTherapyHours}
                         </p>
                       )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600">
-                        Psychiatric hospitalization
-                        {medicalInformation.psychiatricHospitalizationMonths
-                          .required && <span className="text-red-500">*</span>}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        name="psychiatricHospitalizationMonths"
-                        value={
-                          medicalInformation.psychiatricHospitalizationMonths
-                            .value
-                        }
-                        onChange={handleChange}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        placeholder="Enter months"
-                        aria-label="Psychiatric hospitalization months"
-                      />
-                      {medicalInformationErrors.psychiatricHospitalizationMonths && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {
-                            medicalInformationErrors.psychiatricHospitalizationMonths
-                          }
-                        </p>
-                      )}
-                    </div>
+              
                     {/* <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Spread over years
@@ -1055,20 +1010,12 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Past history of psychiatric treatment or councelling :</strong>{" "}
-                  <div className="text-sm text-right">
-                    {medicalInformation.individualTherapyHours.value || "N/A"}
+                        <div className="whitespace-pre-line">
+                    {renderListItems(medicalInformation.individualTherapyHours.value)}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">
-                    Psychiatric Hospitalization:
-                  </strong>{" "}
-                  <div className="text-sm text-right">
-                    {medicalInformation.psychiatricHospitalizationMonths
-                      .value || "N/A"}
-                  </div>
-                </div>
+     
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Current Treatment:</strong>{" "}
                   <div className="text-sm text-right">

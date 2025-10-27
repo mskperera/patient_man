@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaArrowLeft, FaUserPlus, FaClock, FaCheckCircle, FaChevronCircleLeft } from 'react-icons/fa';
+import { FaUserPlus, FaClock } from 'react-icons/fa';
 import moment from 'moment';
 import MessageModel from '../MessageModel';
 import AppoinmentPatientList from '../AppoinmentPatientList';
@@ -422,7 +422,7 @@ const endOfDay = moment(newAppointment.appointmentDate).endOf('day').format('YYY
   useEffect(() => {
     fetchAppointments();
     validateForm();
-  }, [selectedDoctor, newAppointment.appointmentDate]);
+  }, [selectedDoctor, newAppointment.appointmentDate,selectedPatient]);
 
   const handleSelectPatient = (patient) => {
     setSelectedPatient({ ...patient, fullName: `${patient.firstName} ${patient.lastName}` });
@@ -431,7 +431,7 @@ const endOfDay = moment(newAppointment.appointmentDate).endOf('day').format('YYY
       firstName: patient.firstName,
       lastName: patient.lastName,
     }));
-    setFormErrors({});
+ //validateForm();
     setIsPatientDialogOpen(false);
   };
 

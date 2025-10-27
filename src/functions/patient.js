@@ -1573,3 +1573,49 @@ export const deletePsyNote = async (noteId) => {
     return err;
   }
 };
+
+
+
+export const deletePatient = async (patientId) => {
+  try {
+    const token = getToken();
+    return await customAxios
+      .delete(`/patient/${patientId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const deleteAppointment = async (appointmentId) => {
+  try {
+    const token = getToken();
+    return await customAxios
+      .delete(`/appointment/${appointmentId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};

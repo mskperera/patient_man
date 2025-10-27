@@ -45,6 +45,7 @@ function PatientInfoEdit({ mode = "view" }) {
   const modeFromQuery = searchParams.get("mode"); // Get 'mode' query param, fallback to prop
 
   const id = searchParams.get("id");
+  const user =localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'));
 
   
   const [isLoading, setIsLoading] = useState(true);
@@ -132,15 +133,8 @@ if(id===null){
           </h2>
         )}
 
-          {/* <div className="flex items-center gap-2">
-      <strong className="text-gray-600 font-medium">Handled by:</strong>
-      <span className="text-sky-600 max-w-[200px] lg:max-w-[250px] break-words">
-        Dr. Chaminda Weerasiriwardane
-      </span>
-    </div> */}
+
       </div>
-      {/* {JSON.stringify(patientType)} */}
-      {/* {JSON.stringify(basicInfomation)} */}
       {mode !== "add" && (
         <div>
         {basicInformation && <BasicInformationSection basicInformation={basicInformation} patientTypeId={patientType} />}
@@ -148,12 +142,12 @@ if(id===null){
       )}
       {patientType === "1" && (
         <>
-          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-200 rounded-lg">
+          <div className="flex flex-wrap gap-2 mb-6 p-1 bg-sky-100 border-2 border-sky-200 rounded-lg">
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "basicInformation"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("basicInformation")}
             >
@@ -165,11 +159,12 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+          
+          <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "personal"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               }  disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("personal")}
               disabled={tabDetails.isBasicInfo? false : true}
@@ -182,23 +177,12 @@ if(id===null){
                 )}
               </span>
             </button>
-            {/* <button
-          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
-            activeTab === "family"
-              ? "bg-sky-600 text-white shadow-sm"
-              : "bg-transparent text-gray-700  hover:bg-sky-200"
-          }`}
-          onClick={() => setActiveTab("family")}
-        >
-          <FaUsers className="mr-2" size={16} />
-          Family
-        </button> */}
 
-            <button
+         <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "medical"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               }  disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("medical")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -211,11 +195,12 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+          
+         <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "education"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("education")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -229,11 +214,11 @@ if(id===null){
               </span>
             </button>
 
-            <button
+ <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "mentalExam"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("mentalExam")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -246,22 +231,12 @@ if(id===null){
                 )}
               </span>
             </button>
-            {/* <button
-          className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
-            activeTab === "selfEsteemTest"
-              ? "bg-sky-600 text-white shadow-sm"
-              : "bg-transparent text-gray-700  hover:bg-sky-200"
-          }`}
-          onClick={() => setActiveTab("selfEsteemTest")}
-        >
-          <FaBrain className="mr-2" size={16} />
-          Self-Esteem Test 
-        </button> */}
-            <button
+
+   <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "notes"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
               onClick={() => setActiveTab("notes")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -270,11 +245,11 @@ if(id===null){
               Management and Notes
             </button>
 
-    <button
+        <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "psychiatricNotes"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
               onClick={() => setActiveTab("psychiatricNotes")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -333,12 +308,12 @@ if(id===null){
 
       {patientType === "2" && (
         <>
-          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-200 rounded-lg">
+               <div className="flex flex-wrap gap-2 mb-6 p-1 bg-sky-100 border-2 border-sky-200 rounded-lg">
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "basicInformation"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("basicInformation")}
             >
@@ -350,11 +325,11 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+      <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "personal"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("personal")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -367,11 +342,12 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+          
+         <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "family"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("family")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -385,11 +361,11 @@ if(id===null){
               </span>
             </button>
 
-            <button
+    <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "medical"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("medical")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -402,11 +378,12 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+          
+        <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "education"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("education")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -424,7 +401,7 @@ if(id===null){
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "mentalExam"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("mentalExam")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -437,11 +414,11 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+         <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "notes"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("notes")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -449,11 +426,11 @@ if(id===null){
               <FaBookMedical className="mr-2" size={16} />
               Management and Notes
             </button>
-                <button
+           <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "psychiatricNotes"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
               onClick={() => setActiveTab("psychiatricNotes")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -514,12 +491,12 @@ if(id===null){
 
       {patientType === "3" && (
         <>
-          <div className="flex flex-wrap gap-2 mb-6 p-2 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-200 rounded-lg">
+           <div className="flex flex-wrap gap-2 mb-6 p-1 bg-sky-100 border-2 border-sky-200 rounded-lg">
             <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "basicInformation"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("basicInformation")}
             >
@@ -531,11 +508,11 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+   <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "personal"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("personal")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -552,7 +529,7 @@ if(id===null){
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "family"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               }`}
               onClick={() => setActiveTab("family")}
             >
@@ -565,11 +542,11 @@ if(id===null){
               </span>
             </button> */}
 
-            <button
+          <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "medical"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("medical")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -582,11 +559,11 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+  <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "education"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("education")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -600,11 +577,11 @@ if(id===null){
               </span>
             </button>
 
-            <button
+        <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "mentalExam"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("mentalExam")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -617,11 +594,11 @@ if(id===null){
                 )}
               </span>
             </button>
-            <button
+    <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "notes"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed`}
               onClick={() => setActiveTab("notes")}
                   disabled={tabDetails.isBasicInfo? false : true}
@@ -630,11 +607,11 @@ if(id===null){
               Management and Notes
             </button>
 
-                <button
+        <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
                 activeTab === "psychiatricNotes"
                   ? "bg-sky-600 text-white shadow-sm"
-                  : "bg-transparent text-gray-700  hover:bg-sky-200"
+                  : "bg-transparent text-sky-800  hover:bg-sky-200"
               } disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed `}
               onClick={() => setActiveTab("psychiatricNotes")}
                   disabled={tabDetails.isBasicInfo? false : true}

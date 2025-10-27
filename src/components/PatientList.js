@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaEye } from 'react-icons/fa';
+import { FaCheck, FaEye, FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Pagination from './Pagination';
-import { getPatientRegistrations } from '../functions/patient';
+import { getPatientRegistrations,deletePatient } from '../functions/patient';
 import MessageModel from './MessageModel';
+import ConfirmDialog from './dialog/ConfirmDialog';
+
 
 function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSelectPatient,hidePaginationIfTotalPagesIsOne }) {
   const [localPatients, setLocalPatients] = useState([]);
@@ -21,6 +23,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
     type: "error",
   });
 
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const getPatientList = async (page = 1) => {
     const payload = {
@@ -60,6 +63,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
       // Update local and parent state
       setLocalPatients(results);
       setPatients(results);
+      //setSavedNotes(results);
 
       // Safely extract totalRows, default to 0 if undefined
       const { totalRows = 0 } = response.data.outputValues || {};
@@ -88,6 +92,8 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
     }
   };
 
+  
+
   // Trigger API call when triggerSearch, currentPage, or rowsPerPage changes
   useEffect(() => {
     if (triggerSearch > 0) {
@@ -106,8 +112,87 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
     setCurrentPage(1); // Reset to first page when rows per page changes
   };
 
+  const [deletingNoteId, setDeletingNoteId] = useState(null);
+
+    const [noteToDelete, setNoteToDelete] = useState(null);
+
+
+
+
+
+
+const confirmDelete = async () => {
+  try {
+    setShowConfirm(false);
+    setDeletingNoteId(noteToDelete); // Trigger deletion animation
+  const delteNoteRes=  await deletePatient(noteToDelete);
+     console.log(' delteNoteRes',delteNoteRes.data);
+
+          if(delteNoteRes.data.error){
+
+ setModal({
+          isOpen: true,
+          message: 'Something went wrong',
+          type: "danger",
+        });
+
+      return;
+     }
+
+          if(delteNoteRes.data.outputValues.responseStatus==="failed"){
+
+ setModal({
+          isOpen: true,
+          message: delteNoteRes.data.outputValues.outputMessage,
+          type: "warning",
+        });
+
+      return;
+     }
+
+
+
+
+  // const notes=savedNotes;
+const filterdPatients=localPatients.filter(n => n.patientId !== noteToDelete);
+      setPatients(filterdPatients);
+        setLocalPatients(filterdPatients);
+      setDeletingNoteId(null);
+      setNoteToDelete(null);
+
+
+
+ setModal({
+          isOpen: true,
+          message: delteNoteRes.data.outputValues.outputMessage,
+          type: "success",
+        });
+     
+
+
+
+  } catch (err) {
+    console.error('Failed to delete note:', err);
+    setDeletingNoteId(null);
+    setShowConfirm(false);
+    setNoteToDelete(null);
+  }
+};
+
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setNoteToDelete(null);
+  };
+
+
+  const handleDeleteNote = (id) => {
+    setNoteToDelete(id);
+    setShowConfirm(true);
+  };
+
   return (
     <div>
+      
       {error && (
         <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md" role="alert">
           {error}
@@ -120,7 +205,17 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
         type={modal.type}
       />
 
-      <div className="overflow-x-auto">
+            <ConfirmDialog
+          isVisible={showConfirm}
+          message="Are you sure you want to delete this patient? This action cannot be undone, and all patient data will be permanently lost."
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          title={"Confirm Delete"}
+          severity={"danger"}
+
+        />
+
+      <div className="overflow-x-auto"> 
         <table className="min-w-full bg-white border">
           <thead>
             <tr className="bg-gray-100">
@@ -202,7 +297,7 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
                         <FaCheck size={20} /> Select
                       </button>
                     ) : (
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 gap-2">
                         <Link
                           to={`/patient?id=${patient.patientId}&type=${patient.patientTypeId}`}
                           className="flex items-center gap-2 text-sky-600 hover:text-sky-700 transition-colors"
@@ -210,6 +305,14 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
                         >
                           <FaEye size={20} /> View Profile
                         </Link>
+                
+                                  <button
+                              onClick={() => handleDeleteNote(patient.patientId)}
+                          className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors"
+                          aria-label={`Delete patient ${patient.firstName} ${patient.lastName}`}
+                        >
+                          <FaTrash size={16} /> 
+                        </button>
                       </div>
                     )}
                   </td>

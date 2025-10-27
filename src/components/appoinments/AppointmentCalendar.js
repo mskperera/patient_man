@@ -4,8 +4,8 @@ import 'react-calendar/dist/Calendar.css';
 import moment from 'moment';
 import LoadingSpinner from '../LoadingSpinner';
 import MessageModel from '../MessageModel';
-import { FaCalendarAlt, FaCheckCircle, FaFilter, FaPlus, FaUserMd } from 'react-icons/fa';
-import { drpDoctors, getPatientAppointments, updateAppointment } from '../../functions/patient';
+import { FaCalendarAlt, FaCheckCircle, FaFilter, FaPlus, FaTrash, FaUserMd } from 'react-icons/fa';
+import { deleteAppointment, drpDoctors, getPatientAppointments, updateAppointment } from '../../functions/patient';
 import ConfirmDialog from '../dialog/ConfirmDialog';
 import DialogModel from '../DialogModel';
 import AddAppointment from './AddAppointment';
@@ -224,6 +224,82 @@ const AppointmentCalendar = () => {
         return 'bg-white';
     }
   };
+  const [showConfirm, setShowConfirm] = useState(false);
+    const [noteToDelete, setNoteToDelete] = useState(null);
+  const [deletingNoteId, setDeletingNoteId] = useState(null);
+
+
+
+
+
+const confirmDelete = async () => {
+  try {
+    setShowConfirm(false);
+    setDeletingNoteId(noteToDelete); // Trigger deletion animation
+  const delteNoteRes=  await deleteAppointment(noteToDelete);
+     console.log(' delteNoteRes',delteNoteRes.data);
+
+          if(delteNoteRes.data.error){
+
+ setModal({
+          isOpen: true,
+          message: 'Something went wrong',
+          type: "danger",
+        });
+
+      return;
+     }
+
+          if(delteNoteRes.data.outputValues.responseStatus==="failed"){
+
+ setModal({
+          isOpen: true,
+          message: delteNoteRes.data.outputValues.outputMessage,
+          type: "warning",
+        });
+
+      return;
+     }
+
+
+
+
+  // const notes=savedNotes;
+const filterdAppointments=appointments.filter(n => n.appointmentId !== noteToDelete);
+ 
+        setAppointments(filterdAppointments);
+      setDeletingNoteId(null);
+      setNoteToDelete(null);
+
+
+
+ setModal({
+          isOpen: true,
+          message: delteNoteRes.data.outputValues.outputMessage,
+          type: "success",
+        });
+    
+
+  } catch (err) {
+    setDeletingNoteId(null);
+    setShowConfirm(false);
+    setNoteToDelete(null);
+  }
+};
+
+
+
+  const cancelDelete = () => {
+    setShowConfirm(false);
+    setNoteToDelete(null);
+  };
+
+
+  const handleDeleteNote = (id) => {
+    setNoteToDelete(id);
+    setShowConfirm(true);
+  };
+
 
   return (
     <>
@@ -257,6 +333,17 @@ const AppointmentCalendar = () => {
         title={"Confirm Scheduled"}
         severity={"warning"}
       />
+
+                  <ConfirmDialog
+          isVisible={showConfirm}
+          message="Are you sure you want to delete this appointment?"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          title={"Confirm Delete"}
+          severity={"danger"}
+
+        />
+
       <DialogModel
         header="Add New Appointment"
         visible={isAddAppointmentOpen}
@@ -264,6 +351,9 @@ const AppointmentCalendar = () => {
        // width="80%"
        // height="90%"
       >
+
+
+
         <AddAppointment
           selectedDate={selectedDate}
            onHide={() => setIsAddAppointmentOpen(false)}
@@ -481,6 +571,8 @@ const AppointmentCalendar = () => {
                             {moment(appt.appointmentDate).format('h:mm A')}
                           </td>
                           <td className="py-3 px-4 border-b">
+                         
+                         <div className='flex justify-start items-center gap-2'>
                             <select
                               value={appt.status}
                               onChange={(e) => {
@@ -506,6 +598,16 @@ const AppointmentCalendar = () => {
                               <option value="Completed">Completed</option>
                               <option value="Cancelled">Cancelled</option>
                             </select>
+
+                                              <button
+                              onClick={() => handleDeleteNote(appt.appointmentId)}
+                          className="flex items-center gap-2 text-red-600 hover:text-red-700 transition-colors"
+                          aria-label={`Delete appointment ${appt.appointmentId}`}
+                        >
+                          <FaTrash size={16} /> 
+                        </button>
+
+                            </div>
                           </td>
                         </tr>
                       ))}
