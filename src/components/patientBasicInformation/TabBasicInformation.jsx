@@ -11,11 +11,188 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import EditButton from "../EditButton";
 
+
+
+/* --------------------------------------------------------------
+   Print-only styles – put these in a <style> tag inside the component
+   or in a separate print.css file and import it.
+   -------------------------------------------------------------- */
+const printStyles = `
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; }
+    .no-print { display: none; }
+
+    .print-section { 
+      break-inside: avoid; 
+      page-break-inside: avoid; 
+    }
+
+    .print-field {
+      break-inside: avoid;
+    }
+      
+      .print-header {
+      margin-bottom: 1.5rem;
+    }
+  }
+`;
+
+/* --------------------------------------------------------------
+   React component – the markup you posted, now print-ready
+   -------------------------------------------------------------- */
+ function BasicInfoPrint({ basicInformation }) {
+  // -----------------------------------------------------------------
+  // Helper to format date (moment is still used in your code)
+  // -----------------------------------------------------------------
+  const formatDate = (dateStr) =>
+    dateStr ? moment(dateStr).format("YYYY MMM DD") : "";
+
+  return (
+    <>
+      {/* Inject print CSS */}
+      <style>{printStyles}</style>
+
+      {/* -----------------------------------------------------------------
+          Whole block – two-column layout for A4
+          ----------------------------------------------------------------- */}
+      <div className="print-section mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+     
+      {/* Main Header */}
+        <header className="print-header text-left mb-4">
+          <h3 className="text-xl text-center text-sky-700 font-bold  tracking-wide">
+            Basic Information
+          </h3>
+          {/* <div className="mt-2 h-1 w-24 bg-sky-700 mx-auto"></div> */}
+        </header>
+
+        <section className="mb-8">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Personal Details
+          </h3>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
+            {/* First Name */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">First Name:</span>
+              <span className="text-gray-900">{basicInformation.firstName.value}</span>
+            </div>
+
+            {/* Middle Name */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Middle Name:</span>
+              <span className="text-gray-900">{basicInformation.middleName.value}</span>
+            </div>
+
+            {/* Last Name */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Last Name:</span>
+              <span className="text-gray-900">{basicInformation.lastName.value}</span>
+            </div>
+
+            {/* Date of Birth */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Date of Birth:</span>
+              <span className="text-gray-900">{formatDate(basicInformation.dateOfBirth.value)}</span>
+            </div>
+
+            {/* Age */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Age:</span>
+              <span className="text-gray-900">
+                {basicInformation.age.value} {basicInformation.age.value ? "Years" : ""}
+              </span>
+            </div>
+
+            {/* Gender */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Gender:</span>
+              <span className="text-gray-900">{basicInformation.gender.value}</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------
+            Contact Information
+            --------------------------------------------------------- */}
+        <section className="mb-6">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Contact Information
+          </h3>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
+            {/* Home Phone */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Home Phone:</span>
+              <span className="text-gray-900">{basicInformation.homePhone.value}</span>
+            </div>
+
+            {/* Mobile Phone */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Mobile Phone:</span>
+              <span className="text-gray-900">{basicInformation.businessPhone.value}</span>
+            </div>
+
+            {/* Email */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2 md:col-span-2">
+              <span className="font-medium text-gray-700">Email:</span>
+              <span className="text-gray-900 break-all">{basicInformation.email.value}</span>
+            </div>
+
+            {/* Permanent Address – full width */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2 md:col-span-2">
+              <span className="font-medium text-gray-700">Permanent Address:</span>
+              <span className="text-gray-900 max-w-[70%] text-right">
+                {basicInformation.permanentAddress.value}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------
+            Referral Information
+            --------------------------------------------------------- */}
+        <section className="mb-6">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Referral Information
+          </h3>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
+            {/* Referral Source */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Referral Source:</span>
+              <span className="text-gray-900">
+                {basicInformation.referralSource.value === "other"
+                  ? basicInformation.referralSourceOther.value
+                  : basicInformation.referralSource.value || "N/A"}
+              </span>
+            </div>
+
+            {/* Referral Party Present */}
+            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+              <span className="font-medium text-gray-700">Referral Party Present:</span>
+              <span className="text-gray-900">
+                {basicInformation.referralPartyPresent.value ? "Yes" : "No"}
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
+
+
 const TabBasicInformation = ({
   id,
   refreshTabDetails,
   setNewId,
   patientTypeId,
+  printPreviewMode
 }) => {
   const navigate = useNavigate();
   const [basicInformationErrors, setBasicInformationErrors] = useState({});
@@ -551,19 +728,27 @@ const TabBasicInformation = ({
 
   return (
     <>
+ 
       <MessageModel
         isOpen={modal.isOpen}
         onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
         message={modal.message}
         type={modal.type}
       />
+
+
+          {!printPreviewMode ?
+             
+       
+
       <div className="px-2">
         <section className="mb-6">
+     
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-gray-800">
               Basic Information
             </h3>
-            {mode !== "add" && (
+            { mode !== "add" && (
               <div className="flex space-x-3">
                 <EditButton
                   onClick={() => toggleSectionEdit("basic")}
@@ -944,16 +1129,14 @@ const TabBasicInformation = ({
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
               <div className="space-y-8">
                 {/* Personal Details */}
                 <div>
-                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
-                    Personal Details
-                  </h4> */}
+            
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         First Name:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -961,7 +1144,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                          <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Middle Name:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -970,7 +1153,7 @@ const TabBasicInformation = ({
                     </div>
                     
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Last Name:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -979,7 +1162,7 @@ const TabBasicInformation = ({
                     </div>
                
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Date of Birth:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -991,7 +1174,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Age:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -999,7 +1182,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Gender:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -1011,12 +1194,10 @@ const TabBasicInformation = ({
 
                 {/* Contact Information */}
                 <div>
-                  {/* <h4 className="text-lg font-semibold text-sky-700 mb-4">
-                    Contact Information
-                  </h4> */}
+            
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Home Phone:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -1024,7 +1205,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Mobile Phone:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -1032,7 +1213,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Email:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -1040,7 +1221,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                     <div className="md:col-span-2 lg:col-span-3 flex justify-between items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Permanent Address:
                       </span>
                       <span className="text-gray-800 text-right max-w-[70%]">
@@ -1057,7 +1238,7 @@ const TabBasicInformation = ({
                   </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Referral Source:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -1067,7 +1248,7 @@ const TabBasicInformation = ({
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-medium font-semibold">
+                      <span className="text-gray-600 font-semibold">
                         Referral Party Present:
                       </span>
                       <span className="text-gray-800 text-right">
@@ -1080,6 +1261,8 @@ const TabBasicInformation = ({
                 </div>
               </div>
             </div>
+          
+       
           )}
         </section>
         {mode === "add" && (
@@ -1096,6 +1279,13 @@ const TabBasicInformation = ({
           </div>
         )}
       </div>
+     
+     :   
+
+  <BasicInfoPrint basicInformation={basicInformation} />
+          
+            }
+
     </>
   );
 };

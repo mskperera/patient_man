@@ -12,6 +12,7 @@ import PatientTypeSelection from './pages/PatientTypeSelection';
 import AddAppointment from './components/appoinments/AddAppointment';
 import LoginPage from './components/LoginPage';
 import MainLayout from './components/layout/MainLayout';
+import PatientInfoFull from './components/PatientInfoFull';
 // import OccupationManager from './components/OccupationManager';
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
                 <Route path="/patients" element={<PatientList />} />
                  <Route path="/patientType" element={<PatientTypeSelection />} />
                 <Route path="/patient" element={<PatientInfoEdit />} />
+  <Route path="/patientInfoFull" element={<PatientInfoFull />} />
+                
                 {/* <Route path="/add-patient" element={<PatientInfo mode="add" />} /> */}
                 {/* <Route path="/add-note" element={<Notes />} /> */}
                 {/* <Route path="/edit-patient/:id" element={<PatientInfoEdit />} /> */}

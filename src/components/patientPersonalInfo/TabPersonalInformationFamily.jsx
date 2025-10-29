@@ -624,7 +624,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
       {/* Personal Details */}
       <section className="mb-12">
         <div className="flex justify-between items-center mb-2 pb-2">
-          <h3 className="text-xl font-semibold text-gray-700">Personal Details</h3>
+          <h3 className="text-xl font-semibold text-gray-700">Marital Details</h3>
           {mode !== "add" && (
             <div className="flex space-x-4">
               <EditButton

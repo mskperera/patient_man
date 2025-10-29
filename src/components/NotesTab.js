@@ -1,12 +1,187 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner } from 'react-icons/fa';
+import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner, FaUser, FaCalendarAlt } from 'react-icons/fa';
 import { addNote, deleteNote, getNotes, updateNote } from '../functions/patient';
 import ConfirmDialog from './dialog/ConfirmDialog';
 import LoadingSpinner from './LoadingSpinner';
 import { commitFile, markFileAsTobeDeleted, uploadFile } from '../functions/assets';
 import MessageModel from './MessageModel';
+import moment from 'moment';
+
+
+const printCss = `
+  .print-notes {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #1f2937;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 16mm;
+    background: #fff;
+  }
+  .print-notes h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: bold;
+  }
+  .print-notes .header-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .print-notes .note-item {
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .print-notes .note-header {
+    background-color: #f8fafc;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #475569;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .print-notes .note-content {
+    padding: 14px;
+    background-color: #fff;
+    white-space: pre-line;
+  }
+  .print-notes .note-content :global(p) {
+    margin: 0 0 8px;
+  }
+  .print-notes .note-content :global(ul), .print-notes .note-content :global(ol) {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+  .print-notes .note-content :global(li) {
+    margin-bottom: 4px;
+  }
+  .print-notes .attachments {
+    padding: 10px 14px;
+    background-color: #f1f5f9;
+    border-top: 1px dashed #cbd5e1;
+  }
+  .print-notes .attachment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .print-notes .attachment-item {
+    text-align: center;
+    font-size: 11.5px;
+    padding: 8px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    word-break: break-word;
+  }
+  .print-notes .attachment-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+    color: #0ea5e9;
+  }
+  .print-notes .no-notes {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    margin: 40px 0;
+  }
+
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-notes .page-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-notes .page-break { break-before: page; margin-top: 30mm; }
+  }
+`;
+
+const PrintNotesA4 = ({ notes, printPreviewMode = true }) => {
+  if (!printPreviewMode) return null;
+
+  const formatDate = (dateStr) => {
+    try {
+      return moment(dateStr).format("DD MMM YYYY, hh:mm A");
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const renderAttachment = (att) => {
+    const icon =
+      att.type === "image" ? <FaImage className="attachment-icon" /> :
+      att.type === "audio" ? <FaMicrophone className="attachment-icon" /> :
+      <FaFile className="attachment-icon" />;
+
+    return (
+      <div key={att.hash} className="attachment-item">
+        {icon}
+        <div className="font-medium text-gray-800 truncate">{att.name}</div>
+        {att.description && (
+          <div className="text-xs text-gray-600 mt-1 italic">{att.description}</div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+
+      <div className="print-notes">
+        {/* Header */}
+             <h1 className="mb-3  text-lg font-bold text-sky-700">
+      Clinical Notes
+        </h1>
+
+        <div className="header-info">
+          <div><FaCalendarAlt className="inline mr-1" /> <strong>Printed:</strong> {moment().format("DD MMM YYYY, hh:mm A")}</div>
+        </div>
+
+        {/* Notes */}
+        {notes.length === 0 ? (
+          <div className="no-notes">No clinical notes recorded yet.</div>
+        ) : (
+          notes.map((note, idx) => (
+            <div key={note.id} className="note-item">
+              <div className="note-header">
+                <span><strong>Note #{notes.length - idx}</strong></span>
+                <span>{formatDate(note.timestamp)}</span>
+              </div>
+              <div
+                className="note-content"
+                dangerouslySetInnerHTML={{ __html: note.content }}
+              />
+              {note.attachments && note.attachments.length > 0 && (
+                <div className="attachments">
+                  <strong className="text-sm block mb-2">Attachments ({note.attachments.length})</strong>
+                  <div className="attachment-grid">
+                    {note.attachments.map(renderAttachment)}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </>
+  );
+};
+
 
 const VoiceToText = ({ 
   disabled, 
@@ -128,7 +303,7 @@ const VoiceToText = ({
   );
 };
 
-function Notes({ patientId, userId }) {  // Assume passed as props
+function Notes({ patientId, userId,printPreviewMode }) {  // Assume passed as props
   const [notes, setNotes] = useState('');
   const [savedNotes, setSavedNotes] = useState([]);
   const [attachments, setAttachments] = useState([]);
@@ -630,7 +805,11 @@ const confirmDelete = async () => {
 
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
+    <>
+{
+  !printPreviewMode ?
+
+   <div className="px-4 sm:px-6 lg:px-8">
   <MessageModel
         isOpen={modal.isOpen}
         onClose={() => setModal({ isOpen: false, message: "", type: "error" })}
@@ -726,7 +905,7 @@ const confirmDelete = async () => {
           </div>
 
           {/* Save and Cancel Buttons */}
-     <div className="flex justify-end gap-4 mb-6">
+  <div className="flex justify-end gap-4 mb-6">
   <button
     onClick={handleSaveNotes}
     className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-md transition 
@@ -813,7 +992,7 @@ const confirmDelete = async () => {
       <div className="mt-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Notes Timeline</h3>
-     {!showEditor &&    <button
+     { (!printPreviewMode && !showEditor) &&    <button
             onClick={() => setShowEditor(true)}
             className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition"
             aria-label="Add new note"
@@ -1065,6 +1244,15 @@ const confirmDelete = async () => {
 
 
     </div>
+
+        :  <PrintNotesA4
+    notes={savedNotes}
+    printPreviewMode={printPreviewMode}
+  />}
+    </>
+
+
+   
   );
 }
 

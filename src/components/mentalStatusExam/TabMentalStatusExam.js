@@ -7,7 +7,289 @@ import VoiceToText from '../VoiceToText';
 import EditButton from '../EditButton';
 import MessageModel from '../MessageModel';
 
-const MentalStatusExam = ({id,refreshTabDetails}) => {
+
+const printCss = `
+  .print-preview {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 15mm;
+    background: #fff;
+  }
+
+  .print-preview .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #0ea5e9;
+  }
+  .print-preview .info-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-style: italic;
+    margin: 10px 0;
+  }
+  .print-preview .field-box {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .print-preview .field-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .print-preview .field-value {
+    white-space: pre-line;
+    color: #1f2937;
+  }
+  .print-preview .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .print-preview .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .print-preview .checkbox-item.checked {
+    color: #0ea5e9;
+    font-weight: 500;
+  }
+  .print-preview .checkbox-item .check {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .print-preview .checkbox-item.checked .check {
+    background-color: #0ea5e9;
+    border-color: #0ea5e9;
+  }
+  .print-preview .checkbox-item.checked .check svg {
+    width: 10px;
+    height: 10px;
+    color: white;
+  }
+
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-preview .page-break { page-break-before: always; }
+  }
+
+  @media screen {
+    .print-preview .page-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
+  }
+`;
+
+const PrintMentalStatusExamA4 = ({ mse, printPreviewMode = true }) => {
+  if (!printPreviewMode) return null;
+
+  const renderOptions = (options = []) => {
+    if (!options.length) return <span className="text-gray-500 italic">N/A</span>;
+    return (
+      <div className="checkbox-grid">
+        {options.map((opt) => (
+          <div key={opt} className="checkbox-item checked">
+            <div className="check">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span>{opt}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderValue = (value) => {
+    return value ? <div className="field-value">{value}</div> : <span className="text-gray-500 italic">N/A</span>;
+  };
+
+  const renderField = (label, options, comment) => (
+    <div className="field-box">
+      <span className="field-label">{label}</span>
+      {renderOptions(options)}
+      {comment && (
+        <div className="mt-3">
+          <strong className="text-sm text-gray-600">Comment:</strong>
+          <div className="field-value mt-1">{comment}</div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+
+      <div className="print-preview">
+
+        {/* ========== PAGE 1: Header + Circumstance ========== */}
+        <div>
+          <h2 className="mb-3 pb-1 text-xl text-center font-bold text-sky-800">Mental Status Examination</h2>
+
+          <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+            <div>
+              <strong>Form Date:</strong> {mse.formDate ? moment(mse.formDate).format("DD MMM YYYY") : "N/A"}
+            </div>
+            <div className="text-right">
+              <strong>Last Modified:</strong> {mse.lastModified ? moment(mse.lastModified).format("DD MMM YYYY HH:mm") : "N/A"}
+            </div>
+          </div>
+
+          <div className="section-title">Circumstance of Presentation</div>
+          <div className="field-box">
+            {renderValue(mse.circumstanceOfPresentation)}
+          </div>
+        </div>
+
+        {/* ========== PAGE 2: Appearance & Behavior ========== */}
+        <div className="page-break">
+          <div className="section-title">Appearance</div>
+          {renderField("Weight", mse.appearance?.weight?.options, mse.appearance?.comments)}
+          {renderField("Hair", mse.appearance?.hair?.options)}
+          {renderField("Other Features", mse.appearance?.otherFeatures?.options)}
+          {renderField("Grooming", mse.appearance?.grooming?.options)}
+          {renderField("Dress", mse.appearance?.dress?.options)}
+
+          <div className="section-title">Behavior</div>
+          {renderField("Walk", mse.behavior?.walk?.options, mse.behavior?.comments)}
+          {renderField("Combativeness", mse.behavior?.combativeness?.options)}
+          {renderField("Repetition", mse.behavior?.repetition?.options)}
+          {renderField("Overactivity", mse.behavior?.overactivity?.options)}
+          {renderField("Catatonia", mse.behavior?.catatonia?.options)}
+        </div>
+
+        {/* ========== PAGE 3: Speech & Attitude ========== */}
+        <div className="page-break">
+          <div className="section-title">Speech</div>
+          {renderField("Rate", mse.speech?.rate?.options, mse.speech?.comments)}
+          {renderField("Intelligibility", mse.speech?.intelligibility?.options)}
+          {renderField("Volume", mse.speech?.volume?.options)}
+          {renderField("Speech Quality", mse.speech?.speechQuality?.options)}
+          {renderField("Speech Quantity", mse.speech?.speechQuantity?.options)}
+
+          <div className="section-title">Attitude to Examiner</div>
+          {renderField("", mse.attitudeToExaminer?.attitudeToExaminer?.options)}
+        </div>
+
+        {/* ========== PAGE 4: Mood, Affect, Hallucinations ========== */}
+        <div className="page-break">
+          <div className="section-title">Mood and Affect</div>
+          {renderField("Mood", mse.moodAndAffect?.mood?.options, mse.moodAndAffect?.comments)}
+          {renderField("Other Emotions", mse.moodAndAffect?.otherEmotions?.options)}
+          {renderField("Other Signs", mse.moodAndAffect?.otherSigns?.options)}
+          {renderField("Neurovegetative", mse.moodAndAffect?.neuroVegetative?.options)}
+
+          <div className="section-title">Affective Expression</div>
+          {renderField("", mse.affectiveExpression?.affectiveExpression?.options)}
+
+          <div className="section-title">Appropriateness</div>
+          {renderField("", mse.appropriateness?.appropriateness?.options)}
+
+          <div className="section-title">Hallucinations</div>
+          {renderField("", mse.hallucinations?.hallucinations?.options, mse.hallucinations?.comments)}
+        </div>
+
+        {/* ========== PAGE 5: Thought & Perception ========== */}
+        <div className="page-break">
+          <div className="section-title">Disassociation</div>
+          {renderField("", mse.disassociation?.disassociation?.options, mse.disassociation?.comments)}
+
+          <div className="section-title">Agnosia</div>
+          {renderField("", mse.agnosia?.agnosia?.options, mse.agnosia?.comments)}
+
+          <div className="section-title">Content of Thought</div>
+          {renderField("", mse.contentOfThought?.contentOfThought?.options, mse.contentOfThought?.comments)}
+          {renderField("Preoccupations (SI)", mse.contentOfThought?.preoccupationsSI?.options)}
+          {renderField("Hostile Intent", mse.contentOfThought?.hostileIntent?.options)}
+          {renderField("Phobia", mse.contentOfThought?.phobia?.options)}
+
+          {mse.contentOfThought?.contentOfThought?.options?.includes("Delusions") && (
+            <div className="field-box mt-4 ml-6 border-l-4 border-sky-300 pl-4">
+              <span className="field-label">Delusion Types</span>
+              {renderOptions(mse.delusions0?.delusions0?.options)}
+            </div>
+          )}
+        </div>
+
+        {/* ========== PAGE 6: Thought Form & Cognitive ========== */}
+        <div className="page-break">
+          <div className="section-title">Thought Form</div>
+          {renderField("General", mse.thoughtForm?.general?.options, mse.thoughtForm?.comments)}
+          {renderField("Specific", mse.thoughtForm?.specific?.options)}
+          {renderField("Disturbances of Speech", mse.thoughtForm?.disturbancesOfSpeech?.options)}
+          {renderField("Aphasic Disturbances", mse.thoughtForm?.aphasicDisturbances?.options)}
+
+          <div className="section-title">Consciousness</div>
+          {renderField("", mse.consciousness?.consciousness?.options, mse.consciousness?.comments)}
+
+          <div className="section-title">Orientation</div>
+          {renderField("", mse.orientation?.orientation?.options, mse.orientation?.comments)}
+
+          <div className="section-title">Concentration</div>
+          {renderField("", mse.concentration?.concentration?.options, mse.concentration?.comments)}
+
+          <div className="section-title">Memory</div>
+          {renderField("", mse.memory?.memory?.options, mse.memory?.comments)}
+        </div>
+
+        {/* ========== PAGE 7: Intelligence, Judgment, Insight ========== */}
+        <div className="page-break">
+          <div className="section-title">Information & Intelligence</div>
+          {renderField("Attention", mse.informationAndIntelligence?.attention?.options, mse.informationAndIntelligence?.comments)}
+          {renderField("Suggestibility", mse.informationAndIntelligence?.suggestibility?.options)}
+          {renderField("Memory", mse.informationAndIntelligence?.memory2?.options)}
+          {renderField("Intelligence", mse.informationAndIntelligence?.intelligence?.options)}
+
+          <div className="section-title">Judgment</div>
+          {renderField("", mse.judgment?.judgment?.options, mse.judgment?.comments)}
+
+          <div className="section-title">Insight</div>
+          {renderField("", mse.insight?.insight?.options, mse.insight?.comments)}
+
+          <div className="section-title">Reliability</div>
+          {renderField("", mse.reliability?.reliability?.options, mse.reliability?.comments)}
+        </div>
+
+        {/* ========== PAGE 8: Summary & Recommendations ========== */}
+        <div className="page-break">
+          <div className="section-title">Summary</div>
+          {renderField("Global Functioning", mse.summary?.globalFunctioning?.options, mse.summary?.comments)}
+
+          <div className="section-title">Indications & Recommendations</div>
+          <div className="field-box">
+            {renderValue(mse.indicationsAndRecommendations)}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+const MentalStatusExam = ({id,refreshTabDetails,printPreviewMode}) => {
   const [isAddMode, setIsAddMode] = useState(true);
   const [patient, setPatient] = useState({
   mentalStatusExam: {
@@ -146,142 +428,7 @@ const MentalStatusExam = ({id,refreshTabDetails}) => {
   },
 });
 
-  // const [patient, setPatient] = useState({
-  //   mentalStatusExam: {
-  //     circumstanceOfPresentation: '',
-  //     indicationsAndRecommendations: '',
-  //     appearance: {
-  //       appearance: { options: ['j'] },
-  //       weight: { options: ['j'] },
-  //       hair: { options: ['h'] },
-  //       otherFeatures: { options: ['h'] },
-  //       grooming: { options: ['i'] },
-  //       dress: { options: ['g'] },
-  //       comments: '',
-  //     },
-  //     behavior: {
-  //       walk: { options: ['Gait/march'] },
-  //       combativeness: { options: ['Aggressive'] },
-  //       repetition: { options: ['Twitches'] },
-  //       overactivity: { options: ['Overactivity'] },
-  //       catatonia: { options: ['Catalepsy'] },
-  //       comments: '',
-  //     },
-  //     speech: {
-  //       rate: { options: ['Rapid'] },
-  //       intelligibility: { options: ['Slurred'] },
-  //       volume: { options: ['Loud'] },
-  //       speechQuality: { options: ['Emotional'] },
-  //       speechQuantity: { options: ['Talkative'] },
-  //       comments: '',
-  //     },
-  //     attitudeToExaminer: {
-  //       attitudeToExaminer: { options: ['Seductive'] },
-  //     },
-  //     moodAndAffect: {
-  //       mood: { options: ['Euthymic'] },
-  //       otherEmotions: { options: ['Panicked'] },
-  //       otherSigns: { options: ['Ambivalence'] },
-  //       neuroVegetative: { options: ['Hypersomnia'] },
-  //       comments: '',
-  //     },
-  //     affectiveExpression: {
-  //       affectiveExpression: { options: ['Normal'] },
-  //     },
-  //     appropriateness: {
-  //       appropriateness: { options: ['Labile'] },
-  //     },
-  //     hallucinations: {
-  //       hallucinations: { options: ['Hypnogogic'] },
-  //       comments: '',
-  //     },
-  //     disassociation: {
-  //       disassociation: { options: ['Macropsia'] },
-  //       comments: '',
-  //     },
-  //     agnosia: {
-  //       agnosia: { options: ['Anosognosia'] },
-  //       comments: '',
-  //     },
-  //     contentOfThought: {
-  //       contentOfThought: { options: ['Overvalued idea'] },
-  //       preoccupationsSI: { options: ['Current ideation'] },
-  //       hostileIntent: { options: ['History of violence'] },
-  //       phobia: { options: ['Simple'] },
-  //       comments: '',
-  //     },
-  //     delusions0: {
-  //       delusions0: { options: ['Somatic'] },
-  //       comments: '',
-  //     },
-  //     thoughtForm: {
-  //       general: { options: ['Neurosis'] },
-  //       specific: { options: ['Circumstantiality'] },
-  //       disturbancesOfSpeech: { options: ['Voluble'] },
-  //       aphasicDisturbances: { options: ['Jargon'] },
-  //       comments: '',
-  //     },
-  //     consciousness: {
-  //       consciousness: { options: ['Disoriented'] },
-  //       comments: '',
-  //     },
-  //     orientation: {
-  //       orientation: { options: ['Time Disorientation'] },
-  //       comments: '',
-  //     },
-  //     concentration: {
-  //       concentration: { options: ['Serial 7’s inattention'] },
-  //       comments: '',
-  //     },
-  //     memory: {
-  //       memory: { options: ['Remote memory deficit'] },
-  //       comments: '',
-  //     },
-  //     informationAndIntelligence: {
-  //       attention: { options: ['Distractible'] },
-  //       suggestibility: { options: ['Hypnotized'] },
-  //       memory2: { options: ['Localized amnesia'] },
-  //       intelligence: { options: ['Dementia'] },
-  //       comments: '',
-  //     },
-  //     judgment: {
-  //       judgment: { options: ['Critical'] },
-  //       comments: '',
-  //     },
-  //     insight: {
-  //       insight: { options: ['Impaired insight'] },
-  //       comments: '',
-  //     },
-  //     reliability: {
-  //       reliability: { options: ['Reason to fake bad'] },
-  //       comments: '',
-  //     },
-  //     summary: {
-  //       globalFunctioning: { options: ['20 Possible harm'] },
-  //       comments: '',
-  //     },
-  //     generalObservations: {
-  //       appearance: { options: ['Neat'] },
-  //       speech: { options: ['Normal'] },
-  //       eyeContact: { options: ['Normal'] },
-  //       motorActivity: { options: ['Normal'] },
-  //       affect: { options: ['Full'] },
-  //       comments: 'Well-groomed, appropriately dressed',
-  //     },
-  //     cognition: {
-  //       orientationImpairment: { options: ['None'] },
-  //       memoryImpairment: { options: ['None'] },
-  //       attention: { options: ['Normal'] },
-  //       comments: '',
-  //     },
-  //     thoughts: {
-  //       suicidality: { options: ['None'] },
-  //       homicidality: { options: ['None'] },
-  //       delusions: { options: ['None'] },
-  //       comments: '',
-  //     },
-  //   },
-  // });
+ 
   const [initialPatientInformation, setInitialPatientInformation] = useState(null);
   const [editingSection, setEditingSection] = useState(null);
 const [isReady, setIsReady] = useState(false);
@@ -744,7 +891,7 @@ const renderSection = (title, sectionKey, icon, subSections) => {
         <h3 className="text-lg font-semibold text-gray-700 flex items-center tracking-wide">
           {icon} {title}
         </h3>
-        {!isAddMode && (
+        {(!printPreviewMode && !isAddMode) && (
           <div className="flex space-x-4">
             <EditButton
               onClick={() => toggleSectionEdit(sectionKey)}
@@ -1406,6 +1553,8 @@ const renderSectionWithNested = (title, sectionKey, icon, subSections) => {
         message={modal.message}
         type={modal.type}
       />
+   
+  {!printPreviewMode ? 
     <div className="px-6  min-h-screen">
      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-6">
@@ -1534,6 +1683,10 @@ const renderSectionWithNested = (title, sectionKey, icon, subSections) => {
 
 
     </div>
+:<PrintMentalStatusExamA4
+    mse={patient.mentalStatusExam}
+    printPreviewMode={printPreviewMode}
+  />}
          </>
   );
 };

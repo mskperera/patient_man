@@ -21,7 +21,282 @@ import EditButton from "../EditButton";
 import VoiceToText from "../VoiceToText";
 import { FaGraduationCap, FaInfoCircle } from "react-icons/fa";
 
-const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
+
+
+const printCss = `
+  .print-preview {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .print-preview h1 { 
+    text-align: center; 
+    margin-bottom: 20px; 
+    font-size: 22px; 
+  }
+
+  .print-preview table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  .print-preview th,
+  .print-preview td {
+    border: 1px solid #d1d5db;
+    padding: 8px;
+    font-size: 12px;
+  }
+  .print-preview th {
+    background-color: #f3f4f6;
+    font-weight: bold;
+    text-align: left;
+  }
+  .print-preview .info-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-style: italic;
+    margin: 10px 0;
+  }
+  .print-preview .remark-box {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+    white-space: pre-line;
+    font-size: 13px;
+  }
+  .print-preview .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  /* ----- PRINT ONLY ----- */
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-preview .page-break { page-break-before: always; }
+  }
+
+  /* ----- SCREEN ONLY (when preview is on) ----- */
+  @media screen {
+    .print-preview { max-width: 210mm; margin: 0 auto; padding: 15mm; background:#fff; }
+    .print-preview .page-break { 
+      break-before: page;   /* works in modern browsers for on-screen paging */
+      margin-top: 30mm;
+    }
+  }
+`;
+
+const PrintEducationDetailsA4= ({
+  education,
+  printPreviewMode = true,
+}) => {
+  if (!printPreviewMode) return null;
+
+  return (
+    <>
+      {/* Inject the CSS once */}
+      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+
+      <div className="print-preview">
+
+
+        <div>
+          <h1 className="text-lg font-bold text-sky-700">Education Details</h1>
+
+
+                  <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+        Educational Background
+        </h3>
+
+
+          <div style={{ marginBottom: "20px" }}>
+            <strong>Years of Formal Education Completed:</strong>{" "}
+            {education.educationYears == null
+              ? "N/A"
+              : education.educationYears === 20
+              ? "More than 20"
+              : education.educationYears}
+          </div>
+
+          {/* Grade 5 Scholarship */}
+          <div className="section-title">Grade 5 Scholarship Qualification</div>
+          <div style={{ marginBottom: "20px" }}>
+            <strong>Has Grade 5 Scholarship:</strong>{" "}
+            {education.scholarship.enabled ? "Yes" : "No"}
+          </div>
+
+          {education.scholarship.enabled && (
+            <>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Marks</th>
+                    <th>School Admitted</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{education.scholarship.marks || "N/A"}</td>
+                    <td>{education.scholarship.schoolAdmitted || "N/A"}</td>
+                    <td>{education.scholarship.result || "N/A"}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {education.scholarship.remark && (
+                <div style={{ marginTop: "12px" }}>
+                  <strong>Remark:</strong>
+                  <div className="remark-box">{education.scholarship.remark}</div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* ---------- PAGE 2 ---------- */}
+        <div className="page-break">
+    
+                            <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+     G.C.E Ordinary Level (O/L) Qualifications
+        </h3>
+
+          {!education.ol.enabled ? (
+            <div className="info-box">
+              <FaInfoCircle /> <span>No O/L qualifications recorded.</span>
+            </div>
+          ) : education.ol.subjects.length > 0 ? (
+            <>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {education.ol.subjects.map((s, i) => (
+                    <tr key={i}>
+                      <td>{s.name || "N/A"}</td>
+                      <td>{s.marks || "N/A"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {education.ol.remark && (
+                <div style={{ marginTop: "15px" }}>
+                  <strong>Remark:</strong>
+                  <div className="remark-box">{education.ol.remark}</div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="info-box">
+              <FaInfoCircle /> <span>O/L enabled but no subjects added.</span>
+            </div>
+          )}
+        </div>
+
+        {/* ---------- PAGE 3 ---------- */}
+        <div className="page-break">
+              
+                            <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+         G.C.E Advanced Level (A/L) Qualifications
+        </h3>
+
+          {!education.al.enabled ? (
+            <div className="info-box">
+              <FaInfoCircle /> <span>No A/L qualifications recorded.</span>
+            </div>
+          ) : (
+            <>
+              <div style={{ marginBottom: "12px" }}>
+                <strong>Stream:</strong> {education.al.alStreamName || "N/A"}
+              </div>
+
+              {education.al.subjects.length > 0 ? (
+                <>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {education.al.subjects.map((s, i) => (
+                        <tr key={i}>
+                          <td>{s.name || "N/A"}</td>
+                          <td>{s.marks || "N/A"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {education.al.remark && (
+                    <div style={{ marginTop: "15px" }}>
+                      <strong>Remark:</strong>
+                      <div className="remark-box">{education.al.remark}</div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="info-box">
+                  <FaInfoCircle /> <span>A/L enabled but no subjects added.</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+
+        {/* ---------- PAGE 5 ---------- */}
+        <div className="page-break">
+
+                                  <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+International Curriculum
+        </h3>
+
+          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "10px" }}>
+            {education.internationalCurriculum.isEdexcel ? (
+              <div className="badge">
+                <FaGraduationCap style={{ color: "#0ea5e9" }} />
+                <span>Edexcel</span>
+              </div>
+            ):''}
+            {education.internationalCurriculum.isCambridge ? (
+              <div className="badge">
+                <FaGraduationCap style={{ color: "#0ea5e9" }} />
+                <span>Cambridge</span>
+              </div>
+            ):''}
+            {(!education.internationalCurriculum.isEdexcel &&
+              !education.internationalCurriculum.isCambridge) ? (
+                <div className="info-box">
+                  <FaInfoCircle /> <span>No international curriculum followed.</span>
+                </div>
+              ):''}
+          </div>
+        </div>
+        
+      </div>
+    </>
+  );
+};
+
+
+
+const TabEducationDetailsChild = ({ id, refreshTabDetails,printPreviewMode }) => {
   const currentYear = 2025;
   const yearOptions = Array.from(
     { length: 21 },
@@ -1096,6 +1371,8 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
         type={modal.type}
       />
       {!isLoading ? (
+
+  !printPreviewMode ? 
         <div className="px-8">
           {/* Educational Background */}
           <section className="mb-10">
@@ -1965,6 +2242,12 @@ const TabEducationDetailsChild = ({ id, refreshTabDetails }) => {
             </div>
           )}
         </div>
+        :
+            <div className="print-only">
+    <PrintEducationDetailsA4 education={education} printPreviewMode={true} />
+  </div>
+
+
       ) : (
         <div className="flex justify-center items-center h-full">
           <LoadingSpinner />

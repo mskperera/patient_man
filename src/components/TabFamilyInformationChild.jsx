@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaFemale, FaMale } from "react-icons/fa";
+import { FaCalendarAlt, FaFemale, FaMale, FaUser } from "react-icons/fa";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
@@ -15,7 +15,335 @@ import {
 import VoiceToText from "./VoiceToText";
 import EditButton from "./EditButton";
 
-const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
+import moment from "moment";
+
+
+const printCss = `
+  .print-family {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+  .print-family h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: bold;
+  }
+  .print-family .header-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .print-family .section {
+    margin-bottom: 24px;
+    padding: 14px;
+  }
+  .print-family .section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #0ea5e9;
+  }
+  .print-family .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .print-family .field {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #cbd5e1;
+  }
+  .print-family .field-label {
+    font-weight: 600;
+    color: #374151;
+    width: 60%;
+  }
+  .print-family .field-value {
+    color: #1f2937;
+    width: 40%;
+    text-align: right;
+  }
+  .print-family .list {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+  .print-family .list li {
+    margin-bottom: 4px;
+  }
+  .print-family .age-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .print-family .age-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 11px;
+    border-radius: 9999px;
+  }
+  .print-family .age-tag.female {
+    background: #fce7f3;
+    color: #be185d;
+  }
+  .print-family .description-box {
+    background: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    margin-top: 8px;
+  }
+
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-family .page-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-family .page-break { break-before: page; margin-top: 30mm; }
+  }
+`;
+
+const PrintFamilyInformationA4= ({
+  familyInformation
+}) => {
+
+
+  const formatList = (items) => {
+    if (!items || items.length === 0) return <em className="text-gray-500">N/A</em>;
+    return (
+      <ul className="list">
+        {items.map((item, i) => (
+          <li key={i}>{item}</li>
+        ))}
+      </ul>
+    );
+  };
+
+  const formatAges = (ages, gender) => {
+    if (!ages || !ages.trim()) return <em className="text-gray-500">N/A</em>;
+    return (
+      <div className="age-tags">
+        {ages.split(",").map((age, i) => (
+          <span
+            key={i}
+            className={`age-tag ${gender === "female" ? "female" : ""}`}
+          >
+            {gender === "male" ? <FaMale className="mr-1" /> : <FaFemale className="mr-1" />}
+            {age.trim()}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+
+      <div className="print-family">
+        {/* Header */}
+             <h1 className="text-lg font-bold text-sky-700">Family Information</h1>
+        <div className="header-info">
+          <div><FaCalendarAlt className="inline mr-1" /> <strong>Printed:</strong> {moment().format("DD MMM YYYY, hh:mm A")}</div>
+        </div>
+
+        {/* Parental Information */}
+        <div className="section">
+          <div className="section-title">Parental Information</div>
+          <div className="grid">
+            <div>
+              <div className="field">
+                <span className="field-label">Mother's Age</span>
+                <span className="field-value">{familyInformation.motherAge || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Age When Mother Died</span>
+                <span className="field-value">{familyInformation.ageWhenMotherDied || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Mother's Occupation</span>
+                <span className="field-value">{familyInformation.motherOccupation || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Mother's Religion</span>
+                <span className="field-value">{familyInformation.motherReligion || "N/A"}</span>
+              </div>
+            </div>
+            <div>
+              <div className="field">
+                <span className="field-label">Father's Age</span>
+                <span className="field-value">{familyInformation.fatherAge || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Age When Father Died</span>
+                <span className="field-value">{familyInformation.ageWhenFatherDied || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Father's Occupation</span>
+                <span className="field-value">{familyInformation.fatherOccupation || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Father's Religion</span>
+                <span className="field-value">{familyInformation.fatherReligion || "N/A"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <strong className="block mb-2">Who raised you if not parents?</strong>
+            <div className="description-box">
+              {formatList(familyInformation.raisedBy)}
+            </div>
+          </div>
+
+          <div className="grid mt-6">
+            <div>
+              <strong className="block mb-2">Mother Description</strong>
+              <div className="description-box">
+                {formatList(familyInformation.motherDescription)}
+              </div>
+            </div>
+            <div>
+              <strong className="block mb-2">Father Description</strong>
+              <div className="description-box">
+                {formatList(familyInformation.fatherDescription)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sibling Information */}
+        <div className="section">
+          <div className="section-title">Sibling Information</div>
+          <div className="grid">
+            <div>
+              <div className="field">
+                <span className="field-label">Parental Separation Age</span>
+                <span className="field-value">{familyInformation.parentalSeparationAge || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Parental Divorce Age</span>
+                <span className="field-value">{familyInformation.parentalDivorceAge || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Mother's Divorce Count</span>
+                <span className="field-value">{familyInformation.motherDivorceCount || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Father's Divorce Count</span>
+                <span className="field-value">{familyInformation.fatherDivorceCount || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Living Brothers</span>
+                <span className="field-value">{familyInformation.livingBrothers || "N/A"}</span>
+              </div>
+            </div>
+            <div>
+              <div className="field">
+                <span className="field-label">Living Sisters</span>
+                <span className="field-value">{familyInformation.livingSisters || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Brothers' Ages</span>
+                <span className="field-value">
+                  {formatAges(familyInformation.brothersAges, "male")}
+                </span>
+              </div>
+              <div className="field">
+                <span className="field-label">Sisters' Ages</span>
+                <span className="field-value">
+                  {formatAges(familyInformation.sistersAges, "female")}
+                </span>
+              </div>
+              <div className="field">
+                <span className="field-label">Child Number</span>
+                <span className="field-value">{familyInformation.childNumber || "N/A"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Total Family Children</span>
+                <span className="field-value">{familyInformation.familyChildren || "N/A"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <strong className="block mb-2">Adopted?</strong>
+            <div className="description-box font-medium">
+              {familyInformation.adopted || "N/A"}
+            </div>
+          </div>
+
+          <div className="grid mt-6">
+            <div>
+              <strong className="block mb-2">Brother Relationship Issues</strong>
+              <div className="description-box">
+                {familyInformation.brotherDisturbances ? (
+                  <p className="whitespace-pre-line">{familyInformation.brotherDisturbances}</p>
+                ) : (
+                  <em className="text-gray-500">None reported</em>
+                )}
+              </div>
+            </div>
+            <div>
+              <strong className="block mb-2">Sister Relationship Issues</strong>
+              <div className="description-box">
+                {familyInformation.sisterDisturbances ? (
+                  <p className="whitespace-pre-line">{familyInformation.sisterDisturbances}</p>
+                ) : (
+                  <em className="text-gray-500">None reported</em>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Family Mental Health */}
+        <div className="section">
+          <div className="section-title">Family Mental Health</div>
+          <div className="grid">
+            <div>
+              <div className="field">
+                <span className="field-label">Male Relatives Emotionally Disturbed</span>
+                <span className="field-value">{familyInformation.maleRelativesDisturbed || "0"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Male Relatives Hospitalized / Suicide Attempts</span>
+                <span className="field-value">{familyInformation.maleRelativesHospitalized || "0"}</span>
+              </div>
+            </div>
+            <div>
+              <div className="field">
+                <span className="field-label">Female Relatives Emotionally Disturbed</span>
+                <span className="field-value">{familyInformation.femaleRelativesDisturbed || "0"}</span>
+              </div>
+              <div className="field">
+                <span className="field-label">Female Relatives Hospitalized / Suicide Attempts</span>
+                <span className="field-value">{familyInformation.femaleRelativesHospitalized || "0"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
@@ -1016,7 +1344,10 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
       />
 
       {!isLoading ? (
-        <div className="px-8">
+    
+    
+!printPreviewMode ? 
+     <div className="px-8">
    
 
           {/* Parental Information */}
@@ -2202,6 +2533,43 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab }) => {
             </div>
           )}
         </div>
+:
+<PrintFamilyInformationA4
+    familyInformation={{
+      spouseOccupation: familyInformation.spouseOccupation.value,
+      spouseOccupationFullTime: familyInformation.spouseOccupationFullTime.value,
+      motherAge: familyInformation.motherAge.value,
+      ageWhenMotherDied: familyInformation.ageWhenMotherDied.value,
+      fatherAge: familyInformation.fatherAge.value,
+      ageWhenFatherDied: familyInformation.ageWhenFatherDied.value,
+      motherOccupation: familyInformation.motherOccupation.value,
+      fatherOccupation: familyInformation.fatherOccupation.value,
+      motherReligion: familyInformation.motherReligion.value,
+      fatherReligion: familyInformation.fatherReligion.value,
+      raisedBy: familyInformation.raisedBy.value,
+      motherDescription: familyInformation.motherDescription.value,
+      fatherDescription: familyInformation.fatherDescription.value,
+      parentalSeparationAge: familyInformation.parentalSeparationAge.value,
+      parentalDivorceAge: familyInformation.parentalDivorceAge.value,
+      motherDivorceCount: familyInformation.motherDivorceCount.value,
+      fatherDivorceCount: familyInformation.fatherDivorceCount.value,
+      livingBrothers: familyInformation.livingBrothers.value,
+      livingSisters: familyInformation.livingSisters.value,
+      brothersAges: familyInformation.brothersAges.value,
+      sistersAges: familyInformation.sistersAges.value,
+      childNumber: familyInformation.childNumber.value,
+      familyChildren: familyInformation.familyChildren.value,
+      adopted: familyInformation.adopted.value,
+      brotherDisturbances: familyInformation.brotherDisturbances.value,
+      sisterDisturbances: familyInformation.sisterDisturbances.value,
+      maleRelativesDisturbed: familyInformation.maleRelativesDisturbed.value,
+      maleRelativesHospitalized: familyInformation.maleRelativesHospitalized.value,
+      femaleRelativesDisturbed: familyInformation.femaleRelativesDisturbed.value,
+      femaleRelativesHospitalized: familyInformation.femaleRelativesHospitalized.value,
+    }}
+ 
+  />
+  
       ) : (
         <LoadingSpinner />
       )}

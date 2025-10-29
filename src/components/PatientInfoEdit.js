@@ -242,7 +242,7 @@ if(id===null){
                   disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBookMedical className="mr-2" size={16} />
-              Management and Notes
+                 Clinical Notes
             </button>
 
         <button
@@ -424,7 +424,7 @@ if(id===null){
                   disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBookMedical className="mr-2" size={16} />
-              Management and Notes
+                 Clinical Notes
             </button>
            <button
               className={`flex items-center py-2 px-5 rounded-md text-sm font-semibold transition-all duration-200 ${
@@ -604,7 +604,7 @@ if(id===null){
                   disabled={tabDetails.isBasicInfo? false : true}
             >
               <FaBookMedical className="mr-2" size={16} />
-              Management and Notes
+                Clinical Notes
             </button>
 
         <button

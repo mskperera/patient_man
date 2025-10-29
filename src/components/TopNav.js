@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaUserCircle, FaBars, FaTimes, FaSignInAlt, FaPowerOff } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
+import { FaUserDoctor } from 'react-icons/fa6';
 
 function TopNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,13 +68,19 @@ function TopNav() {
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl py-2 z-50">
                 {localStorage.getItem('token') && (
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <h4 className="text-md font-semibold text-gray-800">User info</h4>
-                    <p className="text-sm text-gray-800">Display Name:{user?.displayName || 'Unknown User'}</p>
-                    <p className="text-sm text-gray-800 capitalize">
-                      Role: {user?.userRoleName || 'N/A'}
-                    </p>
-                  </div>
+<div className="px-4 py-3 border-b border-gray-200 bg-white">
+  <h4 className="text-lg font-semibold text-sky-800 mb-1">User Info</h4>
+  <div className="space-y-1">
+    <div className="flex items-center gap-2 text-gray-700">
+      {/* <FaUserDoctor className="text-sky-800 text-xl" /> */}
+      <span className="break-words">{user?.displayName || 'Unknown User'}</span>
+    </div>
+    <div className="flex items-center gap-2 text-sm text-gray-700 capitalize mt-2">
+      <FaUserDoctor className="text-sky-800 text-lg" />
+      <span className='font-bold'>{user?.userRoleName || 'N/A'}</span>
+    </div>
+  </div>
+</div>
                 )}
                 {!localStorage.getItem('token') ? (
                   <button

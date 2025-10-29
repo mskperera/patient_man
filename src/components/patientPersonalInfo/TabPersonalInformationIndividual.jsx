@@ -30,7 +30,322 @@ const maritalStatusOptions = [
   { value: "widowed_not_remarried", text: "Widowed and Not Remarried" },
 ];
 
-const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab }) => {
+
+
+
+const printStyles = `
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; }
+    .no-print { display: none; }
+
+    .print-section { 
+      break-inside: avoid; 
+      page-break-inside: avoid; 
+    }
+
+    .print-field {
+      break-inside: avoid;
+    }
+      
+      .print-header {
+      margin-bottom: 1.5rem;
+    }
+  }
+`;
+
+
+function MaritalInfoPrint({ personalInformation, maritalStatusOptions }) {
+  // ---------- helpers ----------
+  const getMaritalText = () => {
+    const opt = maritalStatusOptions.find(
+      o => o.value === personalInformation.maritalStatus.value
+    );
+    return opt ? opt.text : "N/A";
+  };
+
+  const splitAges = (field) => {
+    const raw = personalInformation[field].value;
+    if (!raw) return [];
+    return raw.split(",").map(a => a.trim()).filter(Boolean);
+  };
+
+  const maleAges   = splitAges("maleChildrenAges");
+  const femaleAges = splitAges("femaleChildrenAges");
+
+  const religiosity = personalInformation.religiosity.value
+    ? Number(personalInformation.religiosity.value)
+    : null;
+
+  // ---------- render ----------
+  return (
+    <>
+      {/* inject CSS */}
+      <style>{printStyles}</style>
+
+      {/* whole block – hidden on screen */}
+      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+
+          <h1 className="text-xl text-center mb-5 font-bold text-sky-700">Personal</h1>
+
+            <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+                 Marital Details
+          </h3>
+
+
+        {/* ---------- Two-column layout ---------- */}
+        <section className="print-section grid grid-cols-2 md:grid-cols-2 gap-6">
+
+          {/* ---- LEFT COLUMN ---- */}
+          <div className="space-y-4">
+
+            {/* Marital status */}
+            <div className="print-field flex justify-between items-start py-2 border-b border-gray-300">
+              <span className="font-medium text-gray-700 w-1/2">
+                Present Marital Status
+              </span>
+              <span className="text-gray-900 w-1/2 text-right">
+                {getMaritalText()}
+              </span>
+            </div>
+
+            {/* Male children ages */}
+            <div className="print-field flex justify-between items-start py-2 border-b border-gray-300">
+              <span className="font-medium text-gray-700 w-1/2">
+                Ages of Male Children
+              </span>
+              <div className="text-gray-900 w-1/2 text-right">
+                {maleAges.length ? maleAges.join(", ") : <span className="italic text-gray-500">N/A</span>}
+              </div>
+            </div>
+
+            {/* Female children ages */}
+            <div className="print-field flex justify-between items-start py-2 border-b border-gray-300">
+              <span className="font-medium text-gray-700 w-1/2">
+                Ages of Female Children
+              </span>
+              <div className="text-gray-900 w-1/2 text-right">
+                {femaleAges.length ? femaleAges.join(", ") : <span className="italic text-gray-500">N/A</span>}
+              </div>
+            </div>
+          </div>
+
+          {/* ---- RIGHT COLUMN ---- */}
+          <div className="space-y-4">
+
+            {/* Years married (only when applicable) */}
+            {["married_first_time", "married_second_time"].includes(
+              personalInformation.maritalStatus.value
+            ) && (
+              <div className="print-field flex justify-between items-center py-2 border-b border-gray-300">
+                <span className="font-medium text-gray-700 w-2/3">
+                  Number of Years Married to Present Spouse
+                </span>
+                <span className="text-gray-900 w-1/3 text-right">
+                  {personalInformation.yearsMarried.value} yrs
+                </span>
+              </div>
+            )}
+
+            {/* Religiosity */}
+            <div className="print-field py-2">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-medium text-gray-700">
+                  How religious are you?
+                </span>
+                <span className="text-gray-900 font-semibold">
+                  {religiosity ? `${religiosity} / 9` : "N/A"}
+                </span>
+              </div>
+
+              {religiosity ? (
+                <div className="text-xs text-gray-600 flex justify-between">
+                  <span>1 = Very Religious</span>
+                  <span>5 = Average</span>
+                  <span>9 = Atheist</span>
+                </div>
+              ) : (
+                <span className="italic text-gray-500">Not specified</span>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
+
+
+
+
+
+function PersonalInsightsPrint({ personalInformation }) {
+  /* ---------- helpers ---------- */
+  const renderList = (field) => {
+    const items = personalInformation[field].value || [];
+    if (!Array.isArray(items) || items.length === 0)
+      return <span className="italic text-gray-500">N/A</span>;
+
+    return (
+      <ul className="list-disc pl-5 space-y-1">
+        {items.map((it, i) => (
+          <li key={i} className="text-gray-700">{it}</li>
+        ))}
+      </ul>
+    );
+  };
+
+  return (
+    <>
+      <style>{printStyles}</style>
+
+      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+
+        <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+          Personal Insights
+        </h3>
+
+        <section className="print-section space-y-5">
+
+          {/* Things Liked */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Things you like to do most</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.thingsLiked.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
+          </div>
+
+          {/* Assets / Good points */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main assets and good points</span>
+            <div className="mt-1">{renderList("assets")}</div>
+          </div>
+
+          {/* Bad points */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main bad points</span>
+            <div className="mt-1">{renderList("badPoints")}</div>
+          </div>
+
+          {/* Social difficulties */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main social difficulties</span>
+            <div className="mt-1">{renderList("socialDifficulties")}</div>
+          </div>
+
+          {/* Love & Sex difficulties */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main love and sex difficulties</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.loveSexDifficulties.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
+          </div>
+
+          {/* Work / School difficulties */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main school or work difficulties</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.schoolWorkDifficulties.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
+          </div>
+
+          {/* Life goals */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main life goals</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.lifeGoals.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
+          </div>
+
+          {/* Things to change */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Things you would most like to change about yourself</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.thingsToChange.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
+          </div>
+
+        </section>
+      </div>
+    </>
+  );
+}
+
+
+function OccupationInfoPrint({ personalInformation }) {
+  return (
+    <>
+      <style>{printStyles}</style>
+
+      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+
+        <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+          Occupation Information
+        </h3>
+
+        <section className="print-section space-y-4">
+
+<div className="grid grid-cols-2 gap-5">
+          {/* Trained for */}
+          <div className="print-field flex justify-between items-center py-2 border-b border-gray-300">
+            <span className="font-medium text-gray-700 w-1/2">
+              Occupation(s) mainly trained for
+            </span>
+            <span className="text-gray-900 w-1/2 text-right">
+              {personalInformation.occupationTrained.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </span>
+          </div>
+
+          {/* Present occupation */}
+          <div className="print-field flex justify-between items-center py-2 border-b border-gray-300">
+            <span className="font-medium text-gray-700 w-1/2">
+              Present occupation
+            </span>
+            <span className="text-gray-900 w-1/2 text-right">
+              {personalInformation.occupation.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </span>
+          </div>
+
+          {/* Status */}
+          <div className="print-field flex justify-between items-center py-2">
+            <span className="font-medium text-gray-700 w-1/2">
+              Occupation status
+            </span>
+            <span className="text-gray-900 w-1/2 text-right">
+              {personalInformation.occupationFullTime.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </span>
+          </div>
+          </div>
+
+        </section>
+      </div>
+    </>
+  );
+}
+
+
+
+const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab ,printPreviewMode}) => {
 
   const [personalInformationErrors, setPersonalInformationErrors] = useState(
     {}
@@ -807,15 +1122,20 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
         type={modal.type}
       />
 
+
       {!isLoading ? (
         <div className="px-8">
           {/* Personal Details */}
+       {!printPreviewMode ?
           <section className="mb-12">
+
+
+
             <div className="flex justify-between items-center mb-2  pb-2">
               <h3 className="text-xl font-semibold text-gray-700">
-                Personal Details
+                  Marital Details
               </h3>
-              {mode !== "add" && (
+              { mode !== "add" && (
                 <div className="flex space-x-4">
                   <EditButton
                     onClick={() => toggleSectionEdit("personalDetails")}
@@ -1138,9 +1458,20 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                 </div>
               </div>
             )}
+
+
           </section>
 
+:
+          <section className="mb-12">
+          
+<MaritalInfoPrint personalInformation={personalInformation} maritalStatusOptions={maritalStatusOptions} />
+</section>
+          }
+
+
           {/* Personal Insights */}
+                 {!printPreviewMode ?
           <section className="mb-12">
             <div className="flex justify-between items-center mb-2 pb-2">
               <h3 className="text-xl font-semibold text-gray-700">
@@ -1456,8 +1787,14 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
               </div>
             )}
           </section>
+:
+          <section className="mb-12">
+      <PersonalInsightsPrint personalInformation={personalInformation} />
+    </section>
+}
 
           {/* Occupation Information */}
+                        {!printPreviewMode ?
           <section className="mb-12">
             <div className="flex justify-between items-center mb-2  pb-2">
               <h3 className="text-xl font-semibold text-gray-700">
@@ -1739,6 +2076,11 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
               </div>
             )}
           </section>
+:
+          <section className="mb-12">
+      <OccupationInfoPrint personalInformation={personalInformation} />
+    </section>}
+    
 
           {mode === "add" && (
             <div className="flex justify-end space-x-4 mt-6">

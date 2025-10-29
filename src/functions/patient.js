@@ -1428,11 +1428,11 @@ export const drpDoctors = async () => {
 };
 
 
-export const saveSummaryNote = async (patientId, doctorId, data) => {
+export const saveSummaryNote = async (patientId, userId, data) => {
   try {
-    console.log('Sending saveSummaryNote request:', { patientId, doctorId, data });
+    console.log('Sending saveSummaryNote request:', { patientId, userId, data });
     const response = await customAxios.put(
-      `/saveSummaryNote?patientId=${patientId}&doctorId=${doctorId}`,
+      `/saveSummaryNote?patientId=${patientId}&userId=${userId}`,
       { note: data },
       {
         headers: {

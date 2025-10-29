@@ -13,11 +13,185 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import EditButton from "../EditButton";
 
+
+/* --------------------------------------------------------------
+   Print-only styles (same pattern as BasicInfoPrint)
+   -------------------------------------------------------------- */
+const printStyles = `
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+
+  /* Hide on screen – show only when printing */
+  .print-only { display: none; }
+
+  @media print {
+    .print-only { display: block !important; }
+    .no-print   { display: none !important; }
+
+    .print-section { 
+      break-inside: avoid; 
+      page-break-inside: avoid; 
+    }
+    .print-field   { break-inside: avoid; }
+    .print-header  { margin-bottom: 1.5rem; }
+  }
+`;
+
+
+
+
+
+  function FamilyInfoPrint({ basicInformation }) {
+  const formatDate = (dateStr) =>
+    dateStr ? moment(dateStr).format("YYYY MMM DD") : "";
+
+  return (
+    <>
+      {/* Inject CSS */}
+      <style jsx>{printStyles}</style>
+
+      {/* Whole block – hidden on screen, visible in print preview */}
+      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+
+        {/* Main Header */}
+        <header className="print-header text-left mb-4">
+          <h3 className="text-xl font-bold text-gray-800 tracking-wide">
+            Family Information – Husband & Wife
+          </h3>
+        </header>
+
+        {/* Table-style layout */}
+        <section className="print-section">
+          {/* Header row */}
+          <div className="grid grid-cols-5 gap-4 mb-2 font-semibold text-sky-700">
+            <div></div>
+            <div className="col-span-2 text-center">Husband</div>
+            <div className="col-span-2 text-center">Wife</div>
+          </div>
+
+          {/* First Name */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">First Name</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandFirstName?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeFirstName?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Middle Name */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Middle Name</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandMiddleName?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeMiddleName?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Last Name */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Last Name</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandLastName?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeLastName?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Date of Birth */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Date of Birth</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {formatDate(basicInformation.husbandDateOfBirth?.value)}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {formatDate(basicInformation.wifeDateOfBirth?.value)}
+            </div>
+          </div>
+
+          {/* Age */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Age</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandAge?.value} {basicInformation.husbandAge?.value ? "Years" : ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeAge?.value} {basicInformation.wifeAge?.value ? "Years" : ""}
+            </div>
+          </div>
+
+          {/* Gender */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Gender</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandGender?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeGender?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Permanent Address */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-start">
+            <span className="font-medium text-gray-700">Permanent Address</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 whitespace-pre-line">
+              {basicInformation.husbandPermanentAddress?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 whitespace-pre-line">
+              {basicInformation.wifePermanentAddress?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Home Phone */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Home Phone</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandHomePhone?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeHomePhone?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Mobile Phone */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Mobile Phone</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.husbandMobilePhone?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
+              {basicInformation.wifeMobilePhone?.value ?? ""}
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
+            <span className="font-medium text-gray-700">Email</span>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 break-all">
+              {basicInformation.husbandEmail?.value ?? ""}
+            </div>
+            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 break-all">
+              {basicInformation.wifeEmail?.value ?? ""}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
+
 const TabBasicInformationFamily = ({
   id,
   refreshTabDetails,
   setNewId,
   patientTypeId,
+  printPreviewMode
 }) => {
   const navigate = useNavigate();
   const [basicInformationErrors, setBasicInformationErrors] = useState({});
@@ -750,6 +924,10 @@ const validateField = (name, value, required) => {
         message={modal.message}
         type={modal.type}
       />
+
+        {!printPreviewMode ?
+             
+       
     <div className="px-8">
       <section className="mb-4">
         <div className="flex justify-between items-center mb-2 pb-2">
@@ -1403,6 +1581,11 @@ const validateField = (name, value, required) => {
         </div>
       )}
     </div>
+
+:
+
+<FamilyInfoPrint basicInformation={basicInformation} />
+}
     </>
   );
 };

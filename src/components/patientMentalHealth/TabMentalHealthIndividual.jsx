@@ -9,7 +9,173 @@ import {
 import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
 
-const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab }) => {
+
+
+/* --------------------------------------------------------------
+   Shared Print & Screen CSS (same as Education)
+   -------------------------------------------------------------- */
+const printCss = `
+  .print-preview {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1f2937;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 15mm;
+    background: #fff;
+  }
+  .print-preview h1 { 
+    text-align: center; 
+    margin-bottom: 20px; 
+    font-size: 22px; 
+  }
+
+  
+  .print-preview .info-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-style: italic;
+    margin: 10px 0;
+  }
+  .print-preview .remark-box {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+    white-space: pre-line;
+    font-size: 13px;
+  }
+  .print-preview .field-box {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .print-preview .field-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .print-preview .field-value {
+    white-space: pre-line;
+    color: #1f2937;
+  }
+
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-preview .page-break { page-break-before: always; }
+  }
+
+  @media screen {
+    .print-preview .page-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
+  }
+`;
+
+const PrintMentalHealthA4= ({ mentalHealth, printPreviewMode = true }) => {
+  if (!printPreviewMode) return null;
+
+  const renderValue = (value) => {
+    if (!value || value.trim() === "") return <span className="text-gray-500 italic">N/A</span>;
+
+    if (value.includes(";")) {
+      const items = value.split(";").map(s => s.trim()).filter(Boolean);
+      return (
+        <ul className="list-disc pl-5 mt-1 space-y-1">
+          {items.map((item, i) => (
+            <li key={i} className="field-value">{item}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    return <div className="field-value">{value}</div>;
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+
+      <div className="print-preview">
+
+        {/* ========== PAGE 1: Title + Health Details ========== */}
+        <div>
+
+     <h1 className="text-xl text-center mb-5 font-bold text-sky-700">Mental Health Details</h1>
+     
+           <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+         Health Details
+        </h3>
+
+          <div className="field-box">
+            <span className="field-label">Chief Physical Ailments, Diseases, Complaints, or Handicaps</span>
+            {renderValue(mentalHealth.physicalAilments)}
+          </div>
+
+          <div className="field-box">
+            <span className="field-label">Present Main Complaints, Symptoms, and Problems</span>
+            {renderValue(mentalHealth.mainComplaints)}
+          </div>
+
+          <div className="field-box">
+            <span className="field-label">Additional Past Complaints, Symptoms, and Problems</span>
+            {renderValue(mentalHealth.pastComplaints)}
+          </div>
+
+          <div className="field-box">
+            <span className="field-label">Under What Conditions Are Problems Worse?</span>
+            {renderValue(mentalHealth.worseConditions)}
+          </div>
+
+          <div className="field-box">
+            <span className="field-label">Under What Conditions Are Problems Improved?</span>
+            {renderValue(mentalHealth.improvedConditions)}
+          </div>
+        </div>
+
+        {/* ========== PAGE 2: Treatment History ========== */}
+        <div className="page-break">
+    
+               <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+     Treatment History
+        </h3>
+
+          <div className="field-box">
+            <span className="field-label">
+              Past History of Psychiatric Treatment or Counselling
+            </span>
+            {renderValue(mentalHealth.pastHistoryOfPsyTeatment)}
+          </div>
+
+          <div className="field-box">
+            <span className="field-label">Are You Undergoing Treatment Anywhere Else Now?</span>
+            <div className="field-value font-medium">
+              {mentalHealth.currentTreatment || "N/A"}
+            </div>
+          </div>
+
+          <div className="field-box">
+            <span className="field-label">Additional Information</span>
+            {renderValue(mentalHealth.additionalInfo)}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
@@ -608,14 +774,16 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab }) => {
       />
 
       {!isLoading ? (
-        <div className="px-8">
+       
+       !printPreviewMode ?
+       <div className="px-8">
           {/* Health Details */}
           <section className=" mb-12">
             <div className="flex justify-between items-center mb-2 pb-2">
               <h3 className="text-xl font-semibold text-gray-800">
                 Health Details
               </h3>
-              {mode !== "add" && (
+              {(!printPreviewMode && mode !== "add") && (
                 <div className="flex space-x-4">
                   <EditButton
                     onClick={() => toggleSectionEdit("health")}
@@ -990,6 +1158,21 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab }) => {
             </div>
           )}
         </div>
+:
+<PrintMentalHealthA4
+      mentalHealth={{
+        physicalAilments: medicalInformation.physicalAilments.value,
+        mainComplaints: medicalInformation.mainComplaints.value,
+        pastComplaints: medicalInformation.pastComplaints.value,
+        worseConditions: medicalInformation.worseConditions.value,
+        improvedConditions: medicalInformation.improvedConditions.value,
+        pastHistoryOfPsyTeatment: medicalInformation.pastHistoryOfPsyTeatment.value,
+        currentTreatment: medicalInformation.currentTreatment.value,
+        additionalInfo: medicalInformation.additionalInfo.value,
+      }}
+      printPreviewMode={printPreviewMode}
+    />
+
       ) : (
         <LoadingSpinner />
       )}
