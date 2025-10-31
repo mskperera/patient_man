@@ -1,138 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner, FaCalendarAlt, FaUser } from 'react-icons/fa';
+import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner, FaCalendarAlt, FaUser, FaRegClock } from 'react-icons/fa';
 import { getSummaryNote, saveSummaryNote, addPsyNote, deletePsyNote, getPsyNotes, updatePsyNote } from '../functions/patient';
 import ConfirmDialog from './dialog/ConfirmDialog';
 import LoadingSpinner from './LoadingSpinner';
 import { commitFile, markFileAsTobeDeleted, uploadPsyNoteAttachments } from '../functions/assets';
 import MessageModel from './MessageModel';
 import moment from 'moment';
+import { getFileIcon } from '../utils/fileIconExtentions';
 
 
-
-/* --------------------------------------------------------------
-   A4 Print CSS (Consistent with Notes Print)
-   -------------------------------------------------------------- */
-const printCss = `
-  .print-notes {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13.5px;
-    line-height: 1.6;
-    max-width: 210mm;
-    margin: 0 auto;
-    padding: 16mm;
-  }
-  .print-notes h1 {
-    text-align: center;
-    font-size: 22px;
-    margin-bottom: 16px;
-    font-weight: bold;
-  }
-  .print-notes .header-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .print-notes .summary-section {
-    margin-bottom: 30px;
-    padding: 14px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
-  }
-  .print-notes .summary-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #0ea5e9;
-  }
-  .print-notes .summary-content {
-    white-space: pre-line;
-  }
-  .print-notes .note-item {
-    margin-bottom: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  .print-notes .note-header {
-    background-color: #f8fafc;
-    padding: 10px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .print-notes .note-content {
-    padding: 14px;
-    background-color: #fff;
-    white-space: pre-line;
-  }
-  .print-notes .note-content :global(p) {
-    margin: 0 0 8px;
-  }
-  .print-notes .note-content :global(ul), .print-notes .note-content :global(ol) {
-    margin: 8px 0;
-    padding-left: 20px;
-  }
-  .print-notes .note-content :global(li) {
-    margin-bottom: 4px;
-  }
-  .print-notes .attachments {
-    padding: 10px 14px;
-    background-color: #f1f5f9;
-    border-top: 1px dashed #cbd5e1;
-  }
-  .print-notes .attachment-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-    margin-top: 8px;
-  }
-  .print-notes .attachment-item {
-    text-align: center;
-    font-size: 11.5px;
-    padding: 8px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    word-break: break-word;
-  }
-  .print-notes .attachment-icon {
-    font-size: 20px;
-    margin-bottom: 4px;
-    color: #0ea5e9;
-  }
-  .print-notes .no-notes {
-    text-align: center;
-    color: #9ca3af;
-    font-style: italic;
-    margin: 40px 0;
-  }
-
-  @media print {
+const printStyles = `
+   @media print {
     @page { size: A4; margin: 1cm; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-notes .page-break { page-break-before: always; }
+    .print-break { page-break-before: always; }
   }
   @media screen {
-    .print-notes .page-break { break-before: page; margin-top: 30mm; }
-  }
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
 `;
 
-const PrintPsychiatricNotesA4 = ({ summaryNote, savedNotes, patientName = "Patient", printPreviewMode = true }) => {
+const PrintPsychiatricNotesA4 = ({ 
+  summaryNote, 
+  savedNotes, 
+  patientName = "Patient", 
+  printPreviewMode = true 
+}) => {
   if (!printPreviewMode) return null;
 
   const formatDate = (dateStr) => {
     try {
-      return moment(dateStr).format("DD MMM YYYY, hh:mm A");
+      return new Date(dateStr).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).replace(",", "");
     } catch {
       return dateStr;
     }
@@ -140,16 +48,26 @@ const PrintPsychiatricNotesA4 = ({ summaryNote, savedNotes, patientName = "Patie
 
   const renderAttachment = (att) => {
     const icon =
-      att.type === "image" ? <FaImage className="attachment-icon" /> :
-      att.type === "audio" ? <FaMicrophone className="attachment-icon" /> :
-      <FaFile className="attachment-icon" />;
+      att.type === "image" ? (
+        <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ) : att.type === "audio" ? (
+        <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        </svg>
+      ) : (
+        <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      );
 
     return (
-      <div key={att.hash} className="attachment-item">
+      <div key={att.hash} className="text-center p-2 bg-white border border-gray-300 rounded-md text-xs">
         {icon}
-        <div className="font-medium text-gray-800 truncate">{att.name}</div>
+        <div className="font-medium text-gray-800 truncate mt-1">{att.name}</div>
         {att.description && (
-          <div className="text-xs text-gray-600 mt-1 italic">{att.description}</div>
+          <div className="text-xs text-gray-600 italic mt-1">{att.description}</div>
         )}
       </div>
     );
@@ -157,51 +75,71 @@ const PrintPsychiatricNotesA4 = ({ summaryNote, savedNotes, patientName = "Patie
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
 
-      <div className="print-notes">
-        {/* Header */}
-        <h1 className=" text-lg font-bold text-sky-700">Psychiatric Notes</h1>
-        
-        <div className="header-info">
-          <div><FaCalendarAlt className="inline mr-1" /> <strong>Printed:</strong> {moment().format("DD MMM YYYY, hh:mm A")}</div>
-        </div>
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto bg-white">
 
-    <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-    Summary Note
+<div className=" mt-10">
+
+        {/* ========== Header ========== */}
+        <h1 className="text-center text-xl font-bold text-sky-700 mb-4">
+          Psychiatric Notes
+        </h1>
+
+
+
+        {/* ========== Summary Note ========== */}
+        <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+          Summary Note
         </h3>
-        {/* Summary Note */}
-        <div className="summary-section">
-    
 
-    
-
-
-          <div
-            className="summary-content"
-            dangerouslySetInnerHTML={{ __html: summaryNote }}
-          />
+        <div className="mb-8 p-3.5 border border-gray-300 border-dashed rounded-lg">
+          {summaryNote ? (
+            <div
+              className="prose prose-sm max-w-none text-gray-800 whitespace-pre-line"
+              dangerouslySetInnerHTML={{ __html: summaryNote }}
+            />
+          ) : (
+            <p className="text-gray-500 italic">No summary note available.</p>
+          )}
         </div>
 
-        {/* Notes Timeline */}
-        <div className="section-title">Notes Timeline</div>
+        {/* ========== Notes Timeline ========== */}
+        <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+          Notes Timeline
+        </h3>
+
         {savedNotes.length === 0 ? (
-          <div className="no-notes">No notes recorded yet.</div>
+          <div className="text-center text-gray-400 italic my-10">
+            No notes recorded yet.
+          </div>
         ) : (
           savedNotes.map((note, idx) => (
-            <div key={note.id} className="note-item">
-              <div className="note-header">
-                <span><strong>Note #{savedNotes.length - idx}</strong></span>
+            <div
+              key={note.id}
+              className="mb-5 border border-gray-300 rounded-lg overflow-hidden shadow-sm"
+            >
+              {/* Note Header */}
+              <div className=" px-3.5 py-2.5 flex justify-between items-center text-xs text-gray-600 border-b border-gray-300 border-dashed">
+                <span>
+                  <strong>Note #{savedNotes.length - idx}</strong>
+                </span>
                 <span>{formatDate(note.timestamp)}</span>
               </div>
+
+              {/* Note Content */}
               <div
-                className="note-content"
+                className="p-3.5 bg-white prose prose-sm max-w-none"
                 dangerouslySetInnerHTML={{ __html: note.content }}
               />
+
+              {/* Attachments */}
               {note.attachments && note.attachments.length > 0 && (
-                <div className="attachments">
-                  <strong className="text-sm block mb-2">Attachments ({note.attachments.length})</strong>
-                  <div className="attachment-grid">
+                <div className="px-3.5 py-2.5 bg-gray-100 border-t border-dashed border-gray-400">
+                  <strong className="block text-sm mb-2 text-gray-700">
+                    Attachments ({note.attachments.length})
+                  </strong>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-2">
                     {note.attachments.map(renderAttachment)}
                   </div>
                 </div>
@@ -209,11 +147,11 @@ const PrintPsychiatricNotesA4 = ({ summaryNote, savedNotes, patientName = "Patie
             </div>
           ))
         )}
+        </div>
       </div>
     </>
   );
 };
-
 
 
 
@@ -366,6 +304,7 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
   const audioStreamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const [deletedAttachments, setDeletedAttachments] = useState([]);
 
     const [isUploadingAttachement,setIsUploadingAttachement]=useState(false);
     const [modal, setModal] = useState({
@@ -413,7 +352,10 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
       const note= {
           id: n.noteId,
           content: n.note,
+          createdDate:n.createdDate,
+        modifiedDate:n.modifiedDate,
           timestamp: new Date(n.createdDate).toLocaleString(),
+
           attachments
         }
   
@@ -623,7 +565,7 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
         {
           ...pendingAttachment,
           description: attachmentDescription,
-          uploadRes:response
+          ...response
         },
       ]);
     }
@@ -663,8 +605,15 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
     }
   };
 
-  const handleDeleteAttachment = (attachId) => {
-    setAttachments(attachments.filter((att) => att.id !== attachId));
+    const handleDeleteAttachment = (hash) => {
+      console.log('hash:',hash);
+           console.log('attachments:',attachments);
+        
+    setAttachments(attachments.filter((att) => att.hash !== hash));
+    const deletedAttachment=attachments.filter((att) => att.hash === hash);
+         console.log('deletedAttachment:',deletedAttachment); 
+
+    setDeletedAttachments([...deletedAttachments,deletedAttachment[0]])
   };
 
   const handleSaveNotes = async () => {
@@ -676,7 +625,7 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
 
   attachments.forEach(att => {
  _attachments.push({description:att.description,name:att.name,
-  type:att.type,hash:att.uploadRes.hash})
+  type:att.type,hash:att.hash})
   });
 
  console.log('aaattt:',_attachments)
@@ -684,49 +633,20 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
 
   const payload={notes,patientId,userId,attachments:_attachments}
   
- console.log('payload:',payload)
+ console.log('editingNoteId:',editingNoteId);
   try {
     let res;
     if (editingNoteId) {
       res = await updatePsyNote(editingNoteId, payload);
-      if (res.data.outputValues.ResponseStatus === 'success') {
-        setSavedNotes(savedNotes.map(note =>
-          note.id === editingNoteId
-            ? {
-                ...note,
-                content: notes,
-                timestamp: new Date().toLocaleString(),
-                attachments: attachments.map(att => ({
-                 // id: att.id,
-                  name: att.name,
-                  type: att.type,
-                  url: att.url,
-                  path: att.path || att.name,
-                  description: att.description,
-                  hash:att.uploadRes.hash
-                }))
-              }
-            : note
-        ));
-        setNewNoteIds(prev => new Set(prev).add(editingNoteId));
-      }
-    } else {
-      res = await addPsyNote(payload);
       
 
-  console.log("Save res:", res);
-        //await loadPersonalInformationData();
-        console.log("update result:", res);
-
-        if (res.data.error) {
+           if (res.data.error) {
           setModal({
             isOpen: true,
             message: res.data.error.message,
-            type: "warning",
+            type: "error",
           });
-
-           setIsSaving(false);
-
+          setIsSaving(false);
           return;
         }
 
@@ -736,17 +656,55 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
             message: res.data.outputValues.outputMessage,
             type: "warning",
           });
-
           setIsSaving(false);
-
           return;
         }
 
+      if (res.data.outputValues.responseStatus === 'success') {
+  
+        setSavedNotes(savedNotes.map(note =>
+          note.id === editingNoteId
+            ? {
+                ...note,
+                content: notes,
+                //timestamp: new Date().toLocaleString(),
+                createdDate:note.createdDate,
+                modifiedDate: new Date().toLocaleString(),
+
+                attachments: attachments.map(att => ({
+                 // id: att.id,
+                  name: att.name,
+                  type: att.type,
+                  url: att.url,
+                  path: att.path || att.name,
+                  description: att.description,
+                  hash:att.hash
+                }))
+              }
+            : note
+        ));
+                      console.log('rrrrrrrrrrrrrrrr')
+        setNewNoteIds(prev => new Set(prev).add(editingNoteId));
 
 
+      deletedAttachments.forEach(async att => {
+          try{
+         const attachmentCommitRes=await markFileAsTobeDeleted(att.hash);
+         console.log('attachmentdeltedRes',attachmentCommitRes)
+          }catch(err){
+            console.log("Error commiting attachment:",err);
+            return;
+          }
+        });
+
+
+      }
+    } else {
+      res = await addPsyNote(payload);
+      
         attachments.forEach(async att => {
           try{
-         const attachmentCommitRes=await commitFile(att.uploadRes.hash);
+         const attachmentCommitRes=await commitFile(att.hash);
          console.log('attachmentCommitRes',attachmentCommitRes)
           }catch(err){
             console.log("Error commiting attachment:",err);
@@ -754,25 +712,58 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
           }
         });
 
+
+     if (res.data.error) {
+          setModal({
+            isOpen: true,
+            message: res.data.error.message,
+            type: "error",
+          });
+          setIsSaving(false);
+          return;
+        }
+
+        if (res.data.outputValues.responseStatus === "failed") {
+          setModal({
+            isOpen: true,
+            message: res.data.outputValues.outputMessage,
+            type: "warning",
+          });
+          setIsSaving(false);
+          return;
+        }
+
+
+        console.log('addPsyNote    i:',res)
       if (res.data.outputValues.responseStatus === 'success') {
+
+
+
+
+
+        
         const newNote = {
           id: res.data.outputValues.noteId_out,
           content: notes,
-          timestamp: new Date().toLocaleString(),
+            createdDate:new Date().toLocaleString(),
+                 modifiedDate:new Date().toLocaleString(),
+          //timestamp: new Date().toLocaleString(),
           attachments: attachments.map(att => ({
             id: att.id,
             name: att.name,
             type: att.type,
             description: att.description,
-               hash:att.uploadRes.hash
+               hash:att.hash
           }))
         };
         setSavedNotes([newNote, ...savedNotes]);
         setNewNoteIds(prev => new Set(prev).add(newNote.id));
 
-        
+        console.log('attachments')
       }
     }
+
+
     setNotes('');
     setAttachments([]);
     setEditingNoteId(null);
@@ -781,10 +772,12 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
   } catch (err) {
     setIsSaving(false);
     console.error('Failed to save note:', err);
+            setModal({
+            isOpen: true,
+            message: err,
+            type: "error",
+          });
     // Handle error modal
-  }
-  finally{
-    setIsSaving(false);
   }
 };
 
@@ -911,6 +904,8 @@ const confirmDelete = async () => {
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${hours}:${mins}:${secs}`;
   };
+
+
 
   return (
    !printPreviewMode ?  <>
@@ -1041,55 +1036,79 @@ const confirmDelete = async () => {
               {/* Current Attachments Preview */}
                    {attachments.length > 0 && (
                      <div className="mb-6">
-                       <h3 className="text-sm font-medium text-gray-700 mb-2">Current Attachments</h3>
-                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                     <h3 className="text-md font-bold text-gray-700 mb-2">Attachments</h3>
+                      <div className="flex justify-start items-center gap-4">
                          {attachments.map((att) => (
-                           <div
-                             key={att.id}
-                             className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm"
-                           >
-                         
-                             {/* {JSON.stringify(att)} */}
-                             <div className="text-2xl mb-2 text-sky-600">
-                               {att.type === 'image' && <FaCamera />}
-                               {att.type === 'file' && <FaFile />}
-                               {att.type === 'audio' && <FaMicrophone />}
-                             </div>
-                             <p className="text-sm font-medium text-gray-900 truncate">{att.name}</p>
-                             {/* <p className="text-xs text-gray-600 mt-1">{att.description}</p> */}
-                             {att.type === 'image' && (
-                               <img src={`https://clpos.legendbyte.com/api/v1/asset/${att.uploadRes.hash}`} alt={att.name} className="mt-2 max-w-full h-auto rounded-md" />
-                               // <a
-                               //   href={att.url}
-                               //   download
-                               //   className="text-sky-600 hover:underline mt-2 block"
-                               // >
-                               //   {att.name}
-                               // </a>
-                           )}
-                             {att.type === 'audio' && (
-                               <audio controls className="mt-2 w-full">
-                                 <source src={att.url} type="audio/webm" />
-                               </audio>
-                             )}
-                             {att.type === 'file' && (
-                               <a
-                                 href={att.url}
-                                 download
-                                 className="text-sky-600 hover:underline mt-2 block"
-                               >
-                                 {att.name}
-                               </a>
-                             )}
-                             <button
-                               onClick={() => handleDeleteAttachment(att.id)}
-                               className="absolute top-2 right-2 text-red-600 hover:text-red-700"
-                               title="Delete Attachment"
-                               aria-label={`Delete attachment ${att.name}`}
-                             >
-                               <FaTrash />
-                             </button>
-                           </div>
+                                <div
+                  key={att.id}
+                  className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm flex flex-col items-center w-44"
+                >
+                
+                
+                                <button
+                                  onClick={() => handleDeleteAttachment(att.hash)}
+                                  className="absolute top-1 right-1 text-red-600 hover:text-red-800"
+                                >
+                                  <FaTrash size={14} />
+                                </button>
+                  {/* Image preview */}
+                  {att.type === "image" && (
+                    <a
+                      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex justify-center"
+                    >
+                      <img
+                        src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                        alt={att.name}
+                        className="mt-2 w-20 h-20 object-cover rounded-md"
+                      />
+                    </a>
+                  )}
+                
+                  {/* Audio preview */}
+                  {att.type === "audio" && (
+                    <div className="mt-2 w-40">
+                      <audio controls className="w-full">
+                        <source
+                          src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                          type="audio/webm"
+                        />
+                      </audio>
+                    </div>
+                  )}
+                
+                  {/* File link */}
+                  {att.type === "file" && (
+                    <a
+                      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center mt-2 "
+                      title={att.name}
+                    >
+                      <img
+                        src={getFileIcon(att.name)}
+                        alt="file icon"
+                        className="w-12 h-12 mb-1"
+                      />
+                      {/* File name directly below icon */}
+                
+                
+                    </a>
+                  )}
+                
+                
+                    <p
+                      className="text-sm mt-2 font-medium text-gray-900 truncate text-center w-full"
+                      title={att.name}
+                    >
+                      {att.name}
+                    </p>
+                
+                </div>
                          ))}
                        </div>
                      </div>
@@ -1125,16 +1144,35 @@ const confirmDelete = async () => {
                 </div>
                 <div className="ml-4 bg-gray-50 border rounded-lg p-4 w-full shadow-sm">
                   <div className="flex justify-between items-center mb-2">
-                    <p className="text-sm text-gray-500">{note.timestamp}</p>
+                                <div className="flex justify-start items-center gap-2">
+                                    <FaRegClock /> 
+                    <p className="text-sm text-gray-500 italic">
+                   {moment(note.createdDate).format("DD MMM YYYY, hh:mm A")}
+                    </p>
+                  
+                    {note.createdDate !== note.modifiedDate && (
+                      <p className="text-sm  italic text-orange-500">
+                        Edited: {moment(note.modifiedDate).format("DD MMM YYYY, hh:mm A")}
+                      </p>
+                    )}
+                  </div>
+                         
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEditNote(note)}
-                        className="text-sky-600 hover:text-sky-700"
-                        title="Edit Note"
-                        aria-label={`Edit note from ${note.timestamp}`}
-                      >
-                        <FaEdit />
-                      </button>
+                                   <button
+                   onClick={() => {
+                     const _note = savedNotes.find((n) => n.id === note.id);
+                     setEditingNoteId(_note.id);
+                     setNotes(_note.content);
+                     setAttachments(_note.attachments ?? []);
+                     setDeletedAttachments([]);
+                     // no need for setShowEditor – the overlay above does the job
+                   }}
+                   className="text-sky-600 hover:text-sky-700"
+                   title="Edit Note"
+                   aria-label={`Edit note from ${note.timestamp}`}
+                 >
+                   <FaEdit />
+                 </button>
                       <button
                         onClick={() => handleDeleteNote(note.id)}
                         className="text-red-600 hover:text-red-700"
@@ -1146,56 +1184,78 @@ const confirmDelete = async () => {
                     </div>
                   </div>
                   <div
-                    className="prose max-w-none mb-4"
+                         className="prose max-w-none mb-4 border border-gray-200 hadow-sm rounded-lg p-4 bg-slate-50"
                     dangerouslySetInnerHTML={{ __html: note.content }}
                   />
                   {note.attachments && note.attachments.length > 0 && (
                     <div>
-                      <div className="flex flex-wrap gap-4">
-                        {note.attachments.map((att) => (
-                          <div
-                            key={att.id}
-                            className="border rounded-lg p-2 text-center relative"
-                          >
-                                   {/* {JSON.stringify(att)} */}
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {att.name}
-                            </p>
-                            {/* <p className="text-xs text-gray-600 mt-1">{att.description}</p> */}
-                            {att.type === 'image' && (
-                           <a
-  href={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
-  target="_blank"
-  rel="noopener noreferrer"
+            <div className="flex flex-wrap gap-4">
+  {note.attachments.map((att) => (
+    <div
+  key={att.id}
+  className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm flex flex-col items-center w-44"
 >
-  <img
-    src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
-    alt={att.name}
-    className="mt-2 w-40 rounded-md cursor-pointer"
-  />
-</a>
+  
+  {/* Image preview */}
+  {att.type === "image" && (
+    <a
+      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex justify-center"
+    >
+      <img
+        src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+        alt={att.name}
+        className="mt-2 w-20 h-20 object-cover rounded-md"
+      />
+    </a>
+  )}
 
-                            )}
-                            {att.type === 'audio' && (
-                              <audio controls className="mt-2 w-full">
-                                <source src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`} type="audio/webm" />
-                              </audio>
-                            )}
-                        {att.type === 'file' && (
-  <a
-    href={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
-    download
-    target="_blank"       // Opens in new tab
-    rel="noopener noreferrer" // Security best practice
-    className="text-sky-600 hover:underline mt-2 block"
-  >
-    {att.name}
-  </a>
-)}
+  {/* Audio preview */}
+  {att.type === "audio" && (
+    <div className="mt-2 w-40">
+      <audio controls className="w-full">
+        <source
+          src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+          type="audio/webm"
+        />
+      </audio>
+    </div>
+  )}
 
-                          </div>
-                        ))}
-                      </div>
+  {/* File link */}
+  {att.type === "file" && (
+    <a
+      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+      download
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex flex-col items-center mt-2"
+      title={att.name}
+    >
+      <img
+        src={getFileIcon(att.name)}
+        alt="file icon"
+        className="w-12 h-12 mb-1"
+      />
+      {/* File name directly below icon */}
+
+    </a>
+  )}
+
+
+    <p
+      className="text-sm mt-2 font-medium text-gray-900 truncate text-center w-full"
+      title={att.name}
+    >
+      {att.name}
+    </p>
+
+</div>
+  ))}
+</div>
+
                     </div>
                   )}
                 </div>
@@ -1401,6 +1461,225 @@ const confirmDelete = async () => {
         title="Confirm Delete"
         severity="danger"
       />
+
+{editingNoteId && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+
+      {/* ───── Header ───── */}
+      <div className="flex justify-between items-center p-4 border-b">
+        <h3 className="text-lg font-semibold text-gray-800">
+          {editingNoteId ? 'Edit Note' : 'New Note'}
+        </h3>
+        <button
+          onClick={handleCancelEditor}
+          className="text-gray-500 hover:text-gray-700"
+          aria-label="Close editor"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* ───── Attachment Toolbar (same as the “new note” panel) ───── */}
+      <div className="flex justify-between items-center p-2 bg-gray-100 border-b">
+        <div className="flex gap-2">
+          {/* Image */}
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleUpload(e, 'image')}
+              className="hidden"
+            />
+            <span
+              className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
+              title="Upload Image"
+            >
+              <FaImage size={16} />
+            </span>
+          </label>
+
+          {/* File (pdf/doc…) */}
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={(e) => handleUpload(e, 'file')}
+              className="hidden"
+            />
+            <span
+              className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
+              title="Upload File"
+            >
+              <FaFile size={16} />
+            </span>
+          </label>
+
+          {/* Audio file */}
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={(e) => handleUpload(e, 'audio')}
+              className="hidden"
+            />
+            <span
+              className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
+              title="Upload Audio"
+            >
+              <FaFileAudio size={16} />
+            </span>
+          </label>
+
+          {/* Camera */}
+          <button
+            onClick={startCamera}
+            className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
+            title="Camera Shot"
+          >
+            <FaCamera size={16} />
+          </button>
+
+          {/* Record audio */}
+          <button
+            onClick={() => setShowRecordModal(true)}
+            className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
+            title="Record Audio"
+          >
+            <FaMicrophone size={16} />
+          </button>
+        </div>
+
+        {/* Voice-to-text (kept hidden – same as original) */}
+        <VoiceToText
+          name="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="hidden"
+          ariaLabel="Voice to text input for notes"
+        />
+      </div>
+
+      {/* ───── Quill editor ───── */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <ReactQuill
+          value={notes}
+          onChange={setNotes}
+          modules={{
+            toolbar: [
+              [{ header: [1, 2, false] }],
+              ['bold', 'italic', 'underline'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['link'],
+              ['clean'],
+            ],
+          }}
+          className="h-full"
+          style={{ height: '100%' }}
+        />
+      </div>
+
+      {/* ───── Existing attachments preview ───── */}
+      {attachments.length > 0 && (
+        <div className="p-4 border-t bg-gray-50">
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Attachments</h4>
+          <div className="flex justify-start items-center gap-4">
+                   {attachments.map((att) => (
+                     <div
+                       key={att.id}
+                    className="border rounded-lg p-4 text-center relative bg-gray-50 shadow-sm flex flex-col items-center w-44"
+                     >
+       
+                       <button
+                         onClick={() => handleDeleteAttachment(att.hash)}
+                         className="absolute top-1 right-1 text-red-600 hover:text-red-800"
+                         type="button"
+                       >
+                         <FaTrash size={14} />
+                       </button>
+       
+                       {att.type === 'image' && (
+                             <a
+             href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+             target="_blank"
+             rel="noopener noreferrer"
+             className="flex justify-center"
+           >
+                         <img
+                           src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+                           alt={att.name}
+                           className="max-h-20 mx-auto rounded"
+                         />
+                         </a>
+                       )}
+                       {att.type === 'audio' && (
+                            <div className="mt-2 w-40">
+                         <audio controls className="w-full">
+                           <source src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`} />
+                         </audio>
+                         </div>
+                       )}
+                       {att.type === 'file' && (
+                         <a
+                 href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+             download
+             target="_blank"
+             rel="noopener noreferrer"
+             className="flex flex-col items-center mt-2 "
+             title={att.name}
+                         >
+                          <img
+               src={getFileIcon(att.name)}
+               alt="file icon"
+               className="w-12 h-12 mb-1"
+             />
+                         </a>
+                       )}
+              <p
+             className="text-sm mt-2 font-medium text-gray-900 truncate text-center w-full"
+             title={att.name}
+           >
+             {att.name}
+           </p>
+                     </div>
+                   ))}
+                 </div>
+        </div>
+      )}
+
+      {/* ───── Footer – Save / Cancel ───── */}
+      <div className="flex justify-end gap-3 p-4 border-t">
+        <button
+          onClick={handleCancelEditor}
+          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSaveNotes}
+          disabled={isSaving || notes.trim() === '<p><br></p>'}
+          className="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:opacity-50 flex items-center gap-2"
+        >
+          {isSaving ? (
+            <>
+              <FaSpinner className="animate-spin" />
+              Saving…
+            </>
+          ) : (
+            <>
+              <FaEdit />
+              {editingNoteId ? 'Update' : 'Save'}
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
     </>
   :

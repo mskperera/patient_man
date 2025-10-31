@@ -4,6 +4,7 @@ import DescriptionInput from "../DescriptionInput";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageModel from "../MessageModel";
 import {
+  addOccupation,
   addPersonalInformation,
   drpBadPoints,
   drpGoodPoints,
@@ -14,6 +15,7 @@ import {
 } from "../../functions/patient";
 import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
+import DialogModel from "../model/DialogModel";
 
 const maritalStatusOptions = [
   { value: "never_married", text: "Never Married" },
@@ -32,31 +34,19 @@ const maritalStatusOptions = [
 
 
 
-
 const printStyles = `
-  @page {
-    size: A4;
-    margin: 1cm;
+   @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
   }
-
-  @media print {
-    body { -webkit-print-color-adjust: exact; }
-    .no-print { display: none; }
-
-    .print-section { 
-      break-inside: avoid; 
-      page-break-inside: avoid; 
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
     }
-
-    .print-field {
-      break-inside: avoid;
-    }
-      
-      .print-header {
-      margin-bottom: 1.5rem;
-    }
-  }
 `;
+
 
 
 function MaritalInfoPrint({ personalInformation, maritalStatusOptions }) {
@@ -88,7 +78,7 @@ function MaritalInfoPrint({ personalInformation, maritalStatusOptions }) {
       <style>{printStyles}</style>
 
       {/* whole block – hidden on screen */}
-      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+      <div className="print-break mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
 
           <h1 className="text-xl text-center mb-5 font-bold text-sky-700">Personal</h1>
 
@@ -203,12 +193,12 @@ function PersonalInsightsPrint({ personalInformation }) {
     <>
       <style>{printStyles}</style>
 
-      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
-
+      <div className="print-only mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
+        <header className="print-header text-left mb-4">
         <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
           Personal Insights
         </h3>
-
+</header>
         <section className="print-section space-y-5">
 
           {/* Things Liked */}
@@ -291,7 +281,7 @@ function OccupationInfoPrint({ personalInformation }) {
     <>
       <style>{printStyles}</style>
 
-      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+      <div className="print-only mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
 
         <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
           Occupation Information
@@ -776,6 +766,107 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
     }
   };
 
+
+//occupation add panel
+const [showOccuptionAddPanel,setShowOccuptionAddPanel]=useState(false);
+const [newOccupationName,setNewOccupationName]=useState('');
+
+
+const NewOccupationPanel = () => {
+  return (
+    <div className="mt-4 p-4 border border-blue-200 rounded-lg">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Enter New Occupation Name
+      </label>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newOccupationName}
+          onChange={(e) => setNewOccupationName(e.target.value)}
+          placeholder="e.g., Data Scientist"
+          className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          autoFocus
+        />
+        <button
+          onClick={async () => {
+            if (!newOccupationName.trim()) {
+              setModal({
+                isOpen: true,
+                message: "Please enter an occupation name.",
+                type: "error",
+              });
+              return;
+            }
+
+            setIsSaving(true);
+            const occupationRes = await addOccupation({ occupationName: newOccupationName.trim() });
+
+            console.log('occupationRes',occupationRes)
+            if (occupationRes.data.error) {
+              setModal({
+                isOpen: true,
+                message: occupationRes.data.error.message,
+                type: "error",
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            if (occupationRes.data.outputValues.responseStatus === "failed") {
+              setModal({
+                isOpen: true,
+                message: occupationRes.data.outputValues.outputMessage,
+                type: "warning",
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            await loadDrpOccupations();
+
+            const occupatoinId=occupationRes.data.outputValues.occupationId;
+
+            setPersonalInformation((prev) => ({
+              ...prev,
+              [selectedOccupationField]: {
+                ...prev[selectedOccupationField],
+                value: newOccupationName.trim(),
+              },
+              // occupation: {
+              //   ...prev.occupation,
+              //   value: newOccupationName.trim(),
+              // },
+            }));
+
+            setNewOccupationName("");
+            setShowOccuptionAddPanel(false);
+            setIsSaving(false);
+
+            setModal({
+              isOpen: true,
+              message: "New occupation added and selected!",
+              type: "success",
+            });
+          }}
+          disabled={isSaving}
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+        >
+          {isSaving ? "Adding..." : "Add"}
+        </button>
+        <button
+          onClick={() => {
+            setShowOccuptionAddPanel(false);
+            setNewOccupationName("");
+          }}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
   // Validate individual field
   const validateField = (name, value, required, dataType) => {
    
@@ -803,6 +894,14 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
   // Handle input changes
   const handleChangePersonalInfo = (e) => {
     const { name, value } = e.target;
+
+if(value===0) // adding custom occupation
+{
+  setShowOccuptionAddPanel(true);
+
+}
+
+
     const { required, dataType } = personalInformation[name];
     const error = validateField(
       personalInformation[name].label,
@@ -1079,6 +1178,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
     setIsSaving(false);
   };
 
+  const [selectedOccupationField,setSelectedOccupationField]=useState('');
   // Function to handle cancel action
   const handleCancel = (editingSection) => {
     if (initialPersonalInformation) {
@@ -1122,6 +1222,17 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
         type={modal.type}
       />
 
+
+      <DialogModel
+        header={"Add New Occupation"}
+        visible={showOccuptionAddPanel}
+        onHide={() => setShowOccuptionAddPanel(false)}
+      >
+
+
+<NewOccupationPanel />
+
+</DialogModel>
 
       {!isLoading ? (
         <div className="px-8">
@@ -1818,23 +1929,7 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                       : "Edit"}
                   </EditButton>
 
-                  {/* <button
-                    onClick={() => toggleSectionEdit("occupation")}
-                    className="flex items-center bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition-all duration-200"
-                    aria-label={
-                      editingSection === "occupation"
-                        ? "Save Occupation Info"
-                        : "Edit Occupation Info"
-                    }
-                    disabled={isSaving}
-                  >
-                    <FaEdit className="mr-2" />
-                    {editingSection === "occupation"
-                      ? isSaving
-                        ? "Saving..."
-                        : "Save"
-                      : "Edit"}
-                  </button> */}
+    
                   {editingSection === "occupation" && (
                     <button
                       onClick={() => handleCancel("occupation")}
@@ -1859,6 +1954,10 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                       )}
                     </label>
 
+
+
+
+
                     {/* <TypeableDropdown
                           options={occupations}
                           value={{ value: personalInformation.occupationTrained?.value,name:personalInformation.occupationTrained?.value}}
@@ -1870,52 +1969,50 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                             aria-label="Occupation trained for"
                         /> */}
 
-                    <div className="flex items-center justify-start gap-2">
-                      <select
-                        name="occupationTrained"
-                        value={personalInformation.occupationTrained.value}
-                        onChange={handleChangePersonalInfo}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        aria-label="Occupation trained for"
-                      >
-                        <option value="">Select occupation</option>
-                        {occupations.map((occupation) => (
-                          <option key={occupation.id} value={occupation.name}>
-                            {occupation.name}
-                          </option>
-                        ))}
-                      </select>
 
-                      <button
-                        title="Refresh dropdown"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaSync />
-                      </button>
 
-                      <button
-                        title="Add new occupation"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaPlusCircle className="text-green-600" />
-                      </button>
-                    </div>
+                    {/* Occupation Trained Dropdown */}
+<div className="flex items-center justify-start gap-2">
+  <select
+    name="occupationTrained"
+    value={personalInformation.occupationTrained.value}
+    onChange={(e) => {
+      const val = e.target.value;
+      if (val === "0") {
+        setShowOccuptionAddPanel(true);
+        setEditingSection("occupation"); // Ensure panel stays open
+          setSelectedOccupationField("occupationTrained");
+      } else {
+        handleChangePersonalInfo(e);
+        setShowOccuptionAddPanel(false);
+      }
+    }}
+    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+    aria-label="Occupation trained for"
+  >
+    <option value="">Select occupation</option>
+    <option value="0">+ Add New Occupation</option>
+    {occupations.map((occupation) => (
+      <option key={occupation.id} value={occupation.name}>
+        {occupation.name}
+      </option>
+    ))}
+  </select>
+
+  <button
+    title="Refresh dropdown"
+    onClick={async () => {
+      setIsOccupationLoading(true);
+      await loadDrpOccupations();
+      setIsOccupationLoading(false);
+    }}
+    disabled={isOccupationLoading}
+    className="text-gray-600 hover:text-sky-600"
+  >
+    <FaSync />
+  </button>
+</div>
+
                     {personalInformationErrors.occupationTrained && (
                       <p className="mt-1 text-sm text-red-600">
                         {personalInformationErrors.occupationTrained}
@@ -1942,50 +2039,47 @@ const TabPersonalInformationIndividual = ({ id, refreshTabDetails, setActiveTab 
                           aria-label={`Present occupation}`}
                         /> */}
                     <div className="flex items-center justify-start gap-2">
-                      <select
-                        name="occupation"
-                        value={personalInformation.occupation.value}
-                        onChange={handleChangePersonalInfo}
-                        className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                        aria-label="Present occupation"
-                      >
-                        <option value="">Select occupation</option>
-                        {occupations.map((occupation) => (
-                          <option key={occupation.id} value={occupation.name}>
-                            {occupation.name}
-                          </option>
-                        ))}
-                      </select>
+                  
+<select
+    name="occupation"
+    value={personalInformation.occupation.value}
+    onChange={(e) => {
+      const val = e.target.value;
+      if (val === "0") {
+        setShowOccuptionAddPanel(true);
+        setEditingSection("occupation");
+        setSelectedOccupationField("occupation");
+      } else {
+        handleChangePersonalInfo(e);
+        setShowOccuptionAddPanel(false);
+      }
+    }}
+    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+    aria-label="Present occupation"
+  >
+    <option value="">Select occupation</option>
+    <option value="0">+ Add New Occupation</option>
+    {occupations.map((occupation) => (
+      <option key={occupation.id} value={occupation.name}>
+        {occupation.name}
+      </option>
+    ))}
+  </select>
 
-                      <button
-                        title="Refresh dropdown"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaSync />
-                      </button>
+  <button
+    title="Refresh dropdown"
+    onClick={async () => {
+      setIsOccupationLoading(true);
+      await loadDrpOccupations();
+      setIsOccupationLoading(false);
+    }}
+    disabled={isOccupationLoading}
+    className="text-gray-600 hover:text-sky-600"
+  >
+    <FaSync />
+  </button>
 
-                      <button
-                        title="Add new occupation"
-                        onClick={async () => {
-                          try {
-                            setIsOccupationLoading(true);
-                            await loadDrpOccupations();
-                          } finally {
-                            setIsOccupationLoading(false);
-                          }
-                        }}
-                        disabled={isOccupationLoading}
-                      >
-                        <FaPlusCircle className="text-green-600" />
-                      </button>
+                   
                     </div>
 
                     {personalInformationErrors.occupation && (

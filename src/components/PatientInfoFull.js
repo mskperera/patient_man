@@ -32,6 +32,11 @@ import LoadingSpinner from "./LoadingSpinner";
 import TabMentalStatusExamFamily from "./mentalStatusExam/TabMentalStatusExamFamily";
 import PsychiatricNotesTab from "./PsychiatricNotesTab";
 
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
+
+
+
 const printStyles = `
   @media print {
   body * {
@@ -48,6 +53,12 @@ const printStyles = `
     top: 0;
     width: 100%;
   }
+
+      .no-print {
+      display: none !important;
+      visibility: hidden !important;
+    }
+      
 }
 
 `;
@@ -60,6 +71,21 @@ function PatientInfoFull({ mode = "view" }) {
   const id = searchParams.get("id");
   const userId = localStorage.getItem("userId");
   const user = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
+
+// … inside the component, before the return
+const navigate = useNavigate();
+
+const BackButton = () => (
+  <button
+    onClick={() => navigate(-1)}               // go back to previous page
+    className="absolute left-10 flex items-center gap-2 text-sky-700 hover:text-sky-900
+               font-bold text-lg transition-colors"
+  >
+    <FaArrowLeft size={20} />
+    Back
+  </button>
+);
+
 
   const [isLoading, setIsLoading] = useState(true);
   const [tabDetails, setTabDetails] = useState({
@@ -137,14 +163,7 @@ function PatientInfoFull({ mode = "view" }) {
                           <button className="border-gray-100 rounded-xl text-white bg-green-500 hover:bg-green-600 p-4" onClick={handlePrint}>🖨️ Print Report</button>
               </div> */}
 
-                  <div className="fixed bottom-4 right-4 z-50">
-  <button
-    className="rounded-xl text-white bg-green-500 hover:bg-green-600 p-4 border border-gray-100 shadow-lg"
-    onClick={handlePrint}
-  >
-    🖨️ Print Report
-  </button>
-</div>
+
 
           {/* <div className="mb-6">
             {patientType === "1" && (
@@ -173,20 +192,60 @@ function PatientInfoFull({ mode = "view" }) {
           </div> */}
           </div>
 
-        <div className="print-area bg-white pt-5">
+        <div className="print-area bg-white pt-5 relative">
+            <div className="no-print">
+ <BackButton /> 
+              
+                <div className="absolute top-4 right-4">
+  <button
+    className="rounded-xl text-white bg-green-500 hover:bg-green-600 p-4 border border-gray-100 shadow-lg"
+    onClick={handlePrint}
+  >
+    🖨️ Print Report
+  </button>
+</div>
+          </div>
+
           <form onSubmit={(e) => e.preventDefault()} className="space-y-2">
             {patientType === "1" && (
               <>
-      
+    
+          <div className="mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
 
-                     <header className="text-center">
+                 <header className="text-center mb-5">
         <h2 className="text-2xl uppercase font-bold text-gray-800 tracking-wide">
   Patient Biographical Information (Individual)
 </h2>
 
+ 
           {/* <div className="mt-2 h-1 w-24 bg-sky-700 mx-auto"></div> */}
         </header>
 
+
+ {/* <div>
+  <svg className="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+  <strong>Printed:</strong>{" "}
+  {new Date()
+    .toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // 👈 adds AM/PM
+    })
+    .replace(",", "")}
+</div> */}
+
+          </div>
+    
                 <TabBasicInformation
                   patientTypeId={patientType}
                   refreshTabDetails={refreshTabDetailsHandler}
@@ -237,6 +296,46 @@ function PatientInfoFull({ mode = "view" }) {
 
             {patientType === "2" && (
               <>
+
+          <div className="mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
+
+                 <header className="text-center mb-5">
+        <h2 className="text-2xl uppercase font-bold text-gray-800 tracking-wide">
+   Patient Biographical Information (Child)
+</h2>
+
+ 
+          {/* <div className="mt-2 h-1 w-24 bg-sky-700 mx-auto"></div> */}
+        </header>
+
+
+ {/* <div>
+  <svg className="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+  <strong>Printed:</strong>{" "}
+  {new Date()
+    .toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // 👈 adds AM/PM
+    })
+    .replace(",", "")}
+</div> */}
+
+          </div>
+    
+
+
+
                 {/* {renderHeader("Basic Information", <FaInfoCircle size={20} />, tabDetails.isBasicInfo)} */}
                 <TabBasicInformation
                   patientTypeId={patientType}
@@ -294,6 +393,43 @@ function PatientInfoFull({ mode = "view" }) {
 
             {patientType === "3" && (
               <>
+
+          <div className="mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
+
+                 <header className="text-center mb-5">
+        <h2 className="text-2xl uppercase font-bold text-gray-800 tracking-wide">
+   Patient Biographical Information (Family)
+</h2>
+
+ 
+          {/* <div className="mt-2 h-1 w-24 bg-sky-700 mx-auto"></div> */}
+        </header>
+
+
+ {/* <div>
+  <svg className="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+  <strong>Printed:</strong>{" "}
+  {new Date()
+    .toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true, // 👈 adds AM/PM
+    })
+    .replace(",", "")}
+</div> */}
+
+          </div>
+        
                 {/* {renderHeader("Basic Information", <FaInfoCircle size={20} />, tabDetails.isBasicInfo)} */}
                 <TabBasicInformationFamily
                   patientTypeId={patientType}

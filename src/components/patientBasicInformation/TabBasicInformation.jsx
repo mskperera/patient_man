@@ -13,34 +13,20 @@ import EditButton from "../EditButton";
 
 
 
-/* --------------------------------------------------------------
-   Print-only styles – put these in a <style> tag inside the component
-   or in a separate print.css file and import it.
-   -------------------------------------------------------------- */
 const printStyles = `
-  @page {
-    size: A4;
-    margin: 1cm;
+
+   @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
   }
-
-  @media print {
-    body { -webkit-print-color-adjust: exact; }
-    .no-print { display: none; }
-
-    .print-section { 
-      break-inside: avoid; 
-      page-break-inside: avoid; 
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
     }
-
-    .print-field {
-      break-inside: avoid;
-    }
-      
-      .print-header {
-      margin-bottom: 1.5rem;
-    }
-  }
 `;
+
 
 /* --------------------------------------------------------------
    React component – the markup you posted, now print-ready
@@ -60,7 +46,7 @@ const printStyles = `
       {/* -----------------------------------------------------------------
           Whole block – two-column layout for A4
           ----------------------------------------------------------------- */}
-      <div className="print-section mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+      <div className="mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
      
       {/* Main Header */}
         <header className="print-header text-left mb-4">
@@ -77,31 +63,32 @@ const printStyles = `
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
             {/* First Name */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
-              <span className="font-medium text-gray-700">First Name:</span>
+     
+               <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                            <span className="font-medium text-gray-700">First Name:</span>
               <span className="text-gray-900">{basicInformation.firstName.value}</span>
-            </div>
+              </div>
 
             {/* Middle Name */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+             <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Middle Name:</span>
               <span className="text-gray-900">{basicInformation.middleName.value}</span>
             </div>
 
             {/* Last Name */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+     <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Last Name:</span>
               <span className="text-gray-900">{basicInformation.lastName.value}</span>
             </div>
 
             {/* Date of Birth */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+    <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Date of Birth:</span>
               <span className="text-gray-900">{formatDate(basicInformation.dateOfBirth.value)}</span>
             </div>
 
             {/* Age */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+             <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Age:</span>
               <span className="text-gray-900">
                 {basicInformation.age.value} {basicInformation.age.value ? "Years" : ""}
@@ -109,7 +96,7 @@ const printStyles = `
             </div>
 
             {/* Gender */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+             <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Gender:</span>
               <span className="text-gray-900">{basicInformation.gender.value}</span>
             </div>
@@ -126,25 +113,25 @@ const printStyles = `
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
             {/* Home Phone */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+       <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Home Phone:</span>
               <span className="text-gray-900">{basicInformation.homePhone.value}</span>
             </div>
 
             {/* Mobile Phone */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+       <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Mobile Phone:</span>
               <span className="text-gray-900">{basicInformation.businessPhone.value}</span>
             </div>
 
             {/* Email */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2 md:col-span-2">
+    <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Email:</span>
               <span className="text-gray-900 break-all">{basicInformation.email.value}</span>
             </div>
 
             {/* Permanent Address – full width */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2 md:col-span-2">
+          <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Permanent Address:</span>
               <span className="text-gray-900 max-w-[70%] text-right">
                 {basicInformation.permanentAddress.value}
@@ -163,7 +150,7 @@ const printStyles = `
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
             {/* Referral Source */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+           <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Referral Source:</span>
               <span className="text-gray-900">
                 {basicInformation.referralSource.value === "other"
@@ -173,7 +160,7 @@ const printStyles = `
             </div>
 
             {/* Referral Party Present */}
-            <div className="print-field flex justify-between rounded border border-gray-300 p-2">
+        <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Referral Party Present:</span>
               <span className="text-gray-900">
                 {basicInformation.referralPartyPresent.value ? "Yes" : "No"}

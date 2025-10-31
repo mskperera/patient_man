@@ -22,319 +22,298 @@ import VoiceToText from "../VoiceToText";
 import { FaGraduationCap, FaInfoCircle } from "react-icons/fa";
 
 
+const printStyles = `
 
-
-const printCss = `
-  .print-preview {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-  .print-preview h1 { 
-    text-align: center; 
-    margin-bottom: 20px; 
-    font-size: 22px; 
-  }
-
-  .print-preview table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 8px;
-  }
-  .print-preview th,
-  .print-preview td {
-    border: 1px solid #d1d5db;
-    padding: 8px;
-    font-size: 12px;
-  }
-  .print-preview th {
-    background-color: #f3f4f6;
-    font-weight: bold;
-    text-align: left;
-  }
-  .print-preview .info-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #6b7280;
-    font-style: italic;
-    margin: 10px 0;
-  }
-  .print-preview .remark-box {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 12px;
-    margin-top: 8px;
-    white-space: pre-line;
-    font-size: 13px;
-  }
-  .print-preview .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: #fff;
-  }
-
-  /* ----- PRINT ONLY ----- */
-  @media print {
+   @media print {
     @page { size: A4; margin: 1cm; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-preview .page-break { page-break-before: always; }
+    .print-break { page-break-before: always; }
   }
-
-  /* ----- SCREEN ONLY (when preview is on) ----- */
   @media screen {
-    .print-preview { max-width: 210mm; margin: 0 auto; padding: 15mm; background:#fff; }
-    .print-preview .page-break { 
-      break-before: page;   /* works in modern browsers for on-screen paging */
+    .print-break { 
+      break-before: page;
       margin-top: 30mm;
     }
-  }
 `;
 
-const PrintEducationDetailsA4= ({
+const PrintEducationDetailsA4 = ({
   education,
   printPreviewMode = true,
 }) => {
   if (!printPreviewMode) return null;
 
+  const renderNA = (value) => (value ? value : "N/A");
+
   return (
     <>
-      {/* Inject the CSS once */}
-      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
 
-      <div className="print-preview">
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto bg-white">
 
-
+        {/* ========== PAGE 1: Header + Background + Scholarship ========== */}
         <div>
-          <h1 className="text-lg font-bold text-sky-700">Education Details</h1>
+          <h1 className="text-center text-xl font-bold text-sky-700 mb-6">Education Details</h1>
 
+          {/* Educational Background */}
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Educational Background
+          </h3>
 
-                  <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-        Educational Background
-        </h3>
-
-
-          <div style={{ marginBottom: "20px" }}>
-            <strong>Years of Formal Education Completed:</strong>{" "}
-            {education.educationYears == null
-              ? "N/A"
-              : education.educationYears === 20
-              ? "More than 20"
-              : education.educationYears}
+          <div className="mb-6">
+            <span className="font-semibold text-gray-700">Years of Formal Education Completed:</span>{" "}
+            <span className="text-gray-800">
+              {education.educationYears == null
+                ? "N/A"
+                : education.educationYears === 20
+                ? "More than 20"
+                : education.educationYears}
+            </span>
           </div>
 
           {/* Grade 5 Scholarship */}
-          <div className="section-title">Grade 5 Scholarship Qualification</div>
-          <div style={{ marginBottom: "20px" }}>
-            <strong>Has Grade 5 Scholarship:</strong>{" "}
-            {education.scholarship.enabled ? "Yes" : "No"}
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Grade 5 Scholarship Qualification
+          </h3>
+
+          <div className="mb-4">
+            <span className="font-semibold text-gray-700">Has Grade 5 Scholarship:</span>{" "}
+            <span className="text-gray-800">{education.scholarship.enabled ? "Yes" : "No"}</span>
           </div>
 
           {education.scholarship.enabled && (
             <>
-              <table>
+              <table className="w-full border-collapse border border-gray-300 mt-2 text-xs">
                 <thead>
-                  <tr>
-                    <th>Marks</th>
-                    <th>School Admitted</th>
-                    <th>Result</th>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Marks</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">School Admitted</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Result</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{education.scholarship.marks || "N/A"}</td>
-                    <td>{education.scholarship.schoolAdmitted || "N/A"}</td>
-                    <td>{education.scholarship.result || "N/A"}</td>
+                    <td className="border border-gray-300 px-2 py-1">{renderNA(education.scholarship.marks)}</td>
+                    <td className="border border-gray-300 px-2 py-1">{renderNA(education.scholarship.schoolAdmitted)}</td>
+                    <td className="border border-gray-300 px-2 py-1">{renderNA(education.scholarship.result)}</td>
                   </tr>
                 </tbody>
               </table>
 
               {education.scholarship.remark && (
-                <div style={{ marginTop: "12px" }}>
-                  <strong>Remark:</strong>
-                  <div className="remark-box">{education.scholarship.remark}</div>
+                <div className="mt-4">
+                  <span className="font-semibold text-gray-700">Remark:</span>
+                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                    {education.scholarship.remark}
+                  </div>
                 </div>
               )}
             </>
           )}
         </div>
 
-        {/* ---------- PAGE 2 ---------- */}
-        <div className="page-break">
-    
-                            <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-     G.C.E Ordinary Level (O/L) Qualifications
-        </h3>
+        {/* ========== PAGE 2: O/L ========== */}
+        <div className="mt-10">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            G.C.E Ordinary Level (O/L) Qualifications
+          </h3>
 
           {!education.ol.enabled ? (
-            <div className="info-box">
-              <FaInfoCircle /> <span>No O/L qualifications recorded.</span>
+            <div className="flex items-center gap-2 text-gray-600 italic">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>No O/L qualifications recorded.</span>
             </div>
           ) : education.ol.subjects.length > 0 ? (
             <>
-              <table>
+              <table className="w-full border-collapse border border-gray-300 mt-2 text-xs">
                 <thead>
-                  <tr>
-                    <th>Subject</th>
-                    <th>Grade</th>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Subject</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Grade</th>
                   </tr>
                 </thead>
                 <tbody>
                   {education.ol.subjects.map((s, i) => (
                     <tr key={i}>
-                      <td>{s.name || "N/A"}</td>
-                      <td>{s.marks || "N/A"}</td>
+                      <td className="border border-gray-300 px-2 py-1">{renderNA(s.name)}</td>
+                      <td className="border border-gray-300 px-2 py-1">{renderNA(s.marks)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
               {education.ol.remark && (
-                <div style={{ marginTop: "15px" }}>
-                  <strong>Remark:</strong>
-                  <div className="remark-box">{education.ol.remark}</div>
+                <div className="mt-4">
+                  <span className="font-semibold text-gray-700">Remark:</span>
+                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                    {education.ol.remark}
+                  </div>
                 </div>
               )}
             </>
           ) : (
-            <div className="info-box">
-              <FaInfoCircle /> <span>O/L enabled but no subjects added.</span>
+            <div className="flex items-center gap-2 text-gray-600 italic">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>O/L enabled but no subjects added.</span>
             </div>
           )}
         </div>
 
-        {/* ---------- PAGE 3 ---------- */}
-        <div className="page-break">
-              
-                            <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-         G.C.E Advanced Level (A/L) Qualifications
-        </h3>
+     {/* ========== PAGE 5: International Curriculum ========== */}
+        <div className="mt-10">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            International Curriculum
+          </h3>
+
+          <div className="flex flex-wrap gap-3 mt-3">
+            {education.internationalCurriculum.isEdexcel ? (
+              <div className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white">
+                <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                </svg>
+                <span className="text-sm font-medium">Edexcel</span>
+              </div>
+            ):''}
+            {education.internationalCurriculum.isCambridge ? (
+              <div className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white">
+                <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                </svg>
+                <span className="text-sm font-medium">Cambridge</span>
+              </div>
+            ):''}
+            {(!education.internationalCurriculum.isEdexcel && !education.internationalCurriculum.isCambridge) ? (
+              <div className="flex items-center gap-2 text-gray-600 italic">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>No international curriculum followed.</span>
+              </div>
+            ):''}
+          </div>
+        </div>
+
+        {/* ========== PAGE 3: A/L ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            G.C.E Advanced Level (A/L) Qualifications
+          </h3>
 
           {!education.al.enabled ? (
-            <div className="info-box">
-              <FaInfoCircle /> <span>No A/L qualifications recorded.</span>
+            <div className="flex items-center gap-2 text-gray-600 italic">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>No A/L qualifications recorded.</span>
             </div>
           ) : (
             <>
-              <div style={{ marginBottom: "12px" }}>
-                <strong>Stream:</strong> {education.al.alStreamName || "N/A"}
+              <div className="mb-4">
+                <span className="font-semibold text-gray-700">Stream:</span>{" "}
+                <span className="text-gray-800">{renderNA(education.al.alStreamName)}</span>
               </div>
 
               {education.al.subjects.length > 0 ? (
                 <>
-                  <table>
+                  <table className="w-full border-collapse border border-gray-300 mt-2 text-xs">
                     <thead>
-                      <tr>
-                        <th>Subject</th>
-                        <th>Grade</th>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Subject</th>
+                        <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Grade</th>
                       </tr>
                     </thead>
                     <tbody>
                       {education.al.subjects.map((s, i) => (
                         <tr key={i}>
-                          <td>{s.name || "N/A"}</td>
-                          <td>{s.marks || "N/A"}</td>
+                          <td className="border border-gray-300 px-2 py-1">{renderNA(s.name)}</td>
+                          <td className="border border-gray-300 px-2 py-1">{renderNA(s.marks)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
 
                   {education.al.remark && (
-                    <div style={{ marginTop: "15px" }}>
-                      <strong>Remark:</strong>
-                      <div className="remark-box">{education.al.remark}</div>
+                    <div className="mt-4">
+                      <span className="font-semibold text-gray-700">Remark:</span>
+                      <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                        {education.al.remark}
+                      </div>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="info-box">
-                  <FaInfoCircle /> <span>A/L enabled but no subjects added.</span>
+                <div className="flex items-center gap-2 text-gray-600 italic">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>A/L enabled but no subjects added.</span>
                 </div>
               )}
             </>
           )}
         </div>
 
-        {/* ---------- PAGE 4 ---------- */}
-        <div className="page-break">
-                        <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
- University Qualifications
-        </h3>
+        {/* ========== PAGE 4: University ========== */}
+        <div className="mt-10">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            University Qualifications
+          </h3>
 
           {!education.university.enabled ? (
-            <div className="info-box">
-              <FaInfoCircle /> <span>No university qualifications recorded.</span>
+            <div className="flex items-center gap-2 text-gray-600 italic">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>No university qualifications recorded.</span>
             </div>
           ) : education.university.subjects.length > 0 ? (
             <>
-              <table>
+              <table className="w-full border-collapse border border-gray-300 mt-2 text-xs">
                 <thead>
-                  <tr>
-                    <th>Degree</th>
-                    <th>Institution</th>
-                    <th>Year</th>
-                    <th>Marks/Grade</th>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Degree</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Institution</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Year</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-bold text-gray-700">Marks/Grade</th>
                   </tr>
                 </thead>
                 <tbody>
                   {education.university.subjects.map((q, i) => (
                     <tr key={i}>
-                      <td>{q.name || "N/A"}</td>
-                      <td>{q.institutionName || "N/A"}</td>
-                      <td>{q.year || "N/A"}</td>
-                      <td>{q.marks || "N/A"}</td>
+                      <td className="border border-gray-300 px-2 py-1">{renderNA(q.name)}</td>
+                      <td className="border border-gray-300 px-2 py-1">{renderNA(q.institutionName)}</td>
+                      <td className="border border-gray-300 px-2 py-1">{renderNA(q.year)}</td>
+                      <td className="border border-gray-300 px-2 py-1">{renderNA(q.marks)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
               {education.university.remark && (
-                <div style={{ marginTop: "15px" }}>
-                  <strong>Remark:</strong>
-                  <div className="remark-box">{education.university.remark}</div>
+                <div className="mt-4">
+                  <span className="font-semibold text-gray-700">Remark:</span>
+                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                    {education.university.remark}
+                  </div>
                 </div>
               )}
             </>
           ) : (
-            <div className="info-box">
-              <FaInfoCircle /> <span>University enabled but no qualifications added.</span>
+            <div className="flex items-center gap-2 text-gray-600 italic">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>University enabled but no qualifications added.</span>
             </div>
           )}
         </div>
 
-        {/* ---------- PAGE 5 ---------- */}
-        <div className="page-break">
-
-                                  <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-International Curriculum
-        </h3>
-
-          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "10px" }}>
-            {education.internationalCurriculum.isEdexcel ? (
-              <div className="badge">
-                <FaGraduationCap style={{ color: "#0ea5e9" }} />
-                <span>Edexcel</span>
-              </div>
-            ):''}
-            {education.internationalCurriculum.isCambridge ? (
-              <div className="badge">
-                <FaGraduationCap style={{ color: "#0ea5e9" }} />
-                <span>Cambridge</span>
-              </div>
-            ):''}
-            {(!education.internationalCurriculum.isEdexcel &&
-              !education.internationalCurriculum.isCambridge) ? (
-                <div className="info-box">
-                  <FaInfoCircle /> <span>No international curriculum followed.</span>
-                </div>
-              ):''}
-          </div>
-        </div>
+   
       </div>
     </>
   );

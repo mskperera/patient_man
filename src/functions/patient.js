@@ -1273,6 +1273,10 @@ export const addMentalStatusExamFamily = async (data) => {
   }
 };
 
+
+
+
+
 export const updateMentalStatusExamFamily = async (id,data) => {
   try {
     const token = getToken();
@@ -1604,6 +1608,30 @@ export const deleteAppointment = async (appointmentId) => {
     const token = getToken();
     return await customAxios
       .delete(`/appointment/${appointmentId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          // authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+export const addOccupation = async (data) => {
+  try {
+    const token = getToken();
+
+    return await customAxios
+      .post(`/occupation`, data, {
         headers: {
           "Content-Type": "application/json",
           // authorization: `Bearer ${token}`,

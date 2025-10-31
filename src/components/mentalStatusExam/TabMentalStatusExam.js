@@ -8,96 +8,17 @@ import EditButton from '../EditButton';
 import MessageModel from '../MessageModel';
 
 
-const printCss = `
-  .print-preview {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    max-width: 210mm;
-    margin: 0 auto;
-    padding: 15mm;
-    background: #fff;
-  }
-
-  .print-preview .section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 20px 0 10px;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #0ea5e9;
-  }
-  .print-preview .info-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #6b7280;
-    font-style: italic;
-    margin: 10px 0;
-  }
-  .print-preview .field-box {
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .print-preview .field-label {
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
-    display: block;
-  }
-  .print-preview .field-value {
-    white-space: pre-line;
-    color: #1f2937;
-  }
-  .print-preview .checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 8px;
-    margin-top: 6px;
-  }
-  .print-preview .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-  }
-  .print-preview .checkbox-item.checked {
-    color: #0ea5e9;
-    font-weight: 500;
-  }
-  .print-preview .checkbox-item .check {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #d1d5db;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .print-preview .checkbox-item.checked .check {
-    background-color: #0ea5e9;
-    border-color: #0ea5e9;
-  }
-  .print-preview .checkbox-item.checked .check svg {
-    width: 10px;
-    height: 10px;
-    color: white;
-  }
-
-  @media print {
+const printStyles = `
+   @media print {
     @page { size: A4; margin: 1cm; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-preview .page-break { page-break-before: always; }
+    .print-break { page-break-before: always; }
   }
-
   @media screen {
-    .print-preview .page-break { 
+    .print-break { 
       break-before: page;
       margin-top: 30mm;
     }
-  }
 `;
 
 const PrintMentalStatusExamA4 = ({ mse, printPreviewMode = true }) => {
@@ -106,12 +27,12 @@ const PrintMentalStatusExamA4 = ({ mse, printPreviewMode = true }) => {
   const renderOptions = (options = []) => {
     if (!options.length) return <span className="text-gray-500 italic">N/A</span>;
     return (
-      <div className="checkbox-grid">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1">
         {options.map((opt) => (
-          <div key={opt} className="checkbox-item checked">
-            <div className="check">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+          <div key={opt} className="flex items-center gap-1.5 text-sky-600 font-medium text-xs">
+            <div className="w-4 h-4 border-2 border-sky-600 rounded flex items-center justify-center bg-sky-600">
+              <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <span>{opt}</span>
@@ -122,17 +43,21 @@ const PrintMentalStatusExamA4 = ({ mse, printPreviewMode = true }) => {
   };
 
   const renderValue = (value) => {
-    return value ? <div className="field-value">{value}</div> : <span className="text-gray-500 italic">N/A</span>;
+    return value ? (
+      <div className="text-gray-800 whitespace-pre-line text-sm">{value}</div>
+    ) : (
+      <span className="text-gray-500 italic">N/A</span>
+    );
   };
 
   const renderField = (label, options, comment) => (
-    <div className="field-box">
-      <span className="field-label">{label}</span>
+    <div className="bg-white border border-gray-300 border-dashed rounded-md p-3 mb-3">
+      {label && <span className="block font-semibold text-gray-700 text-sm mb-1">{label}</span>}
       {renderOptions(options)}
       {comment && (
-        <div className="mt-3">
-          <strong className="text-sm text-gray-600">Comment:</strong>
-          <div className="field-value mt-1">{comment}</div>
+        <div className="mt-2">
+          <span className="text-xs font-medium text-gray-600">Comment:</span>
+          <div className="text-gray-800 text-sm mt-0.5 whitespace-pre-line">{comment}</div>
         </div>
       )}
     </div>
@@ -140,39 +65,53 @@ const PrintMentalStatusExamA4 = ({ mse, printPreviewMode = true }) => {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
 
-      <div className="print-preview">
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto bg-white">
 
         {/* ========== PAGE 1: Header + Circumstance ========== */}
-        <div>
-          <h2 className="mb-3 pb-1 text-xl text-center font-bold text-sky-800">Mental Status Examination</h2>
+        <div className='mt-20'>
+          <h2 className="text-center text-xl font-bold text-sky-700 mb-3 pb-1 ">
+            Mental Status Examination
+          </h2>
 
-          <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+          {/* <div className="grid grid-cols-2 gap-4 text-sm mb-6">
             <div>
-              <strong>Form Date:</strong> {mse.formDate ? moment(mse.formDate).format("DD MMM YYYY") : "N/A"}
+              <strong>Form Date:</strong>{" "}
+              {mse.formDate ? new Date(mse.formDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "N/A"}
             </div>
             <div className="text-right">
-              <strong>Last Modified:</strong> {mse.lastModified ? moment(mse.lastModified).format("DD MMM YYYY HH:mm") : "N/A"}
+              <strong>Last Modified:</strong>{" "}
+              {mse.lastModified
+                ? new Date(mse.lastModified).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "N/A"}
             </div>
-          </div>
+          </div> */}
 
-          <div className="section-title">Circumstance of Presentation</div>
-          <div className="field-box">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">
+            Circumstance of Presentation
+          </h3>
+          <div className="bg-white border border-gray-300 rounded-md p-3">
             {renderValue(mse.circumstanceOfPresentation)}
           </div>
         </div>
 
         {/* ========== PAGE 2: Appearance & Behavior ========== */}
-        <div className="page-break">
-          <div className="section-title">Appearance</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Appearance</h3>
           {renderField("Weight", mse.appearance?.weight?.options, mse.appearance?.comments)}
           {renderField("Hair", mse.appearance?.hair?.options)}
           {renderField("Other Features", mse.appearance?.otherFeatures?.options)}
           {renderField("Grooming", mse.appearance?.grooming?.options)}
           {renderField("Dress", mse.appearance?.dress?.options)}
 
-          <div className="section-title">Behavior</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Behavior</h3>
           {renderField("Walk", mse.behavior?.walk?.options, mse.behavior?.comments)}
           {renderField("Combativeness", mse.behavior?.combativeness?.options)}
           {renderField("Repetition", mse.behavior?.repetition?.options)}
@@ -181,104 +120,104 @@ const PrintMentalStatusExamA4 = ({ mse, printPreviewMode = true }) => {
         </div>
 
         {/* ========== PAGE 3: Speech & Attitude ========== */}
-        <div className="page-break">
-          <div className="section-title">Speech</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Speech</h3>
           {renderField("Rate", mse.speech?.rate?.options, mse.speech?.comments)}
           {renderField("Intelligibility", mse.speech?.intelligibility?.options)}
           {renderField("Volume", mse.speech?.volume?.options)}
           {renderField("Speech Quality", mse.speech?.speechQuality?.options)}
           {renderField("Speech Quantity", mse.speech?.speechQuantity?.options)}
 
-          <div className="section-title">Attitude to Examiner</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Attitude to Examiner</h3>
           {renderField("", mse.attitudeToExaminer?.attitudeToExaminer?.options)}
         </div>
 
         {/* ========== PAGE 4: Mood, Affect, Hallucinations ========== */}
-        <div className="page-break">
-          <div className="section-title">Mood and Affect</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Mood and Affect</h3>
           {renderField("Mood", mse.moodAndAffect?.mood?.options, mse.moodAndAffect?.comments)}
           {renderField("Other Emotions", mse.moodAndAffect?.otherEmotions?.options)}
           {renderField("Other Signs", mse.moodAndAffect?.otherSigns?.options)}
           {renderField("Neurovegetative", mse.moodAndAffect?.neuroVegetative?.options)}
 
-          <div className="section-title">Affective Expression</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Affective Expression</h3>
           {renderField("", mse.affectiveExpression?.affectiveExpression?.options)}
 
-          <div className="section-title">Appropriateness</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Appropriateness</h3>
           {renderField("", mse.appropriateness?.appropriateness?.options)}
 
-          <div className="section-title">Hallucinations</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Hallucinations</h3>
           {renderField("", mse.hallucinations?.hallucinations?.options, mse.hallucinations?.comments)}
         </div>
 
         {/* ========== PAGE 5: Thought & Perception ========== */}
-        <div className="page-break">
-          <div className="section-title">Disassociation</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Disassociation</h3>
           {renderField("", mse.disassociation?.disassociation?.options, mse.disassociation?.comments)}
 
-          <div className="section-title">Agnosia</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Agnosia</h3>
           {renderField("", mse.agnosia?.agnosia?.options, mse.agnosia?.comments)}
 
-          <div className="section-title">Content of Thought</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Content of Thought</h3>
           {renderField("", mse.contentOfThought?.contentOfThought?.options, mse.contentOfThought?.comments)}
           {renderField("Preoccupations (SI)", mse.contentOfThought?.preoccupationsSI?.options)}
           {renderField("Hostile Intent", mse.contentOfThought?.hostileIntent?.options)}
           {renderField("Phobia", mse.contentOfThought?.phobia?.options)}
 
           {mse.contentOfThought?.contentOfThought?.options?.includes("Delusions") && (
-            <div className="field-box mt-4 ml-6 border-l-4 border-sky-300 pl-4">
-              <span className="field-label">Delusion Types</span>
+            <div className="bg-white border border-sky-300 rounded-md p-3 mt-4 ml-6 border-l-4 border-l-sky-400">
+              <span className="block font-semibold text-gray-700 text-sm mb-1">Delusion Types</span>
               {renderOptions(mse.delusions0?.delusions0?.options)}
             </div>
           )}
         </div>
 
         {/* ========== PAGE 6: Thought Form & Cognitive ========== */}
-        <div className="page-break">
-          <div className="section-title">Thought Form</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Thought Form</h3>
           {renderField("General", mse.thoughtForm?.general?.options, mse.thoughtForm?.comments)}
           {renderField("Specific", mse.thoughtForm?.specific?.options)}
           {renderField("Disturbances of Speech", mse.thoughtForm?.disturbancesOfSpeech?.options)}
           {renderField("Aphasic Disturbances", mse.thoughtForm?.aphasicDisturbances?.options)}
 
-          <div className="section-title">Consciousness</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Consciousness</h3>
           {renderField("", mse.consciousness?.consciousness?.options, mse.consciousness?.comments)}
 
-          <div className="section-title">Orientation</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Orientation</h3>
           {renderField("", mse.orientation?.orientation?.options, mse.orientation?.comments)}
 
-          <div className="section-title">Concentration</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Concentration</h3>
           {renderField("", mse.concentration?.concentration?.options, mse.concentration?.comments)}
 
-          <div className="section-title">Memory</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Memory</h3>
           {renderField("", mse.memory?.memory?.options, mse.memory?.comments)}
         </div>
 
         {/* ========== PAGE 7: Intelligence, Judgment, Insight ========== */}
-        <div className="page-break">
-          <div className="section-title">Information & Intelligence</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Information & Intelligence</h3>
           {renderField("Attention", mse.informationAndIntelligence?.attention?.options, mse.informationAndIntelligence?.comments)}
           {renderField("Suggestibility", mse.informationAndIntelligence?.suggestibility?.options)}
           {renderField("Memory", mse.informationAndIntelligence?.memory2?.options)}
           {renderField("Intelligence", mse.informationAndIntelligence?.intelligence?.options)}
 
-          <div className="section-title">Judgment</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Judgment</h3>
           {renderField("", mse.judgment?.judgment?.options, mse.judgment?.comments)}
 
-          <div className="section-title">Insight</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Insight</h3>
           {renderField("", mse.insight?.insight?.options, mse.insight?.comments)}
 
-          <div className="section-title">Reliability</div>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Reliability</h3>
           {renderField("", mse.reliability?.reliability?.options, mse.reliability?.comments)}
         </div>
 
         {/* ========== PAGE 8: Summary & Recommendations ========== */}
-        <div className="page-break">
-          <div className="section-title">Summary</div>
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Summary</h3>
           {renderField("Global Functioning", mse.summary?.globalFunctioning?.options, mse.summary?.comments)}
 
-          <div className="section-title">Indications & Recommendations</div>
-          <div className="field-box">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Indications & Recommendations</h3>
+          <div className="bg-white border border-gray-300 rounded-md p-3">
             {renderValue(mse.indicationsAndRecommendations)}
           </div>
         </div>
@@ -1563,23 +1502,10 @@ const renderSectionWithNested = (title, sectionKey, icon, subSections) => {
           Mental Status Exam
         </h3>
 
-   
-       {!isLoading ?  <>
-      <div className='text-center text-gray-700'>
-  <strong>Form Date:</strong>{' '}
-  {patient.formDate
-    ? moment(patient.formDate).format('DD MMM YYYY')
-    : 'N/A'}
-</div>
-<div className='text-right  text-sky-700'>
-  <strong>Last Modified:</strong>{' '}
-  {patient.lastModified
-    ? moment(patient.lastModified).format('DD MMM YYYY HH:mm a')
-    : 'N/A'}
-</div>
-</>:null}
-      </div>
+   </div>
 
+       {!isLoading ? 
+        <>
   
       {circumstanceOfPresentation('circumstanceOfPresentation')}
 
@@ -1680,7 +1606,7 @@ const renderSectionWithNested = (title, sectionKey, icon, subSections) => {
       )}
 
 
-
+</>:null}
 
     </div>
 :<PrintMentalStatusExamA4

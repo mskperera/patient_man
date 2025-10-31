@@ -7,7 +7,271 @@ import VoiceToText from '../VoiceToText';
 import EditButton from '../EditButton';
 import MessageModel from '../MessageModel';
 
-const TabMentalStatusExamFamily = ({ id, refreshTabDetails }) => {
+const printStyles = `
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
+  }
+`;
+
+const PrintMentalStatusExamFamilyA4 = ({ mse}) => {
+
+  const renderOptions = (options = []) => {
+    if (!options.length) return <span className="text-gray-500 italic">N/A</span>;
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-1">
+        {options.map((opt) => (
+          <div key={opt} className="flex items-center gap-1.5 text-sky-600 font-medium text-xs">
+            <div className="w-4 h-4 border-2 border-sky-600 rounded flex items-center justify-center bg-sky-600">
+              <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span>{opt}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderValue = (value) => {
+    return value ? (
+      <div className="text-gray-800 whitespace-pre-line text-sm">{value}</div>
+    ) : (
+      <span className="text-gray-500 italic">N/A</span>
+    );
+  };
+
+  const renderField = (label, husbandOpts, wifeOpts, husbandComment, wifeComment) => (
+    <div className="grid grid-cols-2 gap-4 mb-3">
+      <div>
+        {label && <span className="block font-semibold text-gray-700 text-sm mb-1">{label} (Husband)</span>}
+        {renderOptions(husbandOpts)}
+        {husbandComment && (
+          <div className="mt-2">
+            <span className="text-xs font-medium text-gray-600">Comment:</span>
+            <div className="text-gray-800 text-sm mt-0.5 whitespace-pre-line">{husbandComment}</div>
+          </div>
+        )}
+      </div>
+      <div>
+        {label && <span className="block font-semibold text-gray-700 text-sm mb-1">{label} (Wife)</span>}
+        {renderOptions(wifeOpts)}
+        {wifeComment && (
+          <div className="mt-2">
+            <span className="text-xs font-medium text-gray-600">Comment:</span>
+            <div className="text-gray-800 text-sm mt-0.5 whitespace-pre-line">{wifeComment}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderSingleField = (label, options, comment) => (
+    <div className="bg-white border border-gray-300 border-dashed rounded-md p-3 mb-3">
+      {label && <span className="block font-semibold text-gray-700 text-sm mb-1">{label}</span>}
+      {renderOptions(options)}
+      {comment && (
+        <div className="mt-2">
+          <span className="text-xs font-medium text-gray-600">Comment:</span>
+          <div className="text-gray-800 text-sm mt-0.5 whitespace-pre-line">{comment}</div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
+
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto bg-white">
+
+        {/* ========== PAGE 1: Header + Circumstance ========== */}
+        <div>
+          <h2 className="text-center text-xl font-bold text-sky-700 mb-3 pb-1 ">
+            Mental Status Examination
+          </h2>
+
+          {/* <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+            <div>
+              <strong>Form Date:</strong>{" "}
+              {mse.formDate ? new Date(mse.formDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "N/A"}
+            </div>
+            <div className="text-right">
+              <strong>Last Modified:</strong>{" "}
+              {mse.lastModified
+                ? new Date(mse.lastModified).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "N/A"}
+            </div>
+          </div> */}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">
+            Circumstance of Presentation
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white border border-gray-300 rounded-md p-3">
+              <strong className="block text-sm font-semibold text-gray-700 mb-1">Husband</strong>
+              {renderValue(mse.circumstanceOfPresentationHusband)}
+            </div>
+            <div className="bg-white border border-gray-300 rounded-md p-3">
+              <strong className="block text-sm font-semibold text-gray-700 mb-1">Wife</strong>
+              {renderValue(mse.circumstanceOfPresentationWife)}
+            </div>
+          </div>
+        </div>
+
+        {/* ========== PAGE 2: Appearance & Behavior ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Appearance</h3>
+          {renderField("Weight", mse.appearanceHusband?.weight?.options, mse.appearanceWife?.weight?.options, mse.appearanceHusband?.comments, mse.appearanceWife?.comments)}
+          {renderField("Hair", mse.appearanceHusband?.hair?.options, mse.appearanceWife?.hair?.options)}
+          {renderField("Other Features", mse.appearanceHusband?.otherFeatures?.options, mse.appearanceWife?.otherFeatures?.options)}
+          {renderField("Grooming", mse.appearanceHusband?.grooming?.options, mse.appearanceWife?.grooming?.options)}
+          {renderField("Dress", mse.appearanceHusband?.dress?.options, mse.appearanceWife?.dress?.options)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Behavior</h3>
+          {renderField("Walk", mse.behaviorHusband?.walk?.options, mse.behaviorWife?.walk?.options, mse.behaviorHusband?.comments, mse.behaviorWife?.comments)}
+          {renderField("Combativeness", mse.behaviorHusband?.combativeness?.options, mse.behaviorWife?.combativeness?.options)}
+          {renderField("Repetition", mse.behaviorHusband?.repetition?.options, mse.behaviorWife?.repetition?.options)}
+          {renderField("Overactivity", mse.behaviorHusband?.overactivity?.options, mse.behaviorWife?.overactivity?.options)}
+          {renderField("Catatonia", mse.behaviorHusband?.catatonia?.options, mse.behaviorWife?.catatonia?.options)}
+        </div>
+
+        {/* ========== PAGE 3: Speech & Attitude ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Speech</h3>
+          {renderField("Rate", mse.speechHusband?.rate?.options, mse.speechWife?.rate?.options, mse.speechHusband?.comments, mse.speechWife?.comments)}
+          {renderField("Intelligibility", mse.speechHusband?.intelligibility?.options, mse.speechWife?.intelligibility?.options)}
+          {renderField("Volume", mse.speechHusband?.volume?.options, mse.speechWife?.volume?.options)}
+          {renderField("Speech Quality", mse.speechHusband?.speechQuality?.options, mse.speechWife?.speechQuality?.options)}
+          {renderField("Speech Quantity", mse.speechHusband?.speechQuantity?.options, mse.speechWife?.speechQuantity?.options)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Attitude to Examiner</h3>
+          {renderField("", mse.attitudeToExaminerHusband?.attitudeToExaminer?.options, mse.attitudeToExaminerWife?.attitudeToExaminer?.options, mse.attitudeToExaminerHusband?.comments, mse.attitudeToExaminerWife?.comments)}
+        </div>
+
+        {/* ========== PAGE 4: Mood, Affect, Hallucinations ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Mood and Affect</h3>
+          {renderField("Mood", mse.moodAndAffectHusband?.mood?.options, mse.moodAndAffectWife?.mood?.options, mse.moodAndAffectHusband?.comments, mse.moodAndAffectWife?.comments)}
+          {renderField("Other Emotions", mse.moodAndAffectHusband?.otherEmotions?.options, mse.moodAndAffectWife?.otherEmotions?.options)}
+          {renderField("Other Signs", mse.moodAndAffectHusband?.otherSigns?.options, mse.moodAndAffectWife?.otherSigns?.options)}
+          {renderField("Neurovegetative", mse.moodAndAffectHusband?.neuroVegetative?.options, mse.moodAndAffectWife?.neuroVegetative?.options)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Affective Expression</h3>
+          {renderField("", mse.affectiveExpressionHusband?.affectiveExpression?.options, mse.affectiveExpressionWife?.affectiveExpression?.options, mse.affectiveExpressionHusband?.comments, mse.affectiveExpressionWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Appropriateness</h3>
+          {renderField("", mse.appropriatenessHusband?.appropriateness?.options, mse.appropriatenessWife?.appropriateness?.options, mse.appropriatenessHusband?.comments, mse.appropriatenessWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Hallucinations</h3>
+          {renderField("", mse.hallucinationsHusband?.hallucinations?.options, mse.hallucinationsWife?.hallucinations?.options, mse.hallucinationsHusband?.comments, mse.hallucinationsWife?.comments)}
+        </div>
+
+        {/* ========== PAGE 5: Disassociation, Agnosia, Thought Content ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Disassociation</h3>
+          {renderField("", mse.disassociationHusband?.disassociation?.options, mse.disassociationWife?.disassociation?.options, mse.disassociationHusband?.comments, mse.disassociationWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Agnosia</h3>
+          {renderField("", mse.agnosiaHusband?.agnosia?.options, mse.agnosiaWife?.agnosia?.options, mse.agnosiaHusband?.comments, mse.agnosiaWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Content of Thought</h3>
+          {renderField("", mse.contentOfThoughtHusband?.contentOfThought?.options, mse.contentOfThoughtWife?.contentOfThought?.options, mse.contentOfThoughtHusband?.comments, mse.contentOfThoughtWife?.comments)}
+          {renderField("Preoccupations (SI)", mse.contentOfThoughtHusband?.preoccupationsSI?.options, mse.contentOfThoughtWife?.preoccupationsSI?.options)}
+          {renderField("Hostile Intent", mse.contentOfThoughtHusband?.hostileIntent?.options, mse.contentOfThoughtWife?.hostileIntent?.options)}
+          {renderField("Phobia", mse.contentOfThoughtHusband?.phobia?.options, mse.contentOfThoughtWife?.phobia?.options)}
+
+          {(mse.contentOfThoughtHusband?.contentOfThought?.options?.includes("Delusions") ||
+            mse.contentOfThoughtWife?.contentOfThought?.options?.includes("Delusions")) && (
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              {mse.contentOfThoughtHusband?.contentOfThought?.options?.includes("Delusions") && (
+                <div className="bg-white border border-sky-300 rounded-md p-3 border-l-4 border-l-sky-400">
+                  <span className="block font-semibold text-gray-700 text-sm mb-1">Delusion Types (Husband)</span>
+                  {renderOptions(mse.delusions0Husband?.delusions0?.options)}
+                </div>
+              )}
+              {mse.contentOfThoughtWife?.contentOfThought?.options?.includes("Delusions") && (
+                <div className="bg-white border border-sky-300 rounded-md p-3 border-l-4 border-l-sky-400">
+                  <span className="block font-semibold text-gray-700 text-sm mb-1">Delusion Types (Wife)</span>
+                  {renderOptions(mse.delusions0Wife?.delusions0?.options)}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ========== PAGE 6: Thought Form & Cognitive ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Thought Form</h3>
+          {renderField("General", mse.thoughtFormHusband?.general?.options, mse.thoughtFormWife?.general?.options, mse.thoughtFormHusband?.comments, mse.thoughtFormWife?.comments)}
+          {renderField("Specific", mse.thoughtFormHusband?.specific?.options, mse.thoughtFormWife?.specific?.options)}
+          {renderField("Disturbances of Speech", mse.thoughtFormHusband?.disturbancesOfSpeech?.options, mse.thoughtFormWife?.disturbancesOfSpeech?.options)}
+          {renderField("Aphasic Disturbances", mse.thoughtFormHusband?.aphasicDisturbances?.options, mse.thoughtFormWife?.aphasicDisturbances?.options)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Consciousness</h3>
+          {renderField("", mse.consciousnessHusband?.consciousness?.options, mse.consciousnessWife?.consciousness?.options, mse.consciousnessHusband?.comments, mse.consciousnessWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Orientation</h3>
+          {renderField("", mse.orientationHusband?.orientation?.options, mse.orientationWife?.orientation?.options, mse.orientationHusband?.comments, mse.orientationWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Concentration</h3>
+          {renderField("", mse.concentrationHusband?.concentration?.options, mse.concentrationWife?.concentration?.options, mse.concentrationHusband?.comments, mse.concentrationWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Memory</h3>
+          {renderField("", mse.memoryHusband?.memory?.options, mse.memoryWife?.memory?.options, mse.memoryHusband?.comments, mse.memoryWife?.comments)}
+        </div>
+
+        {/* ========== PAGE 7: Intelligence, Judgment, Insight ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Information & Intelligence</h3>
+          {renderField("Attention", mse.informationAndIntelligenceHusband?.attention?.options, mse.informationAndIntelligenceWife?.attention?.options, mse.informationAndIntelligenceHusband?.comments, mse.informationAndIntelligenceWife?.comments)}
+          {renderField("Suggestibility", mse.informationAndIntelligenceHusband?.suggestibility?.options, mse.informationAndIntelligenceWife?.suggestibility?.options)}
+          {renderField("Memory", mse.informationAndIntelligenceHusband?.memory2?.options, mse.informationAndIntelligenceWife?.memory2?.options)}
+          {renderField("Intelligence", mse.informationAndIntelligenceHusband?.intelligence?.options, mse.informationAndIntelligenceWife?.intelligence?.options)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Judgment</h3>
+          {renderField("", mse.judgmentHusband?.judgment?.options, mse.judgmentWife?.judgment?.options, mse.judgmentHusband?.comments, mse.judgmentWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Insight</h3>
+          {renderField("", mse.insightHusband?.insight?.options, mse.insightWife?.insight?.options, mse.insightHusband?.comments, mse.insightWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Reliability</h3>
+          {renderField("", mse.reliabilityHusband?.reliability?.options, mse.reliabilityWife?.reliability?.options, mse.reliabilityHusband?.comments, mse.reliabilityWife?.comments)}
+        </div>
+
+        {/* ========== PAGE 8: Summary & Recommendations ========== */}
+        <div className="print-break">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3">Summary</h3>
+          {renderField("Global Functioning", mse.summaryHusband?.globalFunctioning?.options, mse.summaryWife?.globalFunctioning?.options, mse.summaryHusband?.comments, mse.summaryWife?.comments)}
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-3 mt-6">Indications & Recommendations</h3>
+          <div className="bg-white border border-gray-300 rounded-md p-3">
+            {renderValue(mse.indicationsAndRecommendations)}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+
+const TabMentalStatusExamFamily = ({ id, refreshTabDetails,printPreviewMode }) => {
   const [isAddMode, setIsAddMode] = useState(true);
 
   const [patient, setPatient] = useState({
@@ -286,281 +550,6 @@ const TabMentalStatusExamFamily = ({ id, refreshTabDetails }) => {
   lastModified: null
 });
 
-  // const [patient, setPatient] = useState({
-  //   mentalStatusExam: {
-  //     circumstanceOfPresentationHusband: '',
-  //     circumstanceOfPresentationWife:'',
-  //     indicationsAndRecommendations:'',
-  //     appearanceHusband: {
-  //       appearance: { options: [] },
-  //       weight: { options: [] },
-  //       hair: { options: [] },
-  //       otherFeatures: { options: []},
-  //       grooming: { options: []},
-  //       dress: { options: []},
-  //       comments: ''
-  //     },
-  //     appearanceWife: {
-  //       appearance: { options: []},
-  //       weight: { options: []},
-  //       hair: { options: []},
-  //       otherFeatures: { options: []},
-  //       grooming: { options: []},
-  //       dress: { options: []},
-  //       comments: ''
-  //     },
-  //     behaviorHusband: {
-  //       walk: { options: []},
-  //       combativeness: { options: []},
-  //       repetition: { options: []},
-  //       overactivity: { options: []},
-  //       catatonia: { options: []},
-  //       comments: ''
-  //     },
-  //     behaviorWife: {
-  //       walk: { options: []},
-  //       combativeness: { options: []},
-  //       repetition: { options: []},
-  //       overactivity: { options: []},
-  //       catatonia: { options: []},
-  //       comments: ''
-  //     },
-  //     speechHusband: {
-  //       rate: { options: []},
-  //       intelligibility: { options: []},
-  //       volume: { options: []},
-  //       speechQuality: { options: []},
-  //       speechQuantity: { options: []},
-  //       comments: ''
-  //     },
-  //     speechWife: {
-  //       rate: { options: ['Rapid']},
-  //       intelligibility: { options: ['Slurred']},
-  //       volume: { options: ['Loud']},
-  //       speechQuality: { options: ['Emotional']},
-  //       speechQuantity: { options: ['Talkative']},
-  //       comments: ''
-  //     },
-  //     attitudeToExaminerHusband: {
-  //       attitudeToExaminer: { options: ['Seductive']},
-  //       comments: ''
-  //     },
-  //     attitudeToExaminerWife: {
-  //       attitudeToExaminer: { options: ['Seductive']},
-  //       comments: ''
-  //     },
-  //     moodAndAffectHusband: {
-  //       mood: { options: ['Euthymic']},
-  //       otherEmotions: { options: ['Panicked']},
-  //       otherSigns: { options: ['Ambivalence']},
-  //       neuroVegetative: { options: ['Hypersomnia']},
-  //       comments: ''
-  //     },
-  //     moodAndAffectWife: {
-  //       mood: { options: ['Euthymic']},
-  //       otherEmotions: { options: ['Panicked']},
-  //       otherSigns: { options: ['Ambivalence']},
-  //       neuroVegetative: { options: ['Hypersomnia']},
-  //       comments: ''
-  //     },
-  //     affectiveExpressionHusband: {
-  //       affectiveExpression: { options: ['Normal']},
-  //       comments: ''
-  //     },
-  //     affectiveExpressionWife: {
-  //       affectiveExpression: { options: ['Normal']},
-  //       comments: ''
-  //     },
-  //     appropriatenessHusband: {
-  //       appropriateness: { options: ['Labile']},
-  //       comments: ''
-  //     },
-  //     appropriatenessWife: {
-  //       appropriateness: { options: ['Labile']},
-  //       comments: ''
-  //     },
-  //     hallucinationsHusband: {
-  //       hallucinations: { options: ['Hypnogogic']},
-  //       comments: ''
-  //     },
-  //     hallucinationsWife: {
-  //       hallucinations: { options: ['Hypnogogic']},
-  //       comments: ''
-  //     },
-  //     disassociationHusband: {
-  //       disassociation: { options: ['Macropsia']},
-  //       comments: ''
-  //     },
-  //     disassociationWife: {
-  //       disassociation: { options: ['Macropsia']},
-  //       comments: ''
-  //     },
-  //     agnosiaHusband: {
-  //       agnosia: { options: ['Anosognosia']},
-  //       comments: ''
-  //     },
-  //     agnosiaWife: {
-  //       agnosia: { options: ['Anosognosia']},
-  //       comments: ''
-  //     },
-  //     contentOfThoughtHusband: {
-  //       contentOfThought: { options: ['Overvalued idea']},
-  //       preoccupationsSI: { options: ['Current ideation']},
-  //       hostileIntent: { options: ['History of violence']},
-  //       phobia: { options: ['Simple']},
-  //       comments: ''
-  //     },
-  //     contentOfThoughtWife: {
-  //       contentOfThought: { options: ['Overvalued idea']},
-  //       preoccupationsSI: { options: ['Current ideation']},
-  //       hostileIntent: { options: ['History of violence']},
-  //       phobia: { options: ['Simple']},
-  //       comments: ''
-  //     },
-  //     delusions0Husband: {
-  //       delusions0: { options: ['Somatic']},
-  //       comments: ''
-  //     },
-  //     delusions0Wife: {
-  //       delusions0: { options: ['Somatic']},
-  //       comments: ''
-  //     },
-  //     thoughtFormHusband: {
-  //       general: { options: ['Neurosis']},
-  //       specific: { options: ['Circumstantiality']},
-  //       disturbancesOfSpeech: { options: ['Voluble']},
-  //       aphasicDisturbances: { options: ['Jargon']},
-  //       comments: ''
-  //     },
-  //     thoughtFormWife: {
-  //       general: { options: ['Neurosis']},
-  //       specific: { options: ['Circumstantiality']},
-  //       disturbancesOfSpeech: { options: ['Voluble']},
-  //       aphasicDisturbances: { options: ['Jargon']},
-  //       comments: ''
-  //     },
-  //     consciousnessHusband: {
-  //       consciousness: { options: ['Disoriented']},
-  //       comments: ''
-  //     },
-  //     consciousnessWife: {
-  //       consciousness: { options: ['Disoriented']},
-  //       comments: ''
-  //     },
-  //     orientationHusband: {
-  //       orientation: { options: ['Time Disorientation']},
-  //       comments: ''
-  //     },
-  //     orientationWife: {
-  //       orientation: { options: ['Time Disorientation']},
-  //       comments: ''
-  //     },
-  //     concentrationHusband: {
-  //       concentration: { options: ['Serial 7’s inattention']},
-  //       comments: ''
-  //     },
-  //     concentrationWife: {
-  //       concentration: { options: ['Serial 7’s inattention']},
-  //       comments: ''
-  //     },
-  //     memoryHusband: {
-  //       memory: { options: ['Remote memory deficit']},
-  //       comments: ''
-  //     },
-  //     memoryWife: {
-  //       memory: { options: ['Remote memory deficit']},
-  //       comments: ''
-  //     },
-  //     informationAndIntelligenceHusband: {
-  //       attention: { options: ['Distractible']},
-  //       suggestibility: { options: ['Hypnotized']},
-  //       memory2: { options: ['Localized amnesia']},
-  //       intelligence: { options: ['Dementia']},
-  //       comments: ''
-  //     },
-  //     informationAndIntelligenceWife: {
-  //       attention: { options: ['Distractible']},
-  //       suggestibility: { options: ['Hypnotized']},
-  //       memory2: { options: ['Localized amnesia']},
-  //       intelligence: { options: ['Dementia']},
-  //       comments: ''
-  //     },
-  //     judgmentHusband: {
-  //       judgment: { options: ['Critical']},
-  //       comments: ''
-  //     },
-  //     judgmentWife: {
-  //       judgment: { options: ['Critical']},
-  //       comments: ''
-  //     },
-  //     insightHusband: {
-  //       insight: { options: ['Impaired insight']},
-  //       comments: ''
-  //     },
-  //     insightWife: {
-  //       insight: { options: ['Impaired insight']},
-  //       comments: ''
-  //     },
-  //     reliabilityHusband: {
-  //       reliability: { options: ['Reason to fake bad']},
-  //       comments: ''
-  //     },
-  //     reliabilityWife: {
-  //       reliability: { options: ['Reason to fake bad']},
-  //       comments: ''
-  //     },
-  //     summaryHusband: {
-  //       globalFunctioning: { options: ['20 Possible harm']},
-  //       comments: ''
-  //     },
-  //     summaryWife: {
-  //       globalFunctioning: { options: ['20 Possible harm']},
-  //       comments: ''
-  //     },
-  //     generalObservationsHusband: {
-  //       appearance: { options: ['Neat']},
-  //       speech: { options: ['Normal']},
-  //       eyeContact: { options: ['Normal']},
-  //       motorActivity: { options: ['Normal']},
-  //       affect: { options: ['Full']},
-  //       comments: 'Well-groomed, appropriately dressed'
-  //     },
-  //     generalObservationsWife: {
-  //       appearance: { options: ['Neat']},
-  //       speech: { options: ['Normal']},
-  //       eyeContact: { options: ['Normal']},
-  //       motorActivity: { options: ['Normal']},
-  //       affect: { options: ['Full']},
-  //       comments: 'Well-groomed, appropriately dressed'
-  //     },
-  //     cognitionHusband: {
-  //       orientationImpairment: { options: ['None']},
-  //       memoryImpairment: { options: ['None']},
-  //       attention: { options: ['Normal']},
-  //       comments: ''
-  //     },
-  //     cognitionWife: {
-  //       orientationImpairment: { options: ['None']},
-  //       memoryImpairment: { options: ['None']},
-  //       attention: { options: ['Normal']},
-  //       comments: ''
-  //     },
-  //     thoughtsHusband: {
-  //       suicidality: { options: ['None']},
-  //       homicidality: { options: ['None']},
-  //       delusions: { options: ['None']},
-  //       comments: ''
-  //     },
-  //     thoughtsWife: {
-  //       suicidality: { options: ['None']},
-  //       homicidality: { options: ['None']},
-  //       delusions: { options: ['None']},
-  //       comments: ''
-  //     }
-  //   },
-  //   formDate: null,
-  //   lastModified: null
-  // });
 
   const [initialPatientInformation, setInitialPatientInformation] = useState(null);
   const [editingSection, setEditingSection] = useState(null);
@@ -1893,16 +1882,24 @@ const TabMentalStatusExamFamily = ({ id, refreshTabDetails }) => {
         message={modal.message}
         type={modal.type}
       />
+
+
     <div className="px-6  min-h-screen">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-6">
+
+    {!isLoading ?  (
+
+
+!printPreviewMode ?
+  <>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-6">
         <h3 className="flex items-center text-xl font-bold text-gray-700">
           {/* <FaBrain className="mr-3" size={32} /> */}
           Mental Status Exam
         </h3>
 
    
-       {!isLoading ?  <>
-      <div className='text-center text-gray-700'>
+   
+      {/* <div className='text-center text-gray-700'>
   <strong>Form Date:</strong>{' '}
   {patient.formDate
     ? moment(patient.formDate).format('DD MMM YYYY')
@@ -1913,11 +1910,10 @@ const TabMentalStatusExamFamily = ({ id, refreshTabDetails }) => {
   {patient.lastModified
     ? moment(patient.lastModified).format('DD MMM YYYY HH:mm a')
     : 'N/A'}
-</div>
-</>:null}
+</div> */}
+
       </div>
 
-  
       {circumstanceOfPresentation('circumstanceOfPresentation')}
 
       {renderSection('Appearance', 'appearance',<FaUserTie className="mr-2 text-gray-700" size={20} />, [
@@ -2016,10 +2012,17 @@ const TabMentalStatusExamFamily = ({ id, refreshTabDetails }) => {
         </div>
       )}
 
+</>
+    
+:<PrintMentalStatusExamFamilyA4 mse={patient.mentalStatusExam} printPreviewMode={true} />
+    )
 
+:null}
 
 
     </div>
+
+
          </>
   );
 };

@@ -11,7 +11,272 @@ import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
 import DescriptionInput from "../DescriptionInput";
 
-const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
+
+/* --------------------------------------------------------------
+   Print-Only CSS: A4, page breaks, color accuracy
+   -------------------------------------------------------------- */
+const printStyles = `
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
+  }
+`;
+
+/* --------------------------------------------------------------
+   Print View: Family Mental Health (Husband + Wife)
+   -------------------------------------------------------------- */
+const PrintMentalHealthFamilyA4 = ({ medicalInformation }) => {
+
+  // Reusable: render string, list, or N/A
+  const renderValue = (value) => {
+    if (!value || (Array.isArray(value) && value.length === 0) || (typeof value === "string" && value.trim() === "")) {
+      return <span className="text-gray-500 italic">N/A</span>;
+    }
+
+    if (Array.isArray(value)) {
+      return (
+        <ul className="list-disc list-inside mt-2 space-y-1">
+          {value.map((item, i) => (
+            <li key={i} className="text-gray-800">{item}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    if (typeof value === "string" && value.includes(";")) {
+      const items = value.split(";").map(s => s.trim()).filter(Boolean);
+      return (
+        <ul className="list-disc list-inside mt-2 space-y-1">
+          {items.map((item, i) => (
+            <li key={i} className="text-gray-800">{item}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    return <div className="text-gray-800 whitespace-pre-line">{value}</div>;
+  };
+
+  const renderYesNo = (value) => {
+    return value ? "Yes" : "No";
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
+
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto bg-white">
+
+        {/* ========== PAGE 1: Title + Health Details ========== */}
+        <div>
+          <h1 className="text-center text-xl font-bold text-sky-700 mb-6">
+            Family Mental Health Details
+          </h1>
+
+          {/* Column Headers */}
+          <div className="grid grid-cols-5 gap-4 mb-4 font-semibold text-sky-700 text-sm">
+            <div></div>
+            <div className="col-span-2 text-center">Husband</div>
+            <div className="col-span-2 text-center">Wife</div>
+          </div>
+
+          {/* ---------- Health Details ---------- */}
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Health Details
+          </h3>
+
+          {/* Physical Ailments */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Chief Physical Ailments, Diseases, Complaints, or Handicaps
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.physicalAilmentsHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.physicalAilmentsWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Main Complaints */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Present Main Complaints, Symptoms, and Problems
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.mainComplaintsHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.mainComplaintsWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Worse Conditions */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Under What Conditions Are Problems Worse?
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.worseConditionsHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.worseConditionsWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Improved Conditions */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Under What Conditions Are Problems Improved?
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.improvedConditionsHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.improvedConditionsWife.value)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ========== PAGE 2: Treatment History ========== */}
+        <div className="print-break">
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Treatment History
+          </h3>
+
+          {/* Psychiatric Treatment History */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Past History of Psychiatric Treatment or Counselling
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 text-center font-medium">
+                {renderYesNo(medicalInformation.isHistoryOfPsychiatricTreatmentsHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 text-center font-medium">
+                {renderYesNo(medicalInformation.isHistoryOfPsychiatricTreatmentsWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Psychiatric Hospitalization */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Psychiatric Hospitalization
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 text-center font-medium">
+                {renderYesNo(medicalInformation.isPsychiatricHospitalizationHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 text-center font-medium">
+                {renderYesNo(medicalInformation.isPsychiatricHospitalizationWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Mental Illness History */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              History of Mental Illness
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfMentalIllnessHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfMentalIllnessWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Substance Abuse History */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              History of Substance Abuse
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfSubstanceAbuseHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfSubstanceAbuseWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* ACES History */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              History of ACES (Adverse Childhood Experiences)
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfACESHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfACESWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Additional Information
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.additionalInfoHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.additionalInfoWife.value)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
@@ -653,6 +918,9 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
       />
 
       {!isLoading ? (
+
+
+!printPreviewMode ?
         <div className="px-8">
           <section className="mb-12">
             <div className="flex justify-between items-center mb-2 pb-2">
@@ -1381,6 +1649,10 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab }) => {
             </div>
           )}
         </div>
+:
+<PrintMentalHealthFamilyA4 medicalInformation={medicalInformation} />
+
+
       ) : (
         <LoadingSpinner />
       )}

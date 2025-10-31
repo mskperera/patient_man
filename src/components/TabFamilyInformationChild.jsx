@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaFemale, FaMale, FaUser } from "react-icons/fa";
+import { FaCalendarAlt, FaFemale, FaMale, FaSync, FaUser } from "react-icons/fa";
 import DescriptionInput from "./DescriptionInput";
 import LoadingSpinner from "./LoadingSpinner";
 import MessageModel from "./MessageModel";
 import {
   addFamilyInformation,
+  addOccupation,
   drpOccupations,
   drpRaisedBy,
   drpReligions,
@@ -16,118 +17,26 @@ import VoiceToText from "./VoiceToText";
 import EditButton from "./EditButton";
 
 import moment from "moment";
-
+import DialogModel from "./model/DialogModel";
 
 const printCss = `
-  .print-family {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13.5px;
-    line-height: 1.6;
-    max-width: 210mm;
-    margin: 0 auto;
-  }
-  .print-family h1 {
-    text-align: center;
-    font-size: 22px;
-    margin-bottom: 16px;
-    font-weight: bold;
-  }
-  .print-family .header-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #4b5563;
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .print-family .section {
-    margin-bottom: 24px;
-    padding: 14px;
-  }
-  .print-family .section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #0ea5e9;
-  }
-  .print-family .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .print-family .field {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px dashed #cbd5e1;
-  }
-  .print-family .field-label {
-    font-weight: 600;
-    color: #374151;
-    width: 60%;
-  }
-  .print-family .field-value {
-    color: #1f2937;
-    width: 40%;
-    text-align: right;
-  }
-  .print-family .list {
-    margin: 8px 0;
-    padding-left: 20px;
-  }
-  .print-family .list li {
-    margin-bottom: 4px;
-  }
-  .print-family .age-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: flex-end;
-  }
-  .print-family .age-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    background: #dbeafe;
-    color: #1e40af;
-    font-size: 11px;
-    border-radius: 9999px;
-  }
-  .print-family .age-tag.female {
-    background: #fce7f3;
-    color: #be185d;
-  }
-  .print-family .description-box {
-    background: #fff;
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    margin-top: 8px;
-  }
-
   @media print {
     @page { size: A4; margin: 1cm; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-family .page-break { page-break-before: always; }
+    .print-break { page-break-before: always; }
   }
   @media screen {
-    .print-family .page-break { break-before: page; margin-top: 30mm; }
+    .print-break { break-before: page; margin-top: 30mm; }
   }
 `;
 
-const PrintFamilyInformationA4= ({
-  familyInformation
-}) => {
-
-
+const PrintFamilyInformationA4 = ({ familyInformation }) => {
   const formatList = (items) => {
     if (!items || items.length === 0) return <em className="text-gray-500">N/A</em>;
     return (
-      <ul className="list">
+      <ul className="list-disc list-inside space-y-1">
         {items.map((item, i) => (
-          <li key={i}>{item}</li>
+          <li key={i} className="text-gray-800">{item}</li>
         ))}
       </ul>
     );
@@ -136,13 +45,21 @@ const PrintFamilyInformationA4= ({
   const formatAges = (ages, gender) => {
     if (!ages || !ages.trim()) return <em className="text-gray-500">N/A</em>;
     return (
-      <div className="age-tags">
+      <div className="flex flex-wrap justify-end gap-1.5">
         {ages.split(",").map((age, i) => (
           <span
             key={i}
-            className={`age-tag ${gender === "female" ? "female" : ""}`}
+            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+              gender === "female"
+                ? "bg-pink-100 text-pink-800"
+                : "bg-blue-100 text-blue-800"
+            }`}
           >
-            {gender === "male" ? <FaMale className="mr-1" /> : <FaFemale className="mr-1" />}
+            {gender === "male" ? (
+              <FaMale className="w-3 h-3 mr-1" />
+            ) : (
+              <FaFemale className="w-3 h-3 mr-1" />
+            )}
             {age.trim()}
           </span>
         ))}
@@ -154,72 +71,70 @@ const PrintFamilyInformationA4= ({
     <>
       <style dangerouslySetInnerHTML={{ __html: printCss }} />
 
-      <div className="print-family">
+      <div className="print-break  font-sans text-sm leading-relaxed max-w-[210mm] mx-auto">
         {/* Header */}
-             <h1 className="text-lg font-bold text-sky-700">Family Information</h1>
-        <div className="header-info">
-          <div><FaCalendarAlt className="inline mr-1" /> <strong>Printed:</strong> {moment().format("DD MMM YYYY, hh:mm A")}</div>
-        </div>
+        <h1 className="text-center text-xl font-bold text-sky-700 mb-4">Family Information</h1>
+    
 
         {/* Parental Information */}
-        <div className="section">
-          <div className="section-title">Parental Information</div>
-          <div className="grid">
+        <div className="mb-6 rounded-lg">
+          <div className="text-lg font-bold mb-3 pb-1 border-b-2 border-sky-700 text-sky-700">Parental Information</div>
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
             <div>
-              <div className="field">
-                <span className="field-label">Mother's Age</span>
-                <span className="field-value">{familyInformation.motherAge || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Mother's Age</span>
+                <span className="text-right w-2/5">{familyInformation.motherAge || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Age When Mother Died</span>
-                <span className="field-value">{familyInformation.ageWhenMotherDied || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Age When Mother Died</span>
+                <span className="text-right w-2/5">{familyInformation.ageWhenMotherDied || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Mother's Occupation</span>
-                <span className="field-value">{familyInformation.motherOccupation || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Mother's Occupation</span>
+                <span className="text-right w-2/5">{familyInformation.motherOccupation || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Mother's Religion</span>
-                <span className="field-value">{familyInformation.motherReligion || "N/A"}</span>
+              <div className="flex justify-between py-1.5">
+                <span className="font-semibold text-gray-700 w-3/5">Mother's Religion</span>
+                <span className="text-right w-2/5">{familyInformation.motherReligion || "N/A"}</span>
               </div>
             </div>
             <div>
-              <div className="field">
-                <span className="field-label">Father's Age</span>
-                <span className="field-value">{familyInformation.fatherAge || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Father's Age</span>
+                <span className="text-right w-2/5">{familyInformation.fatherAge || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Age When Father Died</span>
-                <span className="field-value">{familyInformation.ageWhenFatherDied || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Age When Father Died</span>
+                <span className="text-right w-2/5">{familyInformation.ageWhenFatherDied || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Father's Occupation</span>
-                <span className="field-value">{familyInformation.fatherOccupation || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Father's Occupation</span>
+                <span className="text-right w-2/5">{familyInformation.fatherOccupation || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Father's Religion</span>
-                <span className="field-value">{familyInformation.fatherReligion || "N/A"}</span>
+              <div className="flex justify-between py-1.5">
+                <span className="font-semibold text-gray-700 w-3/5">Father's Religion</span>
+                <span className="text-right w-2/5">{familyInformation.fatherReligion || "N/A"}</span>
               </div>
             </div>
           </div>
 
           <div className="mt-6">
             <strong className="block mb-2">Who raised you if not parents?</strong>
-            <div className="description-box">
+            <div className="bg-white p-3 rounded border border-dashed border-gray-300">
               {formatList(familyInformation.raisedBy)}
             </div>
           </div>
 
-          <div className="grid mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div>
               <strong className="block mb-2">Mother Description</strong>
-              <div className="description-box">
+              <div className="bg-white p-3 rounded border border-dashed border-gray-300">
                 {formatList(familyInformation.motherDescription)}
               </div>
             </div>
             <div>
               <strong className="block mb-2">Father Description</strong>
-              <div className="description-box">
+              <div className="bg-white p-3 rounded border border-dashed border-gray-300">
                 {formatList(familyInformation.fatherDescription)}
               </div>
             </div>
@@ -227,72 +142,68 @@ const PrintFamilyInformationA4= ({
         </div>
 
         {/* Sibling Information */}
-        <div className="section">
-          <div className="section-title">Sibling Information</div>
-          <div className="grid">
+        <div className="mb-6 p-4 border border-gray-200 rounded-lg">
+          <div className="text-lg font-bold mb-3 pb-1 border-b-2 border-sky-700 text-sky-700">Sibling Information</div>
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
             <div>
-              <div className="field">
-                <span className="field-label">Parental Separation Age</span>
-                <span className="field-value">{familyInformation.parentalSeparationAge || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Parental Separation Age</span>
+                <span className="text-right w-2/5">{familyInformation.parentalSeparationAge || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Parental Divorce Age</span>
-                <span className="field-value">{familyInformation.parentalDivorceAge || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Parental Divorce Age</span>
+                <span className="text-right w-2/5">{familyInformation.parentalDivorceAge || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Mother's Divorce Count</span>
-                <span className="field-value">{familyInformation.motherDivorceCount || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Mother's Divorce Count</span>
+                <span className="text-right w-2/5">{familyInformation.motherDivorceCount || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Father's Divorce Count</span>
-                <span className="field-value">{familyInformation.fatherDivorceCount || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Father's Divorce Count</span>
+                <span className="text-right w-2/5">{familyInformation.fatherDivorceCount || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Living Brothers</span>
-                <span className="field-value">{familyInformation.livingBrothers || "N/A"}</span>
+              <div className="flex justify-between py-1.5">
+                <span className="font-semibold text-gray-700 w-3/5">Living Brothers</span>
+                <span className="text-right w-2/5">{familyInformation.livingBrothers || "N/A"}</span>
               </div>
             </div>
             <div>
-              <div className="field">
-                <span className="field-label">Living Sisters</span>
-                <span className="field-value">{familyInformation.livingSisters || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Living Sisters</span>
+                <span className="text-right w-2/5">{familyInformation.livingSisters || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Brothers' Ages</span>
-                <span className="field-value">
-                  {formatAges(familyInformation.brothersAges, "male")}
-                </span>
+              <div className="py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 block mb-1">Brothers' Ages</span>
+                {formatAges(familyInformation.brothersAges, "male")}
               </div>
-              <div className="field">
-                <span className="field-label">Sisters' Ages</span>
-                <span className="field-value">
-                  {formatAges(familyInformation.sistersAges, "female")}
-                </span>
+              <div className="py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 block mb-1">Sisters' Ages</span>
+                {formatAges(familyInformation.sistersAges, "female")}
               </div>
-              <div className="field">
-                <span className="field-label">Child Number</span>
-                <span className="field-value">{familyInformation.childNumber || "N/A"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Child Number</span>
+                <span className="text-right w-2/5">{familyInformation.childNumber || "N/A"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Total Family Children</span>
-                <span className="field-value">{familyInformation.familyChildren || "N/A"}</span>
+              <div className="flex justify-between py-1.5">
+                <span className="font-semibold text-gray-700 w-3/5">Total Family Children</span>
+                <span className="text-right w-2/5">{familyInformation.familyChildren || "N/A"}</span>
               </div>
             </div>
           </div>
 
           <div className="mt-6">
             <strong className="block mb-2">Adopted?</strong>
-            <div className="description-box font-medium">
+            <div className="bg-white p-3 rounded border border-dashed border-gray-300 font-medium">
               {familyInformation.adopted || "N/A"}
             </div>
           </div>
 
-          <div className="grid mt-6">
+          <div className="print-break grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div>
               <strong className="block mb-2">Brother Relationship Issues</strong>
-              <div className="description-box">
+              <div className="bg-white p-3 rounded border border-dashed border-gray-300">
                 {familyInformation.brotherDisturbances ? (
-                  <p className="whitespace-pre-line">{familyInformation.brotherDisturbances}</p>
+                  <p className="whitespace-pre-line text-gray-800">{familyInformation.brotherDisturbances}</p>
                 ) : (
                   <em className="text-gray-500">None reported</em>
                 )}
@@ -300,9 +211,9 @@ const PrintFamilyInformationA4= ({
             </div>
             <div>
               <strong className="block mb-2">Sister Relationship Issues</strong>
-              <div className="description-box">
+              <div className="bg-white p-3 rounded border border-dashed border-gray-300">
                 {familyInformation.sisterDisturbances ? (
-                  <p className="whitespace-pre-line">{familyInformation.sisterDisturbances}</p>
+                  <p className="whitespace-pre-line text-gray-800">{familyInformation.sisterDisturbances}</p>
                 ) : (
                   <em className="text-gray-500">None reported</em>
                 )}
@@ -312,27 +223,27 @@ const PrintFamilyInformationA4= ({
         </div>
 
         {/* Family Mental Health */}
-        <div className="section">
-          <div className="section-title">Family Mental Health</div>
-          <div className="grid">
+        <div className="p-4 border border-gray-200 rounded-lg">
+          <div className="text-lg font-bold mb-3 pb-1 border-b-2 border-sky-700 text-sky-700">Family Mental Health</div>
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
             <div>
-              <div className="field">
-                <span className="field-label">Male Relatives Emotionally Disturbed</span>
-                <span className="field-value">{familyInformation.maleRelativesDisturbed || "0"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Male Relatives Emotionally Disturbed</span>
+                <span className="text-right w-2/5">{familyInformation.maleRelativesDisturbed || "0"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Male Relatives Hospitalized / Suicide Attempts</span>
-                <span className="field-value">{familyInformation.maleRelativesHospitalized || "0"}</span>
+              <div className="flex justify-between py-1.5">
+                <span className="font-semibold text-gray-700 w-3/5">Male Relatives Hospitalized / Suicide Attempts</span>
+                <span className="text-right w-2/5">{familyInformation.maleRelativesHospitalized || "0"}</span>
               </div>
             </div>
             <div>
-              <div className="field">
-                <span className="field-label">Female Relatives Emotionally Disturbed</span>
-                <span className="field-value">{familyInformation.femaleRelativesDisturbed || "0"}</span>
+              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+                <span className="font-semibold text-gray-700 w-3/5">Female Relatives Emotionally Disturbed</span>
+                <span className="text-right w-2/5">{familyInformation.femaleRelativesDisturbed || "0"}</span>
               </div>
-              <div className="field">
-                <span className="field-label">Female Relatives Hospitalized / Suicide Attempts</span>
-                <span className="field-value">{familyInformation.femaleRelativesHospitalized || "0"}</span>
+              <div className="flex justify-between py-1.5">
+                <span className="font-semibold text-gray-700 w-3/5">Female Relatives Hospitalized / Suicide Attempts</span>
+                <span className="text-right w-2/5">{familyInformation.femaleRelativesHospitalized || "0"}</span>
               </div>
             </div>
           </div>
@@ -341,7 +252,6 @@ const PrintFamilyInformationA4= ({
     </>
   );
 };
-
 
 const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
   const [familyInformationErrors, setFamilyInformationErrors] = useState({});
@@ -915,6 +825,13 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+if(value===0) // adding custom occupation
+{
+  setShowOccuptionAddPanel(true);
+
+}
+
     const fieldValue = type === "checkbox" ? checked : value;
     const { required, dataType } = familyInformation[name];
     const error = validateField(
@@ -1334,6 +1251,117 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
     setEditingSection(null); // Exit edit mode
   };
 
+
+
+
+
+
+//occupation add panel
+const [showOccuptionAddPanel,setShowOccuptionAddPanel]=useState(false);
+const [newOccupationName,setNewOccupationName]=useState('');
+  const [selectedOccupationField,setSelectedOccupationField]=useState('');
+ const [isOccupationLoading, setIsOccupationLoading] = useState(false);
+
+
+const NewOccupationPanel = () => {
+  return (
+    <div className="mt-4 p-4 border border-blue-200 rounded-lg">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Enter New Occupation Name
+      </label>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newOccupationName}
+          onChange={(e) => setNewOccupationName(e.target.value)}
+          placeholder="e.g., Data Scientist"
+          className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          autoFocus
+        />
+        <button
+          onClick={async () => {
+            if (!newOccupationName.trim()) {
+              setModal({
+                isOpen: true,
+                message: "Please enter an occupation name.",
+                type: "error",
+              });
+              return;
+            }
+
+            setIsSaving(true);
+            const occupationRes = await addOccupation({ occupationName: newOccupationName.trim() });
+
+            console.log('occupationRes',occupationRes)
+            if (occupationRes.data.error) {
+              setModal({
+                isOpen: true,
+                message: occupationRes.data.error.message,
+                type: "error",
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            if (occupationRes.data.outputValues.responseStatus === "failed") {
+              setModal({
+                isOpen: true,
+                message: occupationRes.data.outputValues.outputMessage,
+                type: "warning",
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            await loadDrpOccupations();
+
+            const occupatoinId=occupationRes.data.outputValues.occupationId;
+
+            setFamilyInformation((prev) => ({
+              ...prev,
+              [selectedOccupationField]: {
+                ...prev[selectedOccupationField],
+                value: newOccupationName.trim(),
+              },
+              // occupation: {
+              //   ...prev.occupation,
+              //   value: newOccupationName.trim(),
+              // },
+            }));
+
+            setNewOccupationName("");
+            setShowOccuptionAddPanel(false);
+            setIsSaving(false);
+
+            setModal({
+              isOpen: true,
+              message: "New occupation added and selected!",
+              type: "success",
+            });
+          }}
+          disabled={isSaving}
+          type="button"
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+        >
+          {isSaving ? "Adding..." : "Add"}
+        </button>
+        <button
+          onClick={() => {
+            setShowOccuptionAddPanel(false);
+            setNewOccupationName("");
+          }}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
+
+
   return (
     <>
       <MessageModel
@@ -1342,6 +1370,18 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
         message={modal.message}
         type={modal.type}
       />
+
+      <DialogModel
+        header={"Add New Occupation"}
+        visible={showOccuptionAddPanel}
+        onHide={() => setShowOccuptionAddPanel(false)}
+      >
+
+
+<NewOccupationPanel />
+
+</DialogModel>
+
 
       {!isLoading ? (
     
@@ -1500,13 +1540,64 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
                     )}
                   </div>
                   <div>
+
+
                     <label className="block text-sm font-medium text-gray-700">
                       Mother's Occupation
                       {familyInformation.motherOccupation.required && (
                         <span className="text-red-500">*</span>
                       )}
                     </label>
-                    <select
+
+
+
+
+
+<div className="flex items-center justify-start gap-2">
+<select
+    name="motherOccupation"
+    value={familyInformation.motherOccupation.value}
+    onChange={(e) => {
+      const val = e.target.value;
+      if (val === "0") {
+        setShowOccuptionAddPanel(true);
+        setEditingSection("parental");
+        setSelectedOccupationField("motherOccupation");
+      } else {
+        handleChange(e);
+        setShowOccuptionAddPanel(false);
+      }
+    }}
+    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+        aria-label="Mother's occupation"
+  >
+    <option value="">Select occupation</option>
+    <option value="0">+ Add New Occupation</option>
+    {occupations.map((occupation) => (
+      <option key={occupation.id} value={occupation.name}>
+        {occupation.name}
+      </option>
+    ))}
+  </select>
+
+  <button
+    title="Refresh dropdown"
+    onClick={async () => {
+      setIsOccupationLoading(true);
+      await loadDrpOccupations();
+      setIsOccupationLoading(false);
+    }}
+    disabled={isOccupationLoading}
+    className="text-gray-600 hover:text-sky-600"
+  >
+    <FaSync />
+  </button>
+
+</div>
+
+
+
+                    {/* <select
                       name="motherOccupation"
                       value={familyInformation.motherOccupation.value}
                       onChange={handleChange}
@@ -1519,12 +1610,25 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
                           {occupation.name}
                         </option>
                       ))}
-                    </select>
+                    </select> */}
+
+
+
+
+
+
+
+
+
                     {familyInformationErrors.motherOccupation && (
                       <p className="mt-1 text-sm text-red-600">
                         {familyInformationErrors.motherOccupation}
                       </p>
                     )}
+
+
+
+
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -1533,7 +1637,51 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
                         <span className="text-red-500">*</span>
                       )}
                     </label>
-                    <select
+
+                    
+<div className="flex items-center justify-start gap-2">
+<select
+    name="fatherOccupation"
+    value={familyInformation.fatherOccupation.value}
+    onChange={(e) => {
+      const val = e.target.value;
+      if (val === "0") {
+        setShowOccuptionAddPanel(true);
+        setEditingSection("parental");
+        setSelectedOccupationField("fatherOccupation");
+      } else {
+        handleChange(e);
+        setShowOccuptionAddPanel(false);
+      }
+    }}
+    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+        aria-label="Mother's occupation"
+  >
+    <option value="">Select occupation</option>
+    <option value="0">+ Add New Occupation</option>
+    {occupations.map((occupation) => (
+      <option key={occupation.id} value={occupation.name}>
+        {occupation.name}
+      </option>
+    ))}
+  </select>
+
+  <button
+    title="Refresh dropdown"
+    onClick={async () => {
+      setIsOccupationLoading(true);
+      await loadDrpOccupations();
+      setIsOccupationLoading(false);
+    }}
+    disabled={isOccupationLoading}
+    className="text-gray-600 hover:text-sky-600"
+  >
+    <FaSync />
+  </button>
+
+</div>
+
+                    {/* <select
                       name="fatherOccupation"
                       value={familyInformation.fatherOccupation.value}
                       onChange={handleChange}
@@ -1546,7 +1694,7 @@ const TabFamilyInformationChild = ({ id, refreshTabDetails, setActiveTab,printPr
                           {occupation.name}
                         </option>
                       ))}
-                    </select>
+                    </select> */}
                     {familyInformationErrors.fatherOccupation && (
                       <p className="mt-1 text-sm text-red-600">
                         {familyInformationErrors.fatherOccupation}

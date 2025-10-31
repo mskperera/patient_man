@@ -13,178 +13,241 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import EditButton from "../EditButton";
 
-
 /* --------------------------------------------------------------
-   Print-only styles (same pattern as BasicInfoPrint)
+   Print-Only CSS: Page breaks, A4 size, color accuracy
    -------------------------------------------------------------- */
 const printStyles = `
-  @page {
-    size: A4;
-    margin: 1.5cm;
-  }
-
-  /* Hide on screen – show only when printing */
-  .print-only { display: none; }
-
   @media print {
-    .print-only { display: block !important; }
-    .no-print   { display: none !important; }
-
-    .print-section { 
-      break-inside: avoid; 
-      page-break-inside: avoid; 
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
     }
-    .print-field   { break-inside: avoid; }
-    .print-header  { margin-bottom: 1.5rem; }
   }
 `;
 
-
-
-
-
-  function FamilyInfoPrint({ basicInformation }) {
+/* --------------------------------------------------------------
+   Print View Component – Family Basic Information (Husband + Wife)
+   -------------------------------------------------------------- */
+const FamilyInfoPrint = ({ basicInformation }) => {
+  // Format date: "2025 Jan 15"
   const formatDate = (dateStr) =>
-    dateStr ? moment(dateStr).format("YYYY MMM DD") : "";
+    dateStr
+      ? new Date(dateStr).toLocaleDateString("en-GB", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })
+      : "";
 
   return (
     <>
-      {/* Inject CSS */}
-      <style jsx>{printStyles}</style>
+      {/* Inject print CSS */}
+      <style>{printStyles}</style>
 
-      {/* Whole block – hidden on screen, visible in print preview */}
-      <div className="print-only mx-auto max-w-[210mm] bg-white p-6 font-sans text-sm leading-relaxed">
+      {/* A4 Container */}
+      <div className="mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
 
         {/* Main Header */}
-        <header className="print-header text-left mb-4">
-          <h3 className="text-xl font-bold text-gray-800 tracking-wide">
-            Family Information – Husband & Wife
+        <header className="text-center mb-6">
+          <h3 className="text-xl font-bold text-sky-700 tracking-wide">
+            Family Basic Information
           </h3>
         </header>
 
-        {/* Table-style layout */}
-        <section className="print-section">
-          {/* Header row */}
-          <div className="grid grid-cols-5 gap-4 mb-2 font-semibold text-sky-700">
-            <div></div>
-            <div className="col-span-2 text-center">Husband</div>
-            <div className="col-span-2 text-center">Wife</div>
-          </div>
+        {/* Table Header: Husband | Wife */}
+        <div className="grid grid-cols-5 gap-4 font-semibold text-sky-700 text-sm">
+          <div></div>
+          <div className="col-span-2 text-center font-bold">Husband</div>
+          <div className="col-span-2 text-center font-bold">Wife</div>
+        </div>
+
+        {/* ========== Personal Details ========== */}
+        <section className="mb-8">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Personal Details
+          </h3>
 
           {/* First Name */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">First Name</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandFirstName?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">First Name:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.husbandFirstName.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeFirstName?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.wifeFirstName.value || "N/A"}</span>
             </div>
           </div>
 
           {/* Middle Name */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Middle Name</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandMiddleName?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Middle Name:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.husbandMiddleName.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeMiddleName?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.wifeMiddleName.value || "N/A"}</span>
             </div>
           </div>
 
           {/* Last Name */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Last Name</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandLastName?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Last Name:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.husbandLastName.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeLastName?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.wifeLastName.value || "N/A"}</span>
             </div>
           </div>
 
           {/* Date of Birth */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Date of Birth</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {formatDate(basicInformation.husbandDateOfBirth?.value)}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Date of Birth:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{formatDate(basicInformation.husbandDateOfBirth.value)}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {formatDate(basicInformation.wifeDateOfBirth?.value)}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{formatDate(basicInformation.wifeDateOfBirth.value)}</span>
             </div>
           </div>
 
           {/* Age */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Age</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandAge?.value} {basicInformation.husbandAge?.value ? "Years" : ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Age:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">
+                {basicInformation.husbandAge.value ? `${basicInformation.husbandAge.value} Years` : "N/A"}
+              </span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeAge?.value} {basicInformation.wifeAge?.value ? "Years" : ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">
+                {basicInformation.wifeAge.value ? `${basicInformation.wifeAge.value} Years` : "N/A"}
+              </span>
             </div>
           </div>
 
           {/* Gender */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Gender</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandGender?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Gender:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.husbandGender.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeGender?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.wifeGender.value || "N/A"}</span>
             </div>
           </div>
+        </section>
+
+        {/* ========== Contact Information ========== */}
+        <section className="mb-8">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Contact Information
+          </h3>
 
           {/* Permanent Address */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-start">
-            <span className="font-medium text-gray-700">Permanent Address</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 whitespace-pre-line">
-              {basicInformation.husbandPermanentAddress?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Permanent Address:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900 max-w-[70%] text-right">
+                {basicInformation.husbandPermanentAddress.value || "N/A"}
+              </span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 whitespace-pre-line">
-              {basicInformation.wifePermanentAddress?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900 max-w-[70%] text-right">
+                {basicInformation.wifePermanentAddress.value || "N/A"}
+              </span>
             </div>
           </div>
 
           {/* Home Phone */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Home Phone</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandHomePhone?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Home Phone:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.husbandHomePhone.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeHomePhone?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.wifeHomePhone.value || "N/A"}</span>
             </div>
           </div>
 
           {/* Mobile Phone */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Mobile Phone</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.husbandMobilePhone?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Mobile Phone:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.husbandMobilePhone.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900">
-              {basicInformation.wifeMobilePhone?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{basicInformation.wifeMobilePhone.value || "N/A"}</span>
             </div>
           </div>
 
           {/* Email */}
-          <div className="print-field grid grid-cols-5 gap-4 mb-3 items-center">
-            <span className="font-medium text-gray-700">Email</span>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 break-all">
-              {basicInformation.husbandEmail?.value ?? ""}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Email:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900 break-all">{basicInformation.husbandEmail.value || "N/A"}</span>
             </div>
-            <div className="col-span-2 border border-gray-300 rounded p-2 text-gray-900 break-all">
-              {basicInformation.wifeEmail?.value ?? ""}
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900 break-all">{basicInformation.wifeEmail.value || "N/A"}</span>
             </div>
           </div>
         </section>
+
+        {/* ========== Referral Information ========== */}
+        <section className="mb-6">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Referral Information
+          </h3>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* Referral Source */}
+            <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="font-medium text-gray-700">Referral Source:</span>
+              <span className="text-gray-900">
+                {basicInformation.referralSource.value === "other"
+                  ? basicInformation.referralSourceOther.value
+                  : basicInformation.referralSource.value || "N/A"}
+              </span>
+            </div>
+
+            {/* Referral Party Present */}
+            <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="font-medium text-gray-700">Referral Party Present:</span>
+              <span className="text-gray-900">
+                {basicInformation.referralPartyPresent.value ? "Yes" : "No"}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* ========== Form Metadata ========== */}
+        {/* <footer className="mt-8 text-xs text-gray-600 border-t pt-2">
+          <div className="flex justify-between">
+            <span>
+              <strong>Form Date:</strong>{" "}
+              {basicInformation.formDate.value
+                ? formatDate(basicInformation.formDate.value)
+                : "N/A"}
+            </span>
+            <span>
+              <strong>Last Modified:</strong>{" "}
+              {basicInformation.lastModified.value
+                ? new Date(basicInformation.lastModified.value).toLocaleString("en-GB")
+                : "N/A"}
+            </span>
+          </div>
+        </footer> */}
       </div>
     </>
   );
-}
+};
+
+
 
 const TabBasicInformationFamily = ({
   id,

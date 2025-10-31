@@ -10,161 +10,120 @@ import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
 
 
+const printStyles = `
 
-/* --------------------------------------------------------------
-   Shared Print & Screen CSS (same as Education)
-   -------------------------------------------------------------- */
-const printCss = `
-  .print-preview {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #1f2937;
-    max-width: 210mm;
-    margin: 0 auto;
-    padding: 15mm;
-    background: #fff;
-  }
-  .print-preview h1 { 
-    text-align: center; 
-    margin-bottom: 20px; 
-    font-size: 22px; 
-  }
-
-  
-  .print-preview .info-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #6b7280;
-    font-style: italic;
-    margin: 10px 0;
-  }
-  .print-preview .remark-box {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 12px;
-    margin-top: 8px;
-    white-space: pre-line;
-    font-size: 13px;
-  }
-  .print-preview .field-box {
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .print-preview .field-label {
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
-    display: block;
-  }
-  .print-preview .field-value {
-    white-space: pre-line;
-    color: #1f2937;
-  }
-
-  @media print {
+   @media print {
     @page { size: A4; margin: 1cm; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-preview .page-break { page-break-before: always; }
+    .print-break { page-break-before: always; }
   }
-
   @media screen {
-    .print-preview .page-break { 
+    .print-break { 
       break-before: page;
       margin-top: 30mm;
     }
-  }
 `;
 
-const PrintMentalHealthA4= ({ mentalHealth, printPreviewMode = true }) => {
+
+const PrintMentalHealthA4 = ({ mentalHealth, printPreviewMode = true }) => {
   if (!printPreviewMode) return null;
 
   const renderValue = (value) => {
-    if (!value || value.trim() === "") return <span className="text-gray-500 italic">N/A</span>;
+    if (!value || value.trim() === "") {
+      return <span className="text-gray-500 italic">N/A</span>;
+    }
 
     if (value.includes(";")) {
       const items = value.split(";").map(s => s.trim()).filter(Boolean);
       return (
-        <ul className="list-disc pl-5 mt-1 space-y-1">
+        <ul className="list-disc list-inside mt-2 space-y-1">
           {items.map((item, i) => (
-            <li key={i} className="field-value">{item}</li>
+            <li key={i} className="text-gray-800">{item}</li>
           ))}
         </ul>
       );
     }
 
-    return <div className="field-value">{value}</div>;
+    return <div className="text-gray-800 whitespace-pre-line">{value}</div>;
   };
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
 
-      <div className="print-preview">
-
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto ">
+        
         {/* ========== PAGE 1: Title + Health Details ========== */}
         <div>
+          <h1 className="text-center text-xl font-bold text-sky-700 mb-6">Mental Health Details</h1>
 
-     <h1 className="text-xl text-center mb-5 font-bold text-sky-700">Mental Health Details</h1>
-     
-           <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-         Health Details
-        </h3>
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Health Details
+          </h3>
 
-          <div className="field-box">
-            <span className="field-label">Chief Physical Ailments, Diseases, Complaints, or Handicaps</span>
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Chief Physical Ailments, Diseases, Complaints, or Handicaps
+            </span>
             {renderValue(mentalHealth.physicalAilments)}
           </div>
 
-          <div className="field-box">
-            <span className="field-label">Present Main Complaints, Symptoms, and Problems</span>
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Present Main Complaints, Symptoms, and Problems
+            </span>
             {renderValue(mentalHealth.mainComplaints)}
           </div>
 
-          <div className="field-box">
-            <span className="field-label">Additional Past Complaints, Symptoms, and Problems</span>
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Additional Past Complaints, Symptoms, and Problems
+            </span>
             {renderValue(mentalHealth.pastComplaints)}
           </div>
 
-          <div className="field-box">
-            <span className="field-label">Under What Conditions Are Problems Worse?</span>
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Under What Conditions Are Problems Worse?
+            </span>
             {renderValue(mentalHealth.worseConditions)}
           </div>
 
-          <div className="field-box">
-            <span className="field-label">Under What Conditions Are Problems Improved?</span>
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Under What Conditions Are Problems Improved?
+            </span>
             {renderValue(mentalHealth.improvedConditions)}
           </div>
         </div>
 
         {/* ========== PAGE 2: Treatment History ========== */}
-        <div className="page-break">
-    
-               <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
-     Treatment History
-        </h3>
+        <div className="">
 
-          <div className="field-box">
-            <span className="field-label">
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Treatment History
+          </h3>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
               Past History of Psychiatric Treatment or Counselling
             </span>
             {renderValue(mentalHealth.pastHistoryOfPsyTeatment)}
           </div>
 
-          <div className="field-box">
-            <span className="field-label">Are You Undergoing Treatment Anywhere Else Now?</span>
-            <div className="field-value font-medium">
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Are You Undergoing Treatment Anywhere Else Now?
+            </span>
+            <div className="font-medium text-gray-800">
               {mentalHealth.currentTreatment || "N/A"}
             </div>
           </div>
 
-          <div className="field-box">
-            <span className="field-label">Additional Information</span>
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Additional Information
+            </span>
             {renderValue(mentalHealth.additionalInfo)}
           </div>
         </div>
@@ -221,7 +180,7 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
       dataType: "string",
     },
     pastHistoryOfPsyTeatment: {
-      label: "Individual Therapy Hours",
+      label: "Past History of Psychiatric Treatment or Counselling",
       value: "",
       isTouched: false,
       isValid: true,

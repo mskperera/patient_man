@@ -9,7 +9,167 @@ import {
 import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
 
-const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
+const printStyles = `
+
+   @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
+`;
+
+const PrintMentalHealthA4 = ({ mentalHealth, printPreviewMode = true }) => {
+  if (!printPreviewMode) return null;
+
+  const renderValue = (value) => {
+    if (!value || value.trim() === "") {
+      return <span className="text-gray-500 italic">N/A</span>;
+    }
+
+    if (value.includes(";")) {
+      const items = value.split(";").map(s => s.trim()).filter(Boolean);
+      return (
+        <ul className="list-disc list-inside mt-2 space-y-1">
+          {items.map((item, i) => (
+            <li key={i} className="text-gray-800">{item}</li>
+          ))}
+        </ul>
+      );
+    }
+
+    return <div className="text-gray-800 whitespace-pre-line">{value}</div>;
+  };
+
+  const renderNumber = (value) => {
+    return value !== null && value !== undefined && value !== "" ? value : "N/A";
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
+
+      <div className="print-break font-sans text-sm leading-relaxed max-w-[210mm] mx-auto bg-white">
+        
+        {/* ========== PAGE 1: Title + Health Details ========== */}
+        <div className="mt-10">
+          <h1 className="text-center text-xl font-bold text-sky-700 mb-6">Mental Health Details</h1>
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Health Details
+          </h3>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Chief Physical Ailments, Diseases, Complaints, or Handicaps
+            </span>
+            {renderValue(mentalHealth.physicalAilments)}
+          </div>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Present Main Complaints, Symptoms, and Problems
+            </span>
+            {renderValue(mentalHealth.mainComplaints)}
+          </div>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Additional Past Complaints, Symptoms, and Problems
+            </span>
+            {renderValue(mentalHealth.pastComplaints)}
+          </div>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Under What Conditions Are Problems Worse?
+            </span>
+            {renderValue(mentalHealth.worseConditions)}
+          </div>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Under What Conditions Are Problems Improved?
+            </span>
+            {renderValue(mentalHealth.improvedConditions)}
+          </div>
+        </div>
+
+        {/* ========== PAGE 2: Treatment History ========== */}
+        <div className="print-break">
+
+          <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
+            Treatment History
+          </h3>
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Past History of Psychiatric Treatment or Counselling
+            </span>
+            {renderValue(mentalHealth.pastHistoryOfPsyTeatment)}
+          </div>
+
+          {/* Uncomment if needed */}
+          {/* <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+              <span className="block font-semibold text-gray-700 mb-1">Individual Therapy Years</span>
+              <div className="text-gray-800">{renderNumber(mentalHealth.individualTherapyYears)}</div>
+            </div>
+            <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+              <span className="block font-semibold text-gray-700 mb-1">Ended Years Ago</span>
+              <div className="text-gray-800">{renderNumber(mentalHealth.individualTherapyEndYears)}</div>
+            </div>
+            <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+              <span className="block font-semibold text-gray-700 mb-1">Group Therapy Hours</span>
+              <div className="text-gray-800">{renderNumber(mentalHealth.groupTherapyHours)}</div>
+            </div>
+          </div> */}
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Are You Undergoing Treatment Anywhere Else Now?
+            </span>
+            <div className="font-medium text-gray-800">
+              {mentalHealth.currentTreatment || "N/A"}
+            </div>
+          </div>
+
+          {/* Uncomment if antidepressants count is used */}
+          {/* <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Number of Antidepressants Tried
+            </span>
+            <div className="text-gray-800">{renderNumber(mentalHealth.antidepressantsCount)}</div>
+          </div> */}
+
+          {/* Uncomment if psychotherapy type is used */}
+          {/* <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Type of Psychotherapy
+            </span>
+            {renderValue(mentalHealth.psychotherapyType)}
+          </div> */}
+
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              Additional Information
+            </span>
+            {renderValue(mentalHealth.additionalInfo)}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+
+const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
@@ -54,8 +214,8 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       required: false,
       dataType: "string",
     },
-    individualTherapyHours: {
-      label: "Individual Therapy Hours",
+   pastHistoryOfPsyTeatment: {
+      label: "Past History of Psychiatric Treatment or Counselling",
       value: "",
       isTouched: false,
       isValid: true,
@@ -178,9 +338,9 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
           isTouched: false,
           isValid: true,
         },
-        individualTherapyHours: {
-          ...medicalInformation.individualTherapyHours,
-          value: patientData.individualTherapyHours,
+        pastHistoryOfPsyTeatment: {
+          ...medicalInformation.pastHistoryOfPsyTeatment,
+          value: patientData.pastHistoryOfPsyTeatment,
           isTouched: false,
           isValid: true,
         },
@@ -351,10 +511,10 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
         pastComplaints: medicalInformation.pastComplaints.value,
         worseConditions: medicalInformation.worseConditions.value,
         improvedConditions: medicalInformation.improvedConditions.value,
-        individualTherapyHours:
-          medicalInformation.individualTherapyHours.value === ""
+        pastHistoryOfPsyTeatment:
+          medicalInformation.pastHistoryOfPsyTeatment.value === ""
             ? null
-            : medicalInformation.individualTherapyHours.value,
+            : medicalInformation.pastHistoryOfPsyTeatment.value,
         individualTherapyYears:
           medicalInformation.individualTherapyYears.value === ""
             ? null
@@ -457,10 +617,10 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       pastComplaints: medicalInformation.pastComplaints.value,
       worseConditions: medicalInformation.worseConditions.value,
       improvedConditions: medicalInformation.improvedConditions.value,
-      individualTherapyHours:
-        medicalInformation.individualTherapyHours.value === ""
+      pastHistoryOfPsyTeatment:
+        medicalInformation.pastHistoryOfPsyTeatment.value === ""
           ? null
-          : medicalInformation.individualTherapyHours.value,
+          : medicalInformation.pastHistoryOfPsyTeatment.value,
       individualTherapyYears:
         medicalInformation.individualTherapyYears.value === ""
           ? null
@@ -597,6 +757,8 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
       />
 
       {!isLoading ? (
+
+!printPreviewMode ?
         <div className="px-8">
           {/* Health Details */}
           <section className=" mb-12">
@@ -841,22 +1003,22 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
                        Past history of psychiatric treatment or councelling
-                        {medicalInformation.individualTherapyHours.required && (
+                        {medicalInformation.pastHistoryOfPsyTeatment.required && (
                           <span className="text-red-500">*</span>
                         )}
                       </label>
                              <VoiceToText
-                    name="individualTherapyHours"
-                    value={medicalInformation.individualTherapyHours.value}
+                    name="pastHistoryOfPsyTeatment"
+                    value={medicalInformation.pastHistoryOfPsyTeatment.value}
                     onChange={handleChange}
                     className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     rows="4"
                     placeholder="Past history of psychiatric treatment or councelling"
                     aria-label="Past history of psychiatric treatment or councelling"
                   />
-                      {medicalInformationErrors.individualTherapyHours && (
+                      {medicalInformationErrors.pastHistoryOfPsyTeatment && (
                         <p className="mt-1 text-sm text-red-600">
-                          {medicalInformationErrors.individualTherapyHours}
+                          {medicalInformationErrors.pastHistoryOfPsyTeatment}
                         </p>
                       )}
                     </div>
@@ -1011,7 +1173,7 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2  bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Past history of psychiatric treatment or councelling :</strong>{" "}
                         <div className="whitespace-pre-line">
-                    {renderListItems(medicalInformation.individualTherapyHours.value)}
+                    {renderListItems(medicalInformation.pastHistoryOfPsyTeatment.value)}
                   </div>
                 </div>
 
@@ -1048,6 +1210,23 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab }) => {
             </div>
           )}
         </div>
+:
+
+<PrintMentalHealthA4
+      mentalHealth={{
+        physicalAilments: medicalInformation.physicalAilments.value,
+        mainComplaints: medicalInformation.mainComplaints.value,
+        pastComplaints: medicalInformation.pastComplaints.value,
+        worseConditions: medicalInformation.worseConditions.value,
+        improvedConditions: medicalInformation.improvedConditions.value,
+        pastHistoryOfPsyTeatment: medicalInformation.pastHistoryOfPsyTeatment.value,
+        currentTreatment: medicalInformation.currentTreatment.value,
+        additionalInfo: medicalInformation.additionalInfo.value,
+      }}
+      printPreviewMode={printPreviewMode}
+    />
+
+
       ) : (
         <LoadingSpinner />
       )}

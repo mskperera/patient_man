@@ -3,6 +3,7 @@ import { FaFemale, FaMale, FaPlusCircle, FaSync } from "react-icons/fa";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageModel from "../MessageModel";
 import {
+  addOccupation,
   addPersonalInformationFamily,
   drpBadPoints,
   drpGoodPoints,
@@ -13,6 +14,7 @@ import {
 } from "../../functions/patient";
 import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
+import DialogModel from "../model/DialogModel";
 
 const maritalStatusOptions = [
   { value: "married", text: "Married" },
@@ -28,7 +30,259 @@ const workStatusOptions = [
   { value: "part-time", text: "Part-time" },
 ];
 
-const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) => {
+
+/* --------------------------------------------------------------
+   Print-Only CSS: A4, page breaks, color accuracy
+   -------------------------------------------------------------- */
+const printStyles = `
+  @media print {
+    @page { size: A4; margin: 1cm; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-break { page-break-before: always; }
+  }
+  @media screen {
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
+  }
+`;
+
+/* --------------------------------------------------------------
+   Print View: Family Personal Information (Husband + Wife)
+   -------------------------------------------------------------- */
+const PrintPersonalInformationFamilyA4 = ({ personalInformation, maritalStatusOptions }) => {
+
+  // Helper: Get marital status text
+  const getMaritalText = (value) => {
+    const opt = maritalStatusOptions.find(o => o.value === value);
+    return opt ? opt.text : "N/A";
+  };
+
+  // Helper: Split comma-separated ages
+  const splitAges = (field) => {
+    const raw = personalInformation[field]?.value;
+    if (!raw) return [];
+    return raw.split(",").map(a => a.trim()).filter(Boolean);
+  };
+
+  const maleAges = splitAges("maleChildrenAges");
+  const femaleAges = splitAges("femaleChildrenAges");
+
+  // Helper: Render value or N/A
+  const renderValue = (value) => {
+    return value ? value : <span className="italic text-gray-500">N/A</span>;
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
+
+      <div className="print-break mx-auto max-w-[210mm] bg-white font-sans text-sm leading-relaxed">
+
+        {/* ========== PAGE 1: Title + Marital Details ========== */}
+        <div>
+          <h1 className="text-xl text-center mb-5 font-bold text-sky-700">
+            Family Personal Information
+          </h1>
+
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Marital Details
+          </h3>
+
+          {/* Two-column layout */}
+          <section className="grid grid-cols-2 gap-6">
+
+            {/* ---- LEFT COLUMN: Husband ---- */}
+            <div className="space-y-4">
+              {/* Marital Status */}
+              <div className="flex justify-between items-start py-2 border-b border-gray-300">
+                <span className="font-medium text-gray-700 w-1/2">
+                  Present Marital Status
+                </span>
+                <span className="text-gray-900 w-1/2 text-right">
+                  {getMaritalText(personalInformation.maritalStatusHusband.value)}
+                </span>
+              </div>
+
+              {/* Years Married */}
+              {personalInformation.maritalStatusHusband.value === "married" && (
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                  <span className="font-medium text-gray-700 w-2/3">
+                    Number of Years Married to Present Spouse
+                  </span>
+                  <span className="text-gray-900 w-1/3 text-right">
+                    {renderValue(personalInformation.yearsMarriedHusband.value)} yrs
+                  </span>
+                </div>
+              )}
+
+              {/* Male Children Ages */}
+              <div className="flex justify-between items-start py-2 border-b border-gray-300">
+                <span className="font-medium text-gray-700 w-1/2">
+                  Ages of Male Children
+                </span>
+                <div className="text-gray-900 w-1/2 text-right">
+                  {maleAges.length ? maleAges.join(", ") : <span className="italic text-gray-500">N/A</span>}
+                </div>
+              </div>
+            </div>
+
+            {/* ---- RIGHT COLUMN: Wife ---- */}
+            <div className="space-y-4">
+              {/* Marital Status */}
+              <div className="flex justify-between items-start py-2 border-b border-gray-300">
+                <span className="font-medium text-gray-700 w-1/2">
+                  Present Marital Status
+                </span>
+                <span className="text-gray-900 w-1/2 text-right">
+                  {getMaritalText(personalInformation.maritalStatusWife.value)}
+                </span>
+              </div>
+
+              {/* Years Married */}
+              {personalInformation.maritalStatusWife.value === "married" && (
+                <div className="flex justify-between items-center py-2 border-b border-gray-300">
+                  <span className="font-medium text-gray-700 w-2/3">
+                    Number of Years Married to Present Spouse
+                  </span>
+                  <span className="text-gray-900 w-1/3 text-right">
+                    {renderValue(personalInformation.yearsMarriedWife.value)} yrs
+                  </span>
+                </div>
+              )}
+
+              {/* Female Children Ages */}
+              <div className="flex justify-between items-start py-2 border-b border-gray-300">
+                <span className="font-medium text-gray-700 w-1/2">
+                  Ages of Female Children
+                </span>
+                <div className="text-gray-900 w-1/2 text-right">
+                  {femaleAges.length ? femaleAges.join(", ") : <span className="italic text-gray-500">N/A</span>}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* ========== PAGE 2: Personal Insights ========== */}
+        <div className="print-break mt-8">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Personal Insights
+          </h3>
+
+          <div className="space-y-4">
+            {/* Love & Sex Difficulties */}
+            <div className="py-2">
+              <span className="font-medium text-gray-700 block mb-1">
+                Main Love and Sex Difficulties
+              </span>
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
+                {renderValue(personalInformation.loveSexDifficulties.value)}
+              </div>
+            </div>
+
+            {/* Life Goals */}
+            <div className="py-2">
+              <span className="font-medium text-gray-700 block mb-1">
+                Main Life Goals
+              </span>
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
+                {renderValue(personalInformation.lifeGoals.value)}
+              </div>
+            </div>
+
+            {/* Things to Change */}
+            <div className="py-2">
+              <span className="font-medium text-gray-700 block mb-1">
+                Things Most Like to Change About Yourself
+              </span>
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
+                {renderValue(personalInformation.thingsToChange.value)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ========== PAGE 3: Occupation Information ========== */}
+        <div className="print-break mt-8">
+          <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+            Occupation Information
+          </h3>
+
+          {/* Column Headers */}
+          <div className="grid grid-cols-5 gap-4 mb-4 font-semibold text-sky-700 text-sm">
+            <div></div>
+            <div className="col-span-2 text-center">Husband</div>
+            <div className="col-span-2 text-center">Wife</div>
+          </div>
+
+          {/* Occupation Trained For */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Occupation(s) Trained For
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(personalInformation.occupationTrainedHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(personalInformation.occupationTrainedWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Present Occupation */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Present Occupation
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(personalInformation.occupationHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(personalInformation.occupationWife.value)}
+              </div>
+            </div>
+          </div>
+
+          {/* Work Status */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+              Work Status
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 text-center font-medium">
+                {renderValue(
+                  personalInformation.workStatusHusband.value === "full-time" ? "Full-time" :
+                  personalInformation.workStatusHusband.value === "part-time" ? "Part-time" : null
+                )}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 text-center font-medium">
+                {renderValue(
+                  personalInformation.workStatusWife.value === "full-time" ? "Full-time" :
+                  personalInformation.workStatusWife.value === "part-time" ? "Part-time" : null
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+
+
+const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
   const [personalInformationErrors, setPersonalInformationErrors] = useState({});
   const [mode, setMode] = useState("add");
   const [editingSection, setEditingSection] = useState(null);
@@ -610,6 +864,110 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
   };
 
 
+
+//occupation add panel
+const [showOccuptionAddPanel,setShowOccuptionAddPanel]=useState(false);
+const [newOccupationName,setNewOccupationName]=useState('');
+  const [selectedOccupationField,setSelectedOccupationField]=useState('');
+
+const NewOccupationPanel = () => {
+  return (
+    <div className="mt-4 p-4 border border-blue-200 rounded-lg">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Enter New Occupation Name
+      </label>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newOccupationName}
+          onChange={(e) => setNewOccupationName(e.target.value)}
+          placeholder="e.g., Data Scientist"
+          className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          autoFocus
+        />
+        <button
+          onClick={async () => {
+            if (!newOccupationName.trim()) {
+              setModal({
+                isOpen: true,
+                message: "Please enter an occupation name.",
+                type: "error",
+              });
+              return;
+            }
+
+            setIsSaving(true);
+            const occupationRes = await addOccupation({ occupationName: newOccupationName.trim() });
+
+            console.log('occupationRes',occupationRes)
+            if (occupationRes.data.error) {
+              setModal({
+                isOpen: true,
+                message: occupationRes.data.error.message,
+                type: "error",
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            if (occupationRes.data.outputValues.responseStatus === "failed") {
+              setModal({
+                isOpen: true,
+                message: occupationRes.data.outputValues.outputMessage,
+                type: "warning",
+              });
+              setIsSaving(false);
+              return;
+            }
+
+            await loadDrpOccupations();
+
+            const occupatoinId=occupationRes.data.outputValues.occupationId;
+
+            setPersonalInformation((prev) => ({
+              ...prev,
+              [selectedOccupationField]: {
+                ...prev[selectedOccupationField],
+                value: newOccupationName.trim(),
+              },
+              // occupation: {
+              //   ...prev.occupation,
+              //   value: newOccupationName.trim(),
+              // },
+            }));
+
+            setNewOccupationName("");
+            setShowOccuptionAddPanel(false);
+            setIsSaving(false);
+
+            setModal({
+              isOpen: true,
+              message: "New occupation added and selected!",
+              type: "success",
+            });
+          }}
+          disabled={isSaving}
+          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+        >
+          {isSaving ? "Adding..." : "Add"}
+        </button>
+        <button
+          onClick={() => {
+            setShowOccuptionAddPanel(false);
+            setNewOccupationName("");
+          }}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
+
+
   return (
     <>
       <MessageModel
@@ -619,7 +977,25 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
         type={modal.type}
       />
 
+      <DialogModel
+        header={"Add New Occupation"}
+        visible={showOccuptionAddPanel}
+        onHide={() => setShowOccuptionAddPanel(false)}
+      >
+
+
+<NewOccupationPanel />
+
+</DialogModel>
+
+
+
+
       {!isLoading ? (
+
+
+!printPreviewMode ? 
+
        <div className="px-8">
       {/* Personal Details */}
       <section className="mb-12">
@@ -1084,6 +1460,48 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
               </label>
               <div className="col-span-2">
                 <div className="flex items-center justify-start gap-2">
+                <select
+                    name="occupationTrainedHusband"
+                    value={personalInformation.occupationTrainedHusband.value}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "0") {
+                        setShowOccuptionAddPanel(true);
+                        setEditingSection("occupation");
+                        setSelectedOccupationField("occupationTrainedHusband");
+                      } else {
+                        handleChangePersonalInfo(e);
+                        setShowOccuptionAddPanel(false);
+                      }
+                    }}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                   aria-label="Husband occupation trained for"
+                  >
+                    <option value="">Select occupation</option>
+                    <option value="0">+ Add New Occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      setIsOccupationLoading(true);
+                      await loadDrpOccupations();
+                      setIsOccupationLoading(false);
+                    }}
+                    disabled={isOccupationLoading}
+                    className="text-gray-600 hover:text-sky-600"
+                  >
+                    <FaSync />
+                  </button>
+                
+                </div>
+                
+                {/* <div className="flex items-center justify-start gap-2">
                   <select
                     name="occupationTrainedHusband"
                     value={personalInformation.occupationTrainedHusband.value}
@@ -1126,7 +1544,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                   >
                     <FaPlusCircle className="text-green-600" />
                   </button>
-                </div>
+                </div> */}
                 {personalInformationErrors.occupationTrainedHusband && (
                   <p className="mt-1 text-sm text-red-600">
                     {personalInformationErrors.occupationTrainedHusband}
@@ -1134,6 +1552,51 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                 )}
               </div>
               <div className="col-span-2">
+
+
+
+                    <div className="flex items-center justify-start gap-2">
+                <select
+                    name="occupationTrainedWife"
+                    value={personalInformation.occupationTrainedWife.value}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "0") {
+                        setShowOccuptionAddPanel(true);
+                        setEditingSection("occupation");
+                        setSelectedOccupationField("occupationTrainedWife");
+                      } else {
+                        handleChangePersonalInfo(e);
+                        setShowOccuptionAddPanel(false);
+                      }
+                    }}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                                  aria-label="Wife occupation trained for"
+                  >
+                    <option value="">Select occupation</option>
+                    <option value="0">+ Add New Occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      setIsOccupationLoading(true);
+                      await loadDrpOccupations();
+                      setIsOccupationLoading(false);
+                    }}
+                    disabled={isOccupationLoading}
+                    className="text-gray-600 hover:text-sky-600"
+                  >
+                    <FaSync />
+                  </button>
+                
+                </div>
+{/*                 
                 <div className="flex items-center justify-start gap-2">
                   <select
                     name="occupationTrainedWife"
@@ -1177,7 +1640,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                   >
                     <FaPlusCircle className="text-green-600" />
                   </button>
-                </div>
+                </div> */}
                 {personalInformationErrors.occupationTrainedWife && (
                   <p className="mt-1 text-sm text-red-600">
                     {personalInformationErrors.occupationTrainedWife}
@@ -1186,6 +1649,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
               </div>
             </div>
             <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+
               <label className="block text-sm font-medium text-gray-700">
                 Present Occupation{" "}
                 {personalInformation.occupationHusband.required && (
@@ -1193,7 +1657,52 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                 )}
               </label>
               <div className="col-span-2">
-                <div className="flex items-center justify-start gap-2">
+
+
+      <div className="flex items-center justify-start gap-2">
+                <select
+                    name="occupationHusband"
+                    value={personalInformation.occupationHusband.value}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "0") {
+                        setShowOccuptionAddPanel(true);
+                        setEditingSection("occupation");
+                        setSelectedOccupationField("occupationHusband");
+                      } else {
+                        handleChangePersonalInfo(e);
+                        setShowOccuptionAddPanel(false);
+                      }
+                    }}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                         aria-label="Husband present occupation"
+                  >
+                    <option value="">Select occupation</option>
+                    <option value="0">+ Add New Occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      setIsOccupationLoading(true);
+                      await loadDrpOccupations();
+                      setIsOccupationLoading(false);
+                    }}
+                    disabled={isOccupationLoading}
+                    className="text-gray-600 hover:text-sky-600"
+                  >
+                    <FaSync />
+                  </button>
+                
+                </div>
+
+
+                {/* <div className="flex items-center justify-start gap-2">
                   <select
                     name="occupationHusband"
                     value={personalInformation.occupationHusband.value}
@@ -1236,7 +1745,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                   >
                     <FaPlusCircle className="text-green-600" />
                   </button>
-                </div>
+                </div> */}
                 {personalInformationErrors.occupationHusband && (
                   <p className="mt-1 text-sm text-red-600">
                     {personalInformationErrors.occupationHusband}
@@ -1244,7 +1753,51 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                 )}
               </div>
               <div className="col-span-2">
-                <div className="flex items-center justify-start gap-2">
+
+                  <div className="flex items-center justify-start gap-2">
+                <select
+                    name="occupationWife"
+                    value={personalInformation.occupationWife.value}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "0") {
+                        setShowOccuptionAddPanel(true);
+                        setEditingSection("occupation");
+                        setSelectedOccupationField("occupationWife");
+                      } else {
+                        handleChangePersonalInfo(e);
+                        setShowOccuptionAddPanel(false);
+                      }
+                    }}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                          aria-label="Wife present occupation"
+                  >
+                    <option value="">Select occupation</option>
+                    <option value="0">+ Add New Occupation</option>
+                    {occupations.map((occupation) => (
+                      <option key={occupation.id} value={occupation.name}>
+                        {occupation.name}
+                      </option>
+                    ))}
+                  </select>
+                
+                  <button
+                    title="Refresh dropdown"
+                    onClick={async () => {
+                      setIsOccupationLoading(true);
+                      await loadDrpOccupations();
+                      setIsOccupationLoading(false);
+                    }}
+                    disabled={isOccupationLoading}
+                    className="text-gray-600 hover:text-sky-600"
+                  >
+                    <FaSync />
+                  </button>
+                
+                </div>
+
+
+                {/* <div className="flex items-center justify-start gap-2">
                   <select
                     name="occupationWife"
                     value={personalInformation.occupationWife.value}
@@ -1287,7 +1840,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
                   >
                     <FaPlusCircle className="text-green-600" />
                   </button>
-                </div>
+                </div> */}
                 {personalInformationErrors.occupationWife && (
                   <p className="mt-1 text-sm text-red-600">
                     {personalInformationErrors.occupationWife}
@@ -1429,6 +1982,12 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab }) =
         </div>
       )}
     </div>
+:
+<PrintPersonalInformationFamilyA4
+    personalInformation={personalInformation}
+    maritalStatusOptions={maritalStatusOptions}
+  />
+
       ) : (
         <LoadingSpinner />
       )}

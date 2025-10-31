@@ -14,189 +14,117 @@ import {
 import VoiceToText from "../VoiceToText";
 import EditButton from "../EditButton";
 
-import moment from "moment";
-
-const printCss = `
-  .print-personal {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13.5px;
-    line-height: 1.6;
-    color: #1f2937;
-    max-width: 210mm;
-    margin: 0 auto;
-    padding: 16mm;
-    background: #fff;
-  }
-  .print-personal h1 {
-    text-align: center;
-    font-size: 22px;
-    color: #0ea5e9;
-    margin-bottom: 16px;
-    font-weight: bold;
-  }
-  .print-personal .header-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #4b5563;
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .print-personal .section {
-    margin-bottom: 28px;
-    padding: 14px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
-  }
-  .print-personal .section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 12px;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #0ea5e9;
-    color: #1e293b;
-  }
-  .print-personal .field {
-    margin-bottom: 14px;
-  }
-  .print-personal .field-label {
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
-    display: block;
-  }
-  .print-personal .field-value {
-    color: #1f2937;
-    padding: 8px 10px;
-    background: #fff;
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    min-height: 40px;
-    white-space: pre-line;
-  }
-  .print-personal .list {
-    margin: 0;
-    padding-left: 20px;
-  }
-  .print-personal .list li {
-    margin-bottom: 4px;
-    color: #1f2937;
-  }
-  .print-personal .empty {
-    color: #9ca3af;
-    font-style: italic;
-  }
-
-  @media print {
+const printStyles = `
+   @media print {
     @page { size: A4; margin: 1cm; }
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-personal .page-break { page-break-before: always; }
+    .print-break { page-break-before: always; }
   }
   @media screen {
-    .print-personal .page-break { break-before: page; margin-top: 30mm; }
-  }
+    .print-break { 
+      break-before: page;
+      margin-top: 30mm;
+    }
 `;
 
-const PrintPersonalInformationA4 = ({
-  personalInformation
-}) => {
 
-  const formatList = (items) => {
-    if (!items || items.length === 0) return <span className="empty">N/A</span>;
+function ChildPersonalInsightsPrint({ personalInformation }) {
+  /* ---------- helpers ---------- */
+  const renderList = (field) => {
+    const items = personalInformation[field].value || [];
+    if (!Array.isArray(items) || items.length === 0)
+      return <span className="italic text-gray-500">N/A</span>;
+
     return (
-      <ul className="list">
-        {items.map((item, i) => (
-          <li key={i}>{item}</li>
+      <ul className="list-disc pl-5 space-y-1">
+        {items.map((it, i) => (
+          <li key={i} className="text-gray-700">{it}</li>
         ))}
       </ul>
     );
   };
 
-  const formatText = (text) => {
-    if (!text || text.trim() === "") return <span className="empty">N/A</span>;
-    return <span>{text}</span>;
-  };
-
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: printCss }} />
+      <style>{printStyles}</style>
 
-      <div className="print-personal">
-        {/* Header */}
-        <h1>Personal Insights</h1>
-        <div className="header-info">
-          <div><strong>Printed:</strong> {moment().format("DD MMM YYYY, hh:mm A")}</div>
-        </div>
+      <div className="print-break mx-auto max-w-[210mm] bg-white  font-sans text-sm leading-relaxed">
 
-        {/* Personal Insights Section */}
-        <div className="section">
-          <div className="section-title">Personal Insights</div>
+     <h1 className="text-xl text-center mb-5 font-bold text-sky-700">Personal</h1>
+     
+        <h3 className="mb-3 border-b-2 border-sky-700 pb-1 text-lg font-bold text-sky-700">
+          Personal Insights
+        </h3>
+
+        <section className="print-section space-y-5">
 
           {/* Things Liked */}
-          <div className="field">
-            <div className="field-label">
-              Things you like to do most (pleasures, interests, people)
-            </div>
-            <div className="field-value">
-              {formatText(personalInformation.thingsLiked)}
-            </div>
+          <div className="print-field">
+            <span className="font-medium text-gray-700">
+              Things you like to do most, kinds of things and persons that give you pleasure
+            </span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.thingsLiked.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
           </div>
 
-          {/* Assets & Bad Points */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="field">
-              <div className="field-label">Main Assets & Good Points</div>
-              <div className="field-value">
-                {formatList(personalInformation.assets)}
-              </div>
-            </div>
-            <div className="field">
-              <div className="field-label">Main Bad Points</div>
-              <div className="field-value">
-                {formatList(personalInformation.badPoints)}
-              </div>
-            </div>
+          {/* Assets / Good points */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main assets and good points</span>
+            <div className="mt-1">{renderList("assets")}</div>
           </div>
 
-          {/* Social Difficulties */}
-          <div className="field">
-            <div className="field-label">Main Social Difficulties</div>
-            <div className="field-value">
-              {formatList(personalInformation.socialDifficulties)}
-            </div>
+          {/* Bad points */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main bad points</span>
+            <div className="mt-1">{renderList("badPoints")}</div>
           </div>
 
-          {/* School/Work Difficulties */}
-          <div className="field">
-            <div className="field-label">Main School or Work Difficulties</div>
-            <div className="field-value">
-              {formatText(personalInformation.schoolWorkDifficulties)}
-            </div>
+          {/* Social difficulties */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main social difficulties</span>
+            <div className="mt-1">{renderList("socialDifficulties")}</div>
           </div>
 
-          {/* Life Goals */}
-          <div className="field">
-            <div className="field-label">Main Life Goals</div>
-            <div className="field-value">
-              {formatText(personalInformation.lifeGoals)}
-            </div>
+          {/* School difficulties */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main school difficulties</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.schoolWorkDifficulties.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
           </div>
 
-          {/* Things to Change */}
-          <div className="field">
-            <div className="field-label">Things You Would Most Like to Change About Yourself</div>
-            <div className="field-value">
-              {formatText(personalInformation.thingsToChange)}
-            </div>
+          {/* Life goals */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">Main life goals</span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.lifeGoals.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
           </div>
-        </div>
+
+          {/* Things to change */}
+          <div className="print-field">
+            <span className="font-medium text-gray-700">
+              Things you would most like to change about yourself
+            </span>
+            <p className="mt-1 text-gray-900 whitespace-pre-line">
+              {personalInformation.thingsToChange.value || (
+                <span className="italic text-gray-500">N/A</span>
+              )}
+            </p>
+          </div>
+
+        </section>
       </div>
     </>
   );
-};
-
+}
 
 
 const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab,printPreviewMode }) => {
@@ -899,10 +827,13 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab,print
 
 
 
-!printPreviewMode ?
+
         <div className="px-8">
      
 
+
+{!printPreviewMode ?
+<>
           {/* Personal Insights */}
           <section className="mb-12">
             <div className="flex justify-between items-center mb-2 pb-2">
@@ -1186,19 +1117,14 @@ const TabPersonalInformationChild = ({ id, refreshTabDetails, setActiveTab,print
               </button>
             </div>
           )}
-        </div>
+          </>
+
 :
-<PrintPersonalInformationA4
-    personalInformation={{
-      thingsLiked: personalInformation.thingsLiked.value,
-      assets: personalInformation.assets.value,
-      badPoints: personalInformation.badPoints.value,
-      socialDifficulties: personalInformation.socialDifficulties.value,
-      schoolWorkDifficulties: personalInformation.schoolWorkDifficulties.value,
-      lifeGoals: personalInformation.lifeGoals.value,
-      thingsToChange: personalInformation.thingsToChange.value,
-    }}
-  />
+<section className="mb-12">
+    <ChildPersonalInsightsPrint personalInformation={personalInformation} />
+  </section>
+}
+        </div>
 
 
       ) : (
