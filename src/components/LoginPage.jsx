@@ -211,13 +211,13 @@ function LoginPage() {
           {/* Links */}
           <div className="mt-6 text-center space-y-3">
             <a
-              href="/forgot-password"
+              href="/"
               className="text-sm text-sky-600 hover:text-sky-700 hover:underline transition-colors duration-200"
               aria-label="Forgot your password?"
             >
               Forgot your password?
             </a>
-            <p className="text-sm text-gray-600">
+            {/* <p className="text-sm text-gray-600">
               Don't have an account?{' '}
               <a
                 href="/register"
@@ -226,7 +226,7 @@ function LoginPage() {
               >
                 Register
               </a>
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
