@@ -1022,7 +1022,7 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
 
 
                    <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">PassMedical History:</strong>{" "}
+                  <strong className="text-sm">Past Medical History:</strong>{" "}
                   <div className="mt-2 whitespace-pre-line">
                     {renderListItems(medicalInformation.passMedicalHistory.value)}
                   </div>
