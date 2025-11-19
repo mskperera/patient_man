@@ -63,12 +63,32 @@ const PrintMentalHealthA4 = ({ mentalHealth, printPreviewMode = true }) => {
             Health Details
           </h3>
 
+      
           <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
             <span className="block font-semibold text-gray-700 mb-1">
-              Chief Physical Ailments, Diseases, Complaints, or Handicaps
+              Present complaints
             </span>
-            {renderValue(mentalHealth.physicalAilments)}
+            {renderValue(mentalHealth.presentComplaints)}
           </div>
+
+
+          
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+             History of Present complaints
+            </span>
+            {renderValue(mentalHealth.historyOfPresentComplaints)}
+          </div>
+
+
+          
+          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
+            <span className="block font-semibold text-gray-700 mb-1">
+              PassMedical History
+            </span>
+            {renderValue(mentalHealth.passMedicalHistory)}
+          </div>
+
 
           <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
             <span className="block font-semibold text-gray-700 mb-1">
@@ -174,14 +194,34 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
   const [medicalInformation, setMedicalInformation] = useState({
-    physicalAilments: {
-      label: "Physical Ailments",
+    presentComplaints: {
+      label: "Present Complaints",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
+        historyOfPresentComplaints: {
+      label: "History of Present Complaints",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
+           passMedicalHistory: {
+      label: "Past Medical History",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
+
+
     mainComplaints: {
       label: "Main Complaints",
       value: "",
@@ -308,12 +348,26 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
 
     if (patientData) {
       setMedicalInformation({
-        physicalAilments: {
-          ...medicalInformation.physicalAilments,
-          value: patientData.physicalAilments,
+        presentComplaints: {
+          ...medicalInformation.presentComplaints,
+          value: patientData.presentComplaints,
           isTouched: false,
           isValid: true,
         },
+   historyOfPresentComplaints: {
+          ...medicalInformation.historyOfPresentComplaints,
+          value: patientData.historyOfPresentComplaints,
+          isTouched: false,
+          isValid: true,
+        },
+
+           passMedicalHistory: {
+          ...medicalInformation.passMedicalHistory,
+          value: patientData.passMedicalHistory,
+          isTouched: false,
+          isValid: true,
+        },
+
         mainComplaints: {
           ...medicalInformation.mainComplaints,
           value: patientData.mainComplaints,
@@ -506,7 +560,10 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
     if (isValid) {
       const payload = {
         patientId: id,
-        physicalAilments: medicalInformation.physicalAilments.value,
+          presentComplaints: medicalInformation.presentComplaints.value,
+        historyOfPresentComplaints: medicalInformation.historyOfPresentComplaints.value,
+        passMedicalHistory: medicalInformation.passMedicalHistory.value,
+        
         mainComplaints: medicalInformation.mainComplaints.value,
         pastComplaints: medicalInformation.pastComplaints.value,
         worseConditions: medicalInformation.worseConditions.value,
@@ -612,7 +669,10 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
     }
 
     const payload = {
-      physicalAilments: medicalInformation.physicalAilments.value,
+      presentComplaints: medicalInformation.presentComplaints.value,
+      historyOfPresentComplaints: medicalInformation.historyOfPresentComplaints.value,
+      passMedicalHistory: medicalInformation.passMedicalHistory.value,
+      
       mainComplaints: medicalInformation.mainComplaints.value,
       pastComplaints: medicalInformation.pastComplaints.value,
       worseConditions: medicalInformation.worseConditions.value,
@@ -799,29 +859,78 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
             </div>
             {editingSection === "health" || mode === "add" ? (
               <div className="space-y-6">
-                <div>
+                            <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    List your chief physical ailments, diseases, complaints, or
-                    handicaps{" "}
-                    {medicalInformation.physicalAilments.required && (
+                    Present complaints
+                    {medicalInformation.presentComplaints.required && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <VoiceToText
-                    name="physicalAilments"
-                    value={medicalInformation.physicalAilments.value}
+                    name="presentComplaints"
+                    value={medicalInformation.presentComplaints.value}
                     onChange={handleChange}
                     className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     rows="4"
                     placeholder="List physical health issues"
-                    aria-label="Physical ailments"
+                    aria-label="Present complaints"
                   />
-                  {medicalInformationErrors.physicalAilments && (
+                  {medicalInformationErrors.presentComplaints && (
                     <p className="mt-1 text-sm text-red-600">
-                      {medicalInformationErrors.physicalAilments}
+                      {medicalInformationErrors.presentComplaints}
                     </p>
                   )}
                 </div>
+
+
+       <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    History of Present complaints
+                    {medicalInformation.historyOfPresentComplaints.required && (
+                      <span className="text-red-500">*</span>
+                    )}
+                  </label>
+                  <VoiceToText
+                    name="historyOfPresentComplaints"
+                    value={medicalInformation.historyOfPresentComplaints.value}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    rows="4"
+                    placeholder="List physical health issues"
+                    aria-label="Present complaints"
+                  />
+                  {medicalInformationErrors.historyOfPresentComplaints && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {medicalInformationErrors.historyOfPresentComplaints}
+                    </p>
+                  )}
+                </div>
+
+
+
+       <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Past Medical History
+                    {medicalInformation.passMedicalHistory.required && (
+                      <span className="text-red-500">*</span>
+                    )}
+                  </label>
+                  <VoiceToText
+                    name="passMedicalHistory"
+                    value={medicalInformation.passMedicalHistory.value}
+                    onChange={handleChange}
+                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    rows="4"
+                    placeholder="List physical health issues"
+                    aria-label="Present complaints"
+                  />
+                  {medicalInformationErrors.passMedicalHistory && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {medicalInformationErrors.passMedicalHistory}
+                    </p>
+                  )}
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Briefly list (PRINT) your present main complaints, symptoms,
@@ -915,12 +1024,29 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
               </div>
             ) : (
               <div className="space-y-4">
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Chief Physical Ailments:</strong>{" "}
+                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                  <strong className="text-sm">Present Complaints:</strong>{" "}
                   <div className="mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.physicalAilments.value)}
+                    {renderListItems(medicalInformation.presentComplaints.value)}
                   </div>
                 </div>
+
+   <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                  <strong className="text-sm">History of Present Complaints:</strong>{" "}
+                  <div className="mt-2 whitespace-pre-line">
+                    {renderListItems(medicalInformation.historyOfPresentComplaints.value)}
+                  </div>
+                </div>
+
+
+                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                  <strong className="text-sm">PassMedical History:</strong>{" "}
+                  <div className="mt-2 whitespace-pre-line">
+                    {renderListItems(medicalInformation.passMedicalHistory.value)}
+                  </div>
+                </div>
+
+
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Present Main Complaints:</strong>{" "}
                   <div className="mt-2 whitespace-pre-line">
@@ -1214,7 +1340,11 @@ const TabMentalHealthChild = ({ id, refreshTabDetails, setActiveTab,printPreview
 
 <PrintMentalHealthA4
       mentalHealth={{
-        physicalAilments: medicalInformation.physicalAilments.value,
+              presentComplaints: medicalInformation.presentComplaints.value,
+
+  historyOfPresentComplaints: medicalInformation.historyOfPresentComplaints.value,
+        passMedicalHistory: medicalInformation.passMedicalHistory.value,
+
         mainComplaints: medicalInformation.mainComplaints.value,
         pastComplaints: medicalInformation.pastComplaints.value,
         worseConditions: medicalInformation.worseConditions.value,

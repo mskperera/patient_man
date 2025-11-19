@@ -92,22 +92,58 @@ const PrintMentalHealthFamilyA4 = ({ medicalInformation }) => {
             Health Details
           </h3>
 
-          {/* Physical Ailments */}
+
           <div className="grid grid-cols-5 gap-4 mb-4">
             <span className="font-semibold text-gray-700">
-              Chief Physical Ailments, Diseases, Complaints, or Handicaps
+              Present Complaints
             </span>
             <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.physicalAilmentsHusband.value)}
+                {renderValue(medicalInformation.presentComplaintsHusband.value)}
               </div>
             </div>
             <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.physicalAilmentsWife.value)}
+                {renderValue(medicalInformation.presentComplaintsWife.value)}
               </div>
             </div>
           </div>
+
+
+         <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+            History of Present Complaints
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfPresentComplaintsHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.historyOfPresentComplaintsWife.value)}
+              </div>
+            </div>
+          </div>
+
+
+    <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+            Past Medical History
+            </span>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.passMedicalHistoryHusband.value)}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
+                {renderValue(medicalInformation.passMedicalHistoryWife.value)}
+              </div>
+            </div>
+          </div>
+
+
 
           {/* Main Complaints */}
           <div className="grid grid-cols-5 gap-4 mb-4">
@@ -281,22 +317,64 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
   const [editingSection, setEditingSection] = useState(null);
   const [medicalInformationErrors, setMedicalInformationErrors] = useState({});
   const [medicalInformation, setMedicalInformation] = useState({
-    physicalAilmentsHusband: {
-      label: "Husband Physical Ailments",
+
+
+   presentComplaintsHusband: {
+      label: "Husband Present Complaints",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
-    physicalAilmentsWife: {
-      label: "Wife Physical Ailments",
+        historyOfPresentComplaintsHusband: {
+      label: "Husband History of Present Complaints",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
+
+           passMedicalHistoryHusband: {
+      label: "Husband Past Medical History",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
+
+
+
+
+   presentComplaintsWife: {
+      label: "Wife Husband Present Complaints",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+        historyOfPresentComplaintsWife: {
+      label: "Wife Husband History of Present Complaints",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
+           passMedicalHistoryWife: {
+      label: "Wife Husband Past Medical History",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
     mainComplaintsHusband: {
       label: "Husband Main Complaints",
       value: "",
@@ -483,14 +561,53 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
 
     if (patientData) {
       setMedicalInformation({
-        physicalAilmentsHusband: {
-          ...medicalInformation.physicalAilmentsHusband,
-          value: patientData.physicalAilmentsHusband || "",
+
+        presentComplaintsHusband: {
+          ...medicalInformation.presentComplaintsHusband,
+          value: patientData.presentComplaintsHusband,
+          isTouched: false,
+          isValid: true,
         },
-        physicalAilmentsWife: {
-          ...medicalInformation.physicalAilmentsWife,
-          value: patientData.physicalAilmentsWife || "",
+   historyOfPresentComplaintsHusband: {
+          ...medicalInformation.historyOfPresentComplaintsHusband,
+          value: patientData.historyOfPresentComplaintsHusband,
+          isTouched: false,
+          isValid: true,
         },
+
+           passMedicalHistoryHusband: {
+          ...medicalInformation.passMedicalHistoryHusband,
+          value: patientData.passMedicalHistoryHusband,
+          isTouched: false,
+          isValid: true,
+        },
+
+        presentComplaintsWife: {
+          ...medicalInformation.presentComplaintsWife,
+          value: patientData.presentComplaintsWife,
+          isTouched: false,
+          isValid: true,
+        },
+   historyOfPresentComplaintsWife: {
+          ...medicalInformation.historyOfPresentComplaintsWife,
+          value: patientData.historyOfPresentComplaintsWife,
+          isTouched: false,
+          isValid: true,
+        },
+
+           passMedicalHistoryWife: {
+          ...medicalInformation.passMedicalHistoryWife,
+          value: patientData.passMedicalHistoryWife,
+          isTouched: false,
+          isValid: true,
+        },
+
+
+
+
+
+
+
         mainComplaintsHusband: {
           ...medicalInformation.mainComplaintsHusband,
           value: patientData.mainComplaintsHusband || "",
@@ -673,8 +790,24 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
     if (isValid) {
       const payload = {
         patientId: id,
-        physicalAilmentsHusband: medicalInformation.physicalAilmentsHusband.value,
-        physicalAilmentsWife: medicalInformation.physicalAilmentsWife.value,
+
+
+presentComplaintsHusband: medicalInformation.presentComplaintsHusband.value,
+historyOfPresentComplaintsHusband: medicalInformation.historyOfPresentComplaintsHusband.value,
+passMedicalHistoryHusband: medicalInformation.passMedicalHistoryHusband.value,
+
+presentComplaintsWife: medicalInformation.presentComplaintsWife.value,
+historyOfPresentComplaintsWife: medicalInformation.historyOfPresentComplaintsWife.value,
+passMedicalHistoryWife: medicalInformation.passMedicalHistoryWife.value,
+
+
+
+
+
+
+
+
+
         mainComplaintsHusband: medicalInformation.mainComplaintsHusband.value,
         mainComplaintsWife: medicalInformation.mainComplaintsWife.value,
         worseConditionsHusband: medicalInformation.worseConditionsHusband.value,
@@ -755,8 +888,18 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
     }
 
     const payload = {
-      physicalAilmentsHusband: medicalInformation.physicalAilmentsHusband.value,
-      physicalAilmentsWife: medicalInformation.physicalAilmentsWife.value,
+
+
+presentComplaintsHusband:medicalInformation.presentComplaintsHusband.value,
+historyOfPresentComplaintsHusband:medicalInformation.historyOfPresentComplaintsHusband.value,
+passMedicalHistoryHusband:medicalInformation.passMedicalHistoryHusband.value,
+
+
+presentComplaintsWife:medicalInformation.presentComplaintsWife.value,
+historyOfPresentComplaintsWife:medicalInformation.historyOfPresentComplaintsWife.value,
+passMedicalHistoryWife:medicalInformation.passMedicalHistoryWife.value,
+
+
       mainComplaintsHusband: medicalInformation.mainComplaintsHusband.value,
       mainComplaintsWife: medicalInformation.mainComplaintsWife.value,
       worseConditionsHusband: medicalInformation.worseConditionsHusband.value,
@@ -967,41 +1110,129 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <label className="block text-sm font-medium text-gray-700 mt-2">
-                    Physical Ailments
+                    Present Complaints
                   </label>
                   <div className="col-span-2">
                     <VoiceToText
-                      name="physicalAilmentsHusband"
-                      value={medicalInformation.physicalAilmentsHusband.value}
+                      name="presentComplaintsHusband"
+                      value={medicalInformation.presentComplaintsHusband.value}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       rows="4"
-                      placeholder="List physical health issues"
-                      aria-label="Husband physical ailments"
+                      placeholder="List Present Complaints"
+                      aria-label="Husband Present Complaints"
                     />
-                    {medicalInformationErrors.physicalAilmentsHusband && (
+                    {medicalInformationErrors.presentComplaintsHusband && (
                       <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.physicalAilmentsHusband}
+                        {medicalInformationErrors.presentComplaintsHusband}
                       </p>
                     )}
                   </div>
                   <div className="col-span-2">
                     <VoiceToText
-                      name="physicalAilmentsWife"
-                      value={medicalInformation.physicalAilmentsWife.value}
+                      name="presentComplaintsWife"
+                      value={medicalInformation.presentComplaintsWife.value}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       rows="4"
-                      placeholder="List physical health issues"
-                      aria-label="Wife physical ailments"
+                      placeholder="List Present Complaints"
+                      aria-label="Wife present Complaints"
                     />
-                    {medicalInformationErrors.physicalAilmentsWife && (
+                    {medicalInformationErrors.presentComplaintsWife && (
                       <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.physicalAilmentsWife}
+                        {medicalInformationErrors.presentComplaintsWife}
                       </p>
                     )}
                   </div>
                 </div>
+
+
+
+
+         <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <label className="block text-sm font-medium text-gray-700 mt-2">
+                   History of Present Complaints
+                  </label>
+                  <div className="col-span-2">
+                    <VoiceToText
+                      name="historyOfPresentComplaintsHusband"
+                      value={medicalInformation.historyOfPresentComplaintsHusband.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      rows="4"
+                      placeholder="List History of Present Complaints"
+                      aria-label="Husband History of Present Complaints"
+                    />
+                    {medicalInformationErrors.historyOfPresentComplaintsHusband && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {medicalInformationErrors.historyOfPresentComplaintsHusband}
+                      </p>
+                    )}
+                  </div>
+                  <div className="col-span-2">
+                    <VoiceToText
+                      name="historyOfPresentComplaintsWife"
+                      value={medicalInformation.historyOfPresentComplaintsWife.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      rows="4"
+                      placeholder="List History of Present Complaints"
+                      aria-label="Wife history of present Complaints"
+                    />
+                    {medicalInformationErrors.historyOfPresentComplaintsWife && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {medicalInformationErrors.historyOfPresentComplaintsWife}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+
+
+
+
+ <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <label className="block text-sm font-medium text-gray-700 mt-2">
+                   Past Medical History
+                  </label>
+                  <div className="col-span-2">
+                    <VoiceToText
+                      name="passMedicalHistoryHusband"
+                      value={medicalInformation.passMedicalHistoryHusband.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      rows="4"
+                      placeholder="List Past Medical History"
+                      aria-label="Husband passMedicalHistory"
+                    />
+                    {medicalInformationErrors.passMedicalHistoryHusband && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {medicalInformationErrors.passMedicalHistoryHusband}
+                      </p>
+                    )}
+                  </div>
+                  <div className="col-span-2">
+                    <VoiceToText
+                      name="passMedicalHistoryWife"
+                      value={medicalInformation.passMedicalHistoryWife.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      rows="4"
+                      placeholder="List Past Medical History"
+                      aria-label="Wife passMedicalHistory"
+                    />
+                    {medicalInformationErrors.passMedicalHistoryWife && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {medicalInformationErrors.passMedicalHistoryWife}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+
+
+
+
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <label className="block text-sm font-medium text-gray-700 mt-2">
@@ -1126,22 +1357,69 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
                 </div>
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                  <strong className="text-sm">Physical Ailments:</strong>
+                  <strong className="text-sm">Present Complaints:</strong>
                   <div className="col-span-2">
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="whitespace-pre-line">
-                        {medicalInformation.physicalAilmentsHusband.value}
+                        {medicalInformation.presentComplaintsHusband.value}
                       </div>
                     </div>
                   </div>
                   <div className="col-span-2">
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="whitespace-pre-line">
-                        {medicalInformation.physicalAilmentsWife.value}
+                        {medicalInformation.presentComplaintsWife.value}
                       </div>
                     </div>
                   </div>
                 </div>
+
+
+
+
+    <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <strong className="text-sm">History of Present Complaints:</strong>
+                  <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="whitespace-pre-line">
+                        {medicalInformation.historyOfPresentComplaintsHusband.value}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="whitespace-pre-line">
+                        {medicalInformation.historyOfPresentComplaintsWife.value}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+                    <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <strong className="text-sm">Past Medical History:</strong>
+                  <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="whitespace-pre-line">
+                        {medicalInformation.passMedicalHistoryHusband.value}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="whitespace-pre-line">
+                        {medicalInformation.passMedicalHistoryWife.value}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <strong className="text-sm">Main Complaints:</strong>
