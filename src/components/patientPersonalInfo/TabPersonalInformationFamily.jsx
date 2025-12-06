@@ -171,36 +171,74 @@ const PrintPersonalInformationFamilyA4 = ({ personalInformation, maritalStatusOp
             Personal Insights
           </h3>
 
+               {/* Column Headers */}
+          <div className="grid grid-cols-5 gap-4 mb-4 font-semibold text-sky-700 text-sm">
+            <div></div>
+            <div className="col-span-2 text-center">Husband</div>
+            <div className="col-span-2 text-center">Wife</div>
+          </div>
+
+
           <div className="space-y-4">
-            {/* Love & Sex Difficulties */}
-            <div className="py-2">
-              <span className="font-medium text-gray-700 block mb-1">
-                Main Love and Sex Difficulties
-              </span>
+        
+         {/* Occupation Trained For */}
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+                  Main Love and Sex Difficulties
+            </span>
+            <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
-                {renderValue(personalInformation.loveSexDifficulties.value)}
+                {renderValue(personalInformation.loveSexDifficultiesHusband.value)}
               </div>
             </div>
+            <div className="col-span-2">
+                <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
+                {renderValue(personalInformation.loveSexDifficultiesWife.value)}
+              </div>
+            </div>
+          </div>
+
+
 
             {/* Life Goals */}
-            <div className="py-2">
-              <span className="font-medium text-gray-700 block mb-1">
-                Main Life Goals
-              </span>
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+                 Main Life Goals
+            </span>
+            <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
-                {renderValue(personalInformation.lifeGoals.value)}
+                 {renderValue(personalInformation.lifeGoalsHusband.value)}
               </div>
             </div>
+            <div className="col-span-2">
+                <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
+                 {renderValue(personalInformation.lifeGoalsWife.value)}
+              </div>
+            </div>
+          </div>
+
+
+
+          
 
             {/* Things to Change */}
-            <div className="py-2">
-              <span className="font-medium text-gray-700 block mb-1">
-                Things Most Like to Change About Yourself
-              </span>
+                 <div className="grid grid-cols-5 gap-4 mb-4">
+            <span className="font-semibold text-gray-700">
+                 Things Most Like to Change About Yourself
+            </span>
+            <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
-                {renderValue(personalInformation.thingsToChange.value)}
+                 {renderValue(personalInformation.thingsToChangeHusband.value)}
               </div>
             </div>
+            <div className="col-span-2">
+                <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 min-h-[3em]">
+             {renderValue(personalInformation.thingsToChangeWife.value)}
+              </div>
+            </div>
+          </div>
+
+
           </div>
         </div>
 
@@ -349,7 +387,15 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
     },
   
 
-    loveSexDifficulties: {
+    loveSexDifficultiesHusband: {
+      label: "Main Love and Sex Difficulties",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+    loveSexDifficultiesWife: {
       label: "Main Love and Sex Difficulties",
       value: "",
       isTouched: false,
@@ -358,8 +404,7 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
       dataType: "string",
     },
 
-
-    lifeGoals: {
+    lifeGoalsHusband: {
       label: "Main Life Goals",
       value: "",
       isTouched: false,
@@ -367,7 +412,16 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
       required: false,
       dataType: "string",
     },
-    thingsToChange: {
+    lifeGoalsWife: {
+      label: "Main Life Goals",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
+    thingsToChangeHusband: {
       label: "Things to Change About Yourself",
       value: "",
       isTouched: false,
@@ -375,6 +429,16 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
       required: false,
       dataType: "string",
     },
+
+        thingsToChangeWife: {
+      label: "Things to Change About Yourself",
+      value: "",
+      isTouched: false,
+      isValid: true,
+      required: false,
+      dataType: "string",
+    },
+
     occupationTrainedHusband: {
       label: "Husband Occupation(s) Trained For",
       value: "",
@@ -487,25 +551,49 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
           isValid: true,
         },
      
-        loveSexDifficulties: {
-          ...personalInformation.loveSexDifficulties,
-          value: patientData.loveSexDifficulties,
+        loveSexDifficultiesHusband: {
+          ...personalInformation.loveSexDifficultiesHusband,
+          value: patientData.loveSexDifficultiesHusband,
+          isTouched: false,
+          isValid: true,
+        },
+          loveSexDifficultiesWife: {
+          ...personalInformation.loveSexDifficultiesWife,
+          value: patientData.loveSexDifficultiesWife,
           isTouched: false,
           isValid: true,
         },
   
-        lifeGoals: {
-          ...personalInformation.lifeGoals,
-          value: patientData.lifeGoals,
+        lifeGoalsHusband: {
+          ...personalInformation.lifeGoalsHusband,
+          value: patientData.lifeGoalsHusband,
           isTouched: false,
           isValid: true,
         },
-        thingsToChange: {
-          ...personalInformation.thingsToChange,
-          value: patientData.thingsToChange,
+
+        lifeGoalsWife: {
+          ...personalInformation.lifeGoalsWife,
+          value: patientData.lifeGoalsWife,
           isTouched: false,
           isValid: true,
         },
+
+
+        thingsToChangeHusband: {
+          ...personalInformation.thingsToChangeHusband,
+          value: patientData.thingsToChangeHusband,
+          isTouched: false,
+          isValid: true,
+        },
+
+   thingsToChangeWife: {
+          ...personalInformation.thingsToChangeWife,
+          value: patientData.thingsToChangeWife,
+          isTouched: false,
+          isValid: true,
+        },
+
+
         occupationTrainedHusband: {
           ...personalInformation.occupationTrainedHusband,
           value: patientData.occupationTrainedHusband || "",
@@ -606,10 +694,15 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
       maleChildrenAges: personalInformation.maleChildrenAges.value,
       femaleChildrenAges: personalInformation.femaleChildrenAges.value,
  
-      loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+      loveSexDifficultiesHusband: personalInformation.loveSexDifficultiesHusband.value,
+       loveSexDifficultiesWife: personalInformation.loveSexDifficultiesWife.value,
 
-      lifeGoals: personalInformation.lifeGoals.value,
-      thingsToChange: personalInformation.thingsToChange.value,
+      lifeGoalsHusband: personalInformation.lifeGoalsHusband.value,
+     lifeGoalsWife: personalInformation.lifeGoalsWife.value,
+
+      thingsToChangeHusband: personalInformation.thingsToChangeHusband.value,
+      thingsToChangeWife: personalInformation.thingsToChangeWife.value,
+      
       occupationTrainedHusband:personalInformation.occupationTrainedHusband.value ? personalInformation.occupationTrainedHusband.value:null,
       occupationTrainedWife: personalInformation.occupationTrainedWife.value ? personalInformation.occupationTrainedWife.value:null,
       occupationHusband: personalInformation.occupationHusband.value ? personalInformation.occupationHusband.value:null,
@@ -799,10 +892,15 @@ const TabPersonalInformationFamily = ({ id, refreshTabDetails, setActiveTab,prin
         maleChildrenAges: personalInformation.maleChildrenAges.value,
         femaleChildrenAges: personalInformation.femaleChildrenAges.value,
 
-        loveSexDifficulties: personalInformation.loveSexDifficulties.value,
+        loveSexDifficultiesHusband: personalInformation.loveSexDifficultiesHusband.value,
+ loveSexDifficultiesWife: personalInformation.loveSexDifficultiesWife.value,
 
-        lifeGoals: personalInformation.lifeGoals.value,
-        thingsToChange: personalInformation.thingsToChange.value,
+        lifeGoalsHusband: personalInformation.lifeGoalsHusband.value,
+             lifeGoalsWife: personalInformation.lifeGoalsWife.value,
+
+        thingsToChangeHusband: personalInformation.thingsToChangeHusband.value,
+               thingsToChangeWife: personalInformation.thingsToChangeWife.value,
+
       occupationTrainedHusband:personalInformation.occupationTrainedHusband.value ? personalInformation.occupationTrainedHusband.value:null,
       occupationTrainedWife: personalInformation.occupationTrainedWife.value ? personalInformation.occupationTrainedWife.value:null,
       occupationHusband: personalInformation.occupationHusband.value ? personalInformation.occupationHusband.value:null,
@@ -1312,102 +1410,253 @@ const NewOccupationPanel = () => {
           )}
         </div>
         {editingSection === "insights" || mode === "add" ? (
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+        
+        <div className="space-y-6">
+
+     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700">Wife</h4>
+            </div>
+
+          <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+            
+
+
+
+      <label className="block text-sm font-medium text-gray-700">
                 List your main love and sex difficulties
-                {personalInformation.loveSexDifficulties.required && (
+                {personalInformation.loveSexDifficultiesHusband.required && (
                   <span className="text-red-500">*</span>
                 )}
               </label>
+
+              <div className="col-span-2">
+           
               <VoiceToText
-                name="loveSexDifficulties"
-                value={personalInformation.loveSexDifficulties.value}
+                name="loveSexDifficultiesHusband"
+                value={personalInformation.loveSexDifficultiesHusband.value}
                 onChange={handleChangePersonalInfo}
                 className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe relationship challenges"
                 aria-label="Love and sex difficulties"
               />
-              {personalInformationErrors.loveSexDifficulties && (
+              {personalInformationErrors.loveSexDifficultiesHusband && (
                 <p className="mt-1 text-sm text-red-600">
-                  {personalInformationErrors.loveSexDifficulties}
+                  {personalInformationErrors.loveSexDifficultiesHusband}
                 </p>
               )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+         
+
+              </div>
+              <div className="col-span-2">
+                 <VoiceToText
+                name="loveSexDifficultiesWife"
+                value={personalInformation.loveSexDifficultiesWife.value}
+                onChange={handleChangePersonalInfo}
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                rows="4"
+                placeholder="Describe relationship challenges"
+                aria-label="Love and sex difficulties"
+              />
+              {personalInformationErrors.loveSexDifficultiesWife && (
+                <p className="mt-1 text-sm text-red-600">
+                  {personalInformationErrors.loveSexDifficultiesWife}
+                </p>
+              )}
+              </div>
+
+
+          </div>
+            
+      
+
+
+
+         <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+        <label className="block text-sm font-medium text-gray-700">
                 List your main life goals
-                {personalInformation.lifeGoals.required && (
+                {personalInformation.lifeGoalsHusband.required && (
                   <span className="text-red-500">*</span>
                 )}
               </label>
-              <VoiceToText
-                name="lifeGoals"
-                value={personalInformation.lifeGoals.value}
+
+              <div className="col-span-2">
+           
+                <VoiceToText
+                name="lifeGoalsHusband"
+                value={personalInformation.lifeGoalsHusband.value}
                 onChange={handleChangePersonalInfo}
                 className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="List your life goals"
                 aria-label="Life goals"
               />
-              {personalInformationErrors.lifeGoals && (
+              {personalInformationErrors.lifeGoalsHusband && (
                 <p className="mt-1 text-sm text-red-600">
-                  {personalInformationErrors.lifeGoals}
+                  {personalInformationErrors.lifeGoalsHusband}
                 </p>
               )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
+         
+
+              </div>
+              <div className="col-span-2">
+               <VoiceToText
+                name="lifeGoalsWife"
+                value={personalInformation.lifeGoalsWife.value}
+                onChange={handleChangePersonalInfo}
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                rows="4"
+                placeholder="List your life goals"
+                aria-label="Life goals"
+              />
+              {personalInformationErrors.lifeGoalsWife && (
+                <p className="mt-1 text-sm text-red-600">
+                  {personalInformationErrors.lifeGoalsWife}
+                </p>
+              )}
+              </div>
+
+
+          </div>
+
+      
+
+
+
+   <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+          <label className="block text-sm font-medium text-gray-700">
                 List the things about yourself you would most like to change
-                {personalInformation.thingsToChange.required && (
+                {personalInformation.thingsToChangeHusband.required && (
                   <span className="text-red-500">*</span>
                 )}
               </label>
-              <VoiceToText
-                name="thingsToChange"
-                value={personalInformation.thingsToChange.value}
+
+              <div className="col-span-2">
+           
+                 <VoiceToText
+                name="thingsToChangeHusband"
+                value={personalInformation.thingsToChangeHusband.value}
                 onChange={handleChangePersonalInfo}
                 className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                 rows="4"
                 placeholder="Describe desired changes"
                 aria-label="Things to change"
               />
-              {personalInformationErrors.thingsToChange && (
+              {personalInformationErrors.thingsToChangeHusband && (
                 <p className="mt-1 text-sm text-red-600">
-                  {personalInformationErrors.thingsToChange}
+                  {personalInformationErrors.thingsToChangeHusband}
                 </p>
               )}
+         
+
+              </div>
+              <div className="col-span-2">
+               <VoiceToText
+                name="thingsToChangeWife"
+                value={personalInformation.thingsToChangeWife.value}
+                onChange={handleChangePersonalInfo}
+                className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                rows="4"
+                placeholder="Describe desired changes"
+                aria-label="Things to change"
+              />
+              {personalInformationErrors.thingsToChangeWife && (
+                <p className="mt-1 text-sm text-red-600">
+                  {personalInformationErrors.thingsToChangeWife}
+                </p>
+              )}
+              </div>
+          </div>
+
+            <div>  
+        
             </div>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <strong className="text-sm">Main Love/Sex Difficulties:</strong>
-              <div className="mt-2">
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+              <div></div>
+              <h4 className="text-lg font-semibold text-sky-700 mb-4">Husband</h4>
+              <h4 className="text-lg font-semibold text-sky-700 mb-4">Wife</h4>
+            </div>
+
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                    <strong className="text-sm">Main Love/Sex Difficulties:</strong>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                 <div className="">
                 <p className="text-gray-700 mt-1 whitespace-pre-line">
-                  {personalInformation.loveSexDifficulties.value}
+                  {personalInformation.loveSexDifficultiesHusband.value}
                 </p>
               </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <strong className="text-sm">Main Life Goals:</strong>
-              <div className="mt-2">
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="">
                 <p className="text-gray-700 mt-1 whitespace-pre-line">
-                  {personalInformation.lifeGoals.value}
+                  {personalInformation.loveSexDifficultiesWife?.value}
                 </p>
               </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <strong className="text-sm">Things Most Like to Change:</strong>
-              <div className="mt-2">
-                <p className="text-gray-700 mt-1 whitespace-pre-line">
-                  {personalInformation.thingsToChange.value}
-                </p>
+                </div>
               </div>
             </div>
+
+
+      <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <strong className="text-sm">Main Life Goals:</strong>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                 <div className="">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                 {personalInformation.lifeGoalsHusband.value}
+                </p>
+              </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                   {personalInformation.lifeGoalsWife?.value}
+                </p>
+              </div>
+                </div>
+              </div>
+            </div>
+
+   
+              <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                  <strong className="text-sm">Things Most Like to Change:</strong>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                 <div className="">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                            {personalInformation.thingsToChangeHusband.value}
+                </p>
+              </div>
+                </div>
+              </div>
+              <div className="col-span-2">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="">
+                <p className="text-gray-700 mt-1 whitespace-pre-line">
+                            {personalInformation.thingsToChangeWife?.value}
+                </p>
+              </div>
+                </div>
+              </div>
+            </div>
+
+       
           </div>
         )}
+
+
+
       </section>
 
       {/* Occupation Information */}

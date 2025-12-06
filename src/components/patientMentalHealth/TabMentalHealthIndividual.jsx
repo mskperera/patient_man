@@ -90,9 +90,9 @@ const PrintMentalHealthA4 = ({ mentalHealth, printPreviewMode = true }) => {
 
           <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
             <span className="block font-semibold text-gray-700 mb-1">
-              Present Main Complaints, Symptoms, and Problems
+            History of Substance Abuse
             </span>
-            {renderValue(mentalHealth.mainComplaints)}
+            {renderValue(mentalHealth.historyOfSubstanceAbuse)}
           </div>
 
           <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
@@ -104,17 +104,12 @@ const PrintMentalHealthA4 = ({ mentalHealth, printPreviewMode = true }) => {
 
           <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
             <span className="block font-semibold text-gray-700 mb-1">
-              Under What Conditions Are Problems Worse?
+              Psychiatric Family History
             </span>
-            {renderValue(mentalHealth.worseConditions)}
+            {renderValue(mentalHealth.psychiatricFamilyHistory)}
           </div>
 
-          <div className="bg-white border border-dashed border-gray-300 rounded-md p-4 mb-4">
-            <span className="block font-semibold text-gray-700 mb-1">
-              Under What Conditions Are Problems Improved?
-            </span>
-            {renderValue(mentalHealth.improvedConditions)}
-          </div>
+    
         </div>
 
         {/* ========== PAGE 2: Treatment History ========== */}
@@ -185,7 +180,7 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
       dataType: "string",
     },
 
-    mainComplaints: {
+    historyOfSubstanceAbuse: {
       label: "Main Complaints",
       value: "",
       isTouched: false,
@@ -201,7 +196,7 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
       required: false,
       dataType: "string",
     },
-    worseConditions: {
+    psychiatricFamilyHistory: {
       label: "Worse Conditions",
       value: "",
       isTouched: false,
@@ -209,14 +204,7 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
       required: false,
       dataType: "string",
     },
-    improvedConditions: {
-      label: "Improved Conditions",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
+
     pastHistoryOfPsyTeatment: {
       label: "Past History of Psychiatric Treatment or Counselling",
       value: "",
@@ -333,9 +321,9 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
 
 
 
-        mainComplaints: {
-          ...medicalInformation.mainComplaints,
-          value: patientData.mainComplaints,
+        historyOfSubstanceAbuse: {
+          ...medicalInformation.historyOfSubstanceAbuse,
+          value: patientData.historyOfSubstanceAbuse,
           isTouched: false,
           isValid: true,
         },
@@ -345,18 +333,13 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
           isTouched: false,
           isValid: true,
         },
-        worseConditions: {
-          ...medicalInformation.worseConditions,
-          value: patientData.worseConditions,
+        psychiatricFamilyHistory: {
+          ...medicalInformation.psychiatricFamilyHistory,
+          value: patientData.psychiatricFamilyHistory,
           isTouched: false,
           isValid: true,
         },
-        improvedConditions: {
-          ...medicalInformation.improvedConditions,
-          value: patientData.improvedConditions,
-          isTouched: false,
-          isValid: true,
-        },
+ 
         pastHistoryOfPsyTeatment: {
           ...medicalInformation.pastHistoryOfPsyTeatment,
           value: patientData.pastHistoryOfPsyTeatment,
@@ -537,10 +520,10 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
         presentComplaints: medicalInformation.presentComplaints.value,
         historyOfPresentComplaints: medicalInformation.historyOfPresentComplaints.value,
         passMedicalHistory: medicalInformation.passMedicalHistory.value,
-        mainComplaints: medicalInformation.mainComplaints.value,
+        historyOfSubstanceAbuse: medicalInformation.historyOfSubstanceAbuse.value,
         pastComplaints: medicalInformation.pastComplaints.value,
-        worseConditions: medicalInformation.worseConditions.value,
-        improvedConditions: medicalInformation.improvedConditions.value,
+        psychiatricFamilyHistory: medicalInformation.psychiatricFamilyHistory.value,
+
         pastHistoryOfPsyTeatment:
           medicalInformation.pastHistoryOfPsyTeatment.value === ""
             ? null
@@ -646,10 +629,10 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
       presentComplaints: medicalInformation.presentComplaints.value,
       historyOfPresentComplaints: medicalInformation.historyOfPresentComplaints.value,
       passMedicalHistory: medicalInformation.passMedicalHistory.value,
-      mainComplaints: medicalInformation.mainComplaints.value,
+      historyOfSubstanceAbuse: medicalInformation.historyOfSubstanceAbuse.value,
       pastComplaints: medicalInformation.pastComplaints.value,
-      worseConditions: medicalInformation.worseConditions.value,
-      improvedConditions: medicalInformation.improvedConditions.value,
+      psychiatricFamilyHistory: medicalInformation.psychiatricFamilyHistory.value,
+
       pastHistoryOfPsyTeatment:
         medicalInformation.pastHistoryOfPsyTeatment.value === ""
           ? null
@@ -912,24 +895,23 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Briefly list (PRINT) your present main complaints, symptoms,
-                    and problems
-                    {medicalInformation.mainComplaints.required && (
+                  History of Substance Abuse
+                    {medicalInformation.historyOfSubstanceAbuse.required && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <VoiceToText
-                    name="mainComplaints"
-                    value={medicalInformation.mainComplaints.value}
+                    name="historyOfSubstanceAbuse"
+                    value={medicalInformation.historyOfSubstanceAbuse.value}
                     onChange={handleChange}
                     className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     rows="4"
                     placeholder="List current issues"
                     aria-label="Main complaints"
                   />
-                  {medicalInformationErrors.mainComplaints && (
+                  {medicalInformationErrors.historyOfSubstanceAbuse && (
                     <p className="mt-1 text-sm text-red-600">
-                      {medicalInformationErrors.mainComplaints}
+                      {medicalInformationErrors.historyOfSubstanceAbuse}
                     </p>
                   )}
                 </div>
@@ -958,48 +940,27 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Under what conditions are your problems worse?
-                    {medicalInformation.worseConditions.required && (
+                    Psychiatric Family History
+                    {medicalInformation.psychiatricFamilyHistory.required && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <VoiceToText
-                    name="worseConditions"
-                    value={medicalInformation.worseConditions.value}
+                    name="psychiatricFamilyHistory"
+                    value={medicalInformation.psychiatricFamilyHistory.value}
                     onChange={handleChange}
                     className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                     rows="4"
                     placeholder="Describe conditions"
                     aria-label="Worse conditions"
                   />
-                  {medicalInformationErrors.worseConditions && (
+                  {medicalInformationErrors.psychiatricFamilyHistory && (
                     <p className="mt-1 text-sm text-red-600">
-                      {medicalInformationErrors.worseConditions}
+                      {medicalInformationErrors.psychiatricFamilyHistory}
                     </p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Under what conditions are they improved?
-                    {medicalInformation.improvedConditions.required && (
-                      <span className="text-red-500">*</span>
-                    )}
-                  </label>
-                  <VoiceToText
-                    name="improvedConditions"
-                    value={medicalInformation.improvedConditions.value}
-                    onChange={handleChange}
-                    className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    rows="4"
-                    placeholder="Describe conditions"
-                    aria-label="Improved conditions"
-                  />
-                  {medicalInformationErrors.improvedConditions && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {medicalInformationErrors.improvedConditions}
-                    </p>
-                  )}
-                </div>
+             
               </div>
             ) : (
               <div className="space-y-4">
@@ -1029,12 +990,7 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
                 </div>
 
 
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Present Main Complaints:</strong>{" "}
-                  <div className="mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.mainComplaints.value)}
-                  </div>
-                </div>
+             
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Past Complaints:</strong>{" "}
                   <div className="mt-2 whitespace-pre-line">
@@ -1044,51 +1000,23 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
 
 
 
-   <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">History of present complaints:</strong>{" "}
-                  <div className="mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.historyOfPresentComplaints.value)}
-                  </div>
-                </div>
-
-                   <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Past medical history:</strong>{" "}
-                  <div className="mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.passMedicalHistory.value)}
-                  </div>
-                </div>
-
 
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Present Main Complaints:</strong>{" "}
+                  <strong className="text-sm">History of Substance Abuse:</strong>{" "}
                   <div className="mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.mainComplaints.value)}
+                    {renderListItems(medicalInformation.historyOfSubstanceAbuse.value)}
                   </div>
                 </div>
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">Past Complaints:</strong>{" "}
-                  <div className="mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.pastComplaints.value)}
-                  </div>
-                </div>
+         
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">
-                    Conditions When Problems Worsen:
+                   Psychiatric Family History:
                   </strong>{" "}
                   <div className=" mt-2 whitespace-pre-line">
-                    {renderListItems(medicalInformation.worseConditions.value)}
+                    {renderListItems(medicalInformation.psychiatricFamilyHistory.value)}
                   </div>
                 </div>
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
-                  <strong className="text-sm">
-                    Conditions When Problems Improve:
-                  </strong>{" "}
-                  <div className=" mt-2 whitespace-pre-line">
-                    {renderListItems(
-                      medicalInformation.improvedConditions.value
-                    )}
-                  </div>
-                </div>
+          
               </div>
             )}
           </section>
@@ -1287,10 +1215,10 @@ const TabMentalHealthIndividual = ({ id, refreshTabDetails, setActiveTab,printPr
         passMedicalHistory: medicalInformation.passMedicalHistory.value,
 
 
-        mainComplaints: medicalInformation.mainComplaints.value,
+        historyOfSubstanceAbuse: medicalInformation.historyOfSubstanceAbuse.value,
         pastComplaints: medicalInformation.pastComplaints.value,
-        worseConditions: medicalInformation.worseConditions.value,
-        improvedConditions: medicalInformation.improvedConditions.value,
+        psychiatricFamilyHistory: medicalInformation.psychiatricFamilyHistory.value,
+
         pastHistoryOfPsyTeatment: medicalInformation.pastHistoryOfPsyTeatment.value,
         currentTreatment: medicalInformation.currentTreatment.value,
         additionalInfo: medicalInformation.additionalInfo.value,

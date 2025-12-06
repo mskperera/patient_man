@@ -148,16 +148,16 @@ const PrintMentalHealthFamilyA4 = ({ medicalInformation }) => {
           {/* Main Complaints */}
           <div className="grid grid-cols-5 gap-4 mb-4">
             <span className="font-semibold text-gray-700">
-              Present Main Complaints, Symptoms, and Problems
+              History of Substance Abuse
             </span>
             <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.mainComplaintsHusband.value)}
+                {renderValue(medicalInformation.historyOfSubstanceAbuseHusband.value)}
               </div>
             </div>
             <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.mainComplaintsWife.value)}
+                {renderValue(medicalInformation.historyOfSubstanceAbuseWife.value)}
               </div>
             </div>
           </div>
@@ -165,36 +165,21 @@ const PrintMentalHealthFamilyA4 = ({ medicalInformation }) => {
           {/* Worse Conditions */}
           <div className="grid grid-cols-5 gap-4 mb-4">
             <span className="font-semibold text-gray-700">
-              Under What Conditions Are Problems Worse?
+              Psychiatric Family History
             </span>
             <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.worseConditionsHusband.value)}
+                {renderValue(medicalInformation.psychiatricFamilyHistoryHusband.value)}
               </div>
             </div>
             <div className="col-span-2">
               <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.worseConditionsWife.value)}
+                {renderValue(medicalInformation.psychiatricFamilyHistoryWife.value)}
               </div>
             </div>
           </div>
 
-          {/* Improved Conditions */}
-          <div className="grid grid-cols-5 gap-4 mb-4">
-            <span className="font-semibold text-gray-700">
-              Under What Conditions Are Problems Improved?
-            </span>
-            <div className="col-span-2">
-              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.improvedConditionsHusband.value)}
-              </div>
-            </div>
-            <div className="col-span-2">
-              <div className="bg-white border border-dashed border-gray-300 rounded-md p-4">
-                {renderValue(medicalInformation.improvedConditionsWife.value)}
-              </div>
-            </div>
-          </div>
+  
         </div>
 
         {/* ========== PAGE 2: Treatment History ========== */}
@@ -375,46 +360,40 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
       dataType: "string",
     },
 
-    mainComplaintsHusband: {
-      label: "Husband Main Complaints",
+    historyOfSubstanceAbuseHusband: {
+      label: "Husband Substance Abuse History",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
-    mainComplaintsWife: {
-      label: "Wife Main Complaints",
+    historyOfSubstanceAbuseWife: {
+      label: "Wife Substance Abuse History",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
-    worseConditionsHusband: {
-      label: "Husband Worse Conditions",
+
+    psychiatricFamilyHistoryHusband: {
+      label: "Psychiatric Family History Hus",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
-    worseConditionsWife: {
-      label: "Wife Worse Conditions",
+    psychiatricFamilyHistoryWife: {
+      label: "Psychiatric Family History Wife",
       value: "",
       isTouched: false,
       isValid: true,
       required: false,
       dataType: "string",
     },
-    improvedConditionsHusband: {
-      label: "Husband Improved Conditions",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
+
     improvedConditionsWife: {
       label: "Wife Improved Conditions",
       value: "",
@@ -471,22 +450,7 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
       required: false,
       dataType: "string",
     },
-    historyOfSubstanceAbuseHusband: {
-      label: "Husband Substance Abuse History",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
-    historyOfSubstanceAbuseWife: {
-      label: "Wife Substance Abuse History",
-      value: "",
-      isTouched: false,
-      isValid: true,
-      required: false,
-      dataType: "string",
-    },
+
     historyOfACESHusband: {
       label: "Husband ACES History",
       value: "",
@@ -608,30 +572,23 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
 
 
 
-        mainComplaintsHusband: {
-          ...medicalInformation.mainComplaintsHusband,
-          value: patientData.mainComplaintsHusband || "",
+        historyOfSubstanceAbuseHusband: {
+          ...medicalInformation.historyOfSubstanceAbuseHusband,
+          value: patientData.historyOfSubstanceAbuseHusband || "",
         },
-        mainComplaintsWife: {
-          ...medicalInformation.mainComplaintsWife,
-          value: patientData.mainComplaintsWife || "",
+        historyOfSubstanceAbuseWife: {
+          ...medicalInformation.historyOfSubstanceAbuseWife,
+          value: patientData.historyOfSubstanceAbuseWife || "",
         },
-        worseConditionsHusband: {
-          ...medicalInformation.worseConditionsHusband,
-          value: patientData.worseConditionsHusband || "",
+        psychiatricFamilyHistoryHusband: {
+          ...medicalInformation.psychiatricFamilyHistoryHusband,
+          value: patientData.psychiatricFamilyHistoryHusband || "",
         },
-        worseConditionsWife: {
-          ...medicalInformation.worseConditionsWife,
-          value: patientData.worseConditionsWife || "",
+        psychiatricFamilyHistoryWife: {
+          ...medicalInformation.psychiatricFamilyHistoryWife,
+          value: patientData.psychiatricFamilyHistoryWife || "",
         },
-        improvedConditionsHusband: {
-          ...medicalInformation.improvedConditionsHusband,
-          value: patientData.improvedConditionsHusband || "",
-        },
-        improvedConditionsWife: {
-          ...medicalInformation.improvedConditionsWife,
-          value: patientData.improvedConditionsWife || "",
-        },
+   
         isHistoryOfPsychiatricTreatmentsHusband: {
           ...medicalInformation.isHistoryOfPsychiatricTreatmentsHusband,
           value: patientData.isHistoryOfPsychiatricTreatmentsHusband || false,
@@ -656,14 +613,7 @@ const TabMentalHealthFamily = ({ id, refreshTabDetails, setActiveTab,printPrevie
           ...medicalInformation.historyOfMentalIllnessWife,
           value: patientData.historyOfMentalIllnessWife || "",
         },
-        historyOfSubstanceAbuseHusband: {
-          ...medicalInformation.historyOfSubstanceAbuseHusband,
-          value: patientData.historyOfSubstanceAbuseHusband || "",
-        },
-        historyOfSubstanceAbuseWife: {
-          ...medicalInformation.historyOfSubstanceAbuseWife,
-          value: patientData.historyOfSubstanceAbuseWife || "",
-        },
+  
         historyOfACESHusband: {
           ...medicalInformation.historyOfACESHusband,
           value:patientData.historyOfACESHusband ? patientData.historyOfACESHusband.split(";;"):'',
@@ -808,20 +758,18 @@ passMedicalHistoryWife: medicalInformation.passMedicalHistoryWife.value,
 
 
 
-        mainComplaintsHusband: medicalInformation.mainComplaintsHusband.value,
-        mainComplaintsWife: medicalInformation.mainComplaintsWife.value,
-        worseConditionsHusband: medicalInformation.worseConditionsHusband.value,
-        worseConditionsWife: medicalInformation.worseConditionsWife.value,
-        improvedConditionsHusband: medicalInformation.improvedConditionsHusband.value,
-        improvedConditionsWife: medicalInformation.improvedConditionsWife.value,
+   historyOfSubstanceAbuseHusband: medicalInformation.historyOfSubstanceAbuseHusband.value,
+        historyOfSubstanceAbuseWife: medicalInformation.historyOfSubstanceAbuseWife.value,
+        psychiatricFamilyHistoryHusband: medicalInformation.psychiatricFamilyHistoryHusband.value,
+        psychiatricFamilyHistoryWife: medicalInformation.psychiatricFamilyHistoryWife.value,
+ 
         isHistoryOfPsychiatricTreatmentsHusband: medicalInformation.isHistoryOfPsychiatricTreatmentsHusband.value,
         isHistoryOfPsychiatricTreatmentsWife: medicalInformation.isHistoryOfPsychiatricTreatmentsWife.value,
         isPsychiatricHospitalizationHusband: medicalInformation.isPsychiatricHospitalizationHusband.value,
         isPsychiatricHospitalizationWife: medicalInformation.isPsychiatricHospitalizationWife.value,
         historyOfMentalIllnessHusband: medicalInformation.historyOfMentalIllnessHusband.value,
         historyOfMentalIllnessWife: medicalInformation.historyOfMentalIllnessWife.value,
-        historyOfSubstanceAbuseHusband: medicalInformation.historyOfSubstanceAbuseHusband.value,
-        historyOfSubstanceAbuseWife: medicalInformation.historyOfSubstanceAbuseWife.value,
+     
         historyOfACESHusband:medicalInformation.historyOfACESHusband.value ? medicalInformation.historyOfACESHusband.value.map((item) => ({
         name: item,
       })):null,
@@ -900,20 +848,19 @@ historyOfPresentComplaintsWife:medicalInformation.historyOfPresentComplaintsWife
 passMedicalHistoryWife:medicalInformation.passMedicalHistoryWife.value,
 
 
-      mainComplaintsHusband: medicalInformation.mainComplaintsHusband.value,
-      mainComplaintsWife: medicalInformation.mainComplaintsWife.value,
-      worseConditionsHusband: medicalInformation.worseConditionsHusband.value,
-      worseConditionsWife: medicalInformation.worseConditionsWife.value,
-      improvedConditionsHusband: medicalInformation.improvedConditionsHusband.value,
-      improvedConditionsWife: medicalInformation.improvedConditionsWife.value,
+      psychiatricFamilyHistoryHusband: medicalInformation.psychiatricFamilyHistoryHusband.value,
+      psychiatricFamilyHistoryWife: medicalInformation.psychiatricFamilyHistoryWife.value,
+
       isHistoryOfPsychiatricTreatmentsHusband: !!medicalInformation.isHistoryOfPsychiatricTreatmentsHusband.value,
       isHistoryOfPsychiatricTreatmentsWife: !!medicalInformation.isHistoryOfPsychiatricTreatmentsWife.value,
       isPsychiatricHospitalizationHusband: !!medicalInformation.isPsychiatricHospitalizationHusband.value,
       isPsychiatricHospitalizationWife: !!medicalInformation.isPsychiatricHospitalizationWife.value,
       historyOfMentalIllnessHusband: medicalInformation.historyOfMentalIllnessHusband.value,
       historyOfMentalIllnessWife: medicalInformation.historyOfMentalIllnessWife.value,
+
       historyOfSubstanceAbuseHusband: medicalInformation.historyOfSubstanceAbuseHusband.value,
       historyOfSubstanceAbuseWife: medicalInformation.historyOfSubstanceAbuseWife.value,
+
      historyOfACESHusband:medicalInformation.historyOfACESHusband.value ? medicalInformation.historyOfACESHusband.value.map((item) => ({
         name: item,
       })):null,
@@ -1236,37 +1183,37 @@ passMedicalHistoryWife:medicalInformation.passMedicalHistoryWife.value,
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <label className="block text-sm font-medium text-gray-700 mt-2">
-                    Main Complaints
+                    History of Substance Abuse
                   </label>
                   <div className="col-span-2">
                     <VoiceToText
-                      name="mainComplaintsHusband"
-                      value={medicalInformation.mainComplaintsHusband.value}
+                      name="historyOfSubstanceAbuseHusband"
+                      value={medicalInformation.historyOfSubstanceAbuseHusband.value}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       rows="4"
                       placeholder="List current issues"
-                      aria-label="Husband main complaints"
+                      aria-label="Husband History of Substance Abuse"
                     />
-                    {medicalInformationErrors.mainComplaintsHusband && (
+                    {medicalInformationErrors.historyOfSubstanceAbuseHusband && (
                       <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.mainComplaintsHusband}
+                        {medicalInformationErrors.historyOfSubstanceAbuseHusband}
                       </p>
                     )}
                   </div>
                   <div className="col-span-2">
                     <VoiceToText
-                      name="mainComplaintsWife"
-                      value={medicalInformation.mainComplaintsWife.value}
+                      name="historyOfSubstanceAbuseWife"
+                      value={medicalInformation.historyOfSubstanceAbuseWife.value}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       rows="4"
                       placeholder="List current issues"
-                      aria-label="Wife main complaints"
+                      aria-label="Wife History of Substance Abuse"
                     />
-                    {medicalInformationErrors.mainComplaintsWife && (
+                    {medicalInformationErrors.historyOfSubstanceAbuseWife && (
                       <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.mainComplaintsWife}
+                        {medicalInformationErrors.historyOfSubstanceAbuseWife}
                       </p>
                     )}
                   </div>
@@ -1274,79 +1221,43 @@ passMedicalHistoryWife:medicalInformation.passMedicalHistoryWife.value,
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <label className="block text-sm font-medium text-gray-700 mt-2">
-                    Worse Conditions
+                    Psychiatric Family History
                   </label>
                   <div className="col-span-2">
                     <VoiceToText
-                      name="worseConditionsHusband"
-                      value={medicalInformation.worseConditionsHusband.value}
+                      name="psychiatricFamilyHistoryHusband"
+                      value={medicalInformation.psychiatricFamilyHistoryHusband.value}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       rows="4"
                       placeholder="Describe conditions"
-                      aria-label="Husband worse conditions"
+                      aria-label="Husband Psychiatric Family History"
                     />
-                    {medicalInformationErrors.worseConditionsHusband && (
+                    {medicalInformationErrors.psychiatricFamilyHistoryHusband && (
                       <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.worseConditionsHusband}
+                        {medicalInformationErrors.psychiatricFamilyHistoryHusband}
                       </p>
                     )}
                   </div>
                   <div className="col-span-2">
                     <VoiceToText
-                      name="worseConditionsWife"
-                      value={medicalInformation.worseConditionsWife.value}
+                      name="psychiatricFamilyHistoryWife"
+                      value={medicalInformation.psychiatricFamilyHistoryWife.value}
                       onChange={handleChange}
                       className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
                       rows="4"
                       placeholder="Describe conditions"
-                      aria-label="Wife worse conditions"
+                      aria-label="Wife Psychiatric Family History"
                     />
-                    {medicalInformationErrors.worseConditionsWife && (
+                    {medicalInformationErrors.psychiatricFamilyHistoryWife && (
                       <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.worseConditionsWife}
+                        {medicalInformationErrors.psychiatricFamilyHistoryWife}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                  <label className="block text-sm font-medium text-gray-700 mt-2">
-                    Improved Conditions
-                  </label>
-                  <div className="col-span-2">
-                    <VoiceToText
-                      name="improvedConditionsHusband"
-                      value={medicalInformation.improvedConditionsHusband.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      rows="4"
-                      placeholder="Describe conditions"
-                      aria-label="Husband improved conditions"
-                    />
-                    {medicalInformationErrors.improvedConditionsHusband && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.improvedConditionsHusband}
-                      </p>
-                    )}
-                  </div>
-                  <div className="col-span-2">
-                    <VoiceToText
-                      name="improvedConditionsWife"
-                      value={medicalInformation.improvedConditionsWife.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      rows="4"
-                      placeholder="Describe conditions"
-                      aria-label="Wife improved conditions"
-                    />
-                    {medicalInformationErrors.improvedConditionsWife && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {medicalInformationErrors.improvedConditionsWife}
-                      </p>
-                    )}
-                  </div>
-                </div>
+              
               </div>
             ) : (
               <div className="space-y-4">
@@ -1422,58 +1333,42 @@ passMedicalHistoryWife:medicalInformation.passMedicalHistoryWife.value,
 
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                  <strong className="text-sm">Main Complaints:</strong>
+                  <strong className="text-sm">History of Substance Abuse:</strong>
                   <div className="col-span-2">
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="whitespace-pre-line">
-                        {medicalInformation.mainComplaintsHusband.value}
+                        {medicalInformation.historyOfSubstanceAbuseHusband.value}
                       </div>
                     </div>
                   </div>
                   <div className="col-span-2">
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="whitespace-pre-line">
-                        {medicalInformation.mainComplaintsWife.value}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                  <strong className="text-sm">Worse Conditions:</strong>
-                  <div className="col-span-2">
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
-                      <div className="whitespace-pre-line">
-                        {medicalInformation.worseConditionsHusband.value}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-span-2">
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
-                      <div className="whitespace-pre-line">
-                        {medicalInformation.worseConditionsWife.value}
+                        {medicalInformation.historyOfSubstanceAbuseWife.value}
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                  <strong className="text-sm">Improved Conditions:</strong>
+                  <strong className="text-sm">Psychiatric Family History:</strong>
                   <div className="col-span-2">
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="whitespace-pre-line">
-                        {medicalInformation.improvedConditionsHusband.value}
+                        {medicalInformation.psychiatricFamilyHistoryHusband.value}
                       </div>
                     </div>
                   </div>
                   <div className="col-span-2">
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
                       <div className="whitespace-pre-line">
-                        {medicalInformation.improvedConditionsWife.value}
+                        {medicalInformation.psychiatricFamilyHistoryWife.value}
                       </div>
                     </div>
                   </div>
                 </div>
+
+       
               </div>
             )}
           </section>
