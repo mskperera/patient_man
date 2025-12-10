@@ -46,7 +46,7 @@ function Home() {
                { value: 'patientName', label: 'Patient Name (First,Middle or Last)' },
               // { value: 'lastName', label: 'Last Name' },
               { value: 'email', label: 'Email' },
-              { value: 'mobile', label: 'Mobile' },
+              { value: 'phone', label: 'Phone' },
             ].map((option) => (
               <label
                 key={option.value}

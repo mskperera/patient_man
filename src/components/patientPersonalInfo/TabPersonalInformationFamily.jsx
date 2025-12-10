@@ -1527,7 +1527,7 @@ const NewOccupationPanel = () => {
 
    <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
           <label className="block text-sm font-medium text-gray-700">
-                List the things about yourself you would most like to change
+                Things Most Like to Change
                 {personalInformation.thingsToChangeHusband.required && (
                   <span className="text-red-500">*</span>
                 )}

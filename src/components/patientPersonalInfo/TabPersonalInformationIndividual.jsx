@@ -1802,7 +1802,7 @@ if(value===0) // adding custom occupation
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    List the things about yourself you would most like to change
+                    Things Most Like to Change
                     {personalInformation.thingsToChange.required && (
                       <span className="text-red-500">*</span>
                     )}

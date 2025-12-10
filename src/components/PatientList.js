@@ -26,10 +26,14 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
   const [showConfirm, setShowConfirm] = useState(false);
 
   const getPatientList = async (page = 1) => {
+
+
+     console.log('getPatientList searchQuery:', searchQuery,filterType);
+
     const payload = {
       patientNo: filterType === 'patientNo' ? searchQuery : null,
-      homePhone: filterType === 'mobile' ? searchQuery : null,
-      businessPhone: filterType === 'mobile' ? searchQuery : null,
+      homePhone: filterType === 'phone' ? searchQuery : null,
+      //businessPhone: filterType === 'phone' ? searchQuery : null,
       email: filterType === 'email' ? searchQuery : null,
       patientName: filterType === 'patientName' ? searchQuery : null,
       firstName: filterType === 'firstName' ? searchQuery : null,
@@ -37,6 +41,8 @@ function PatientList({ searchQuery, filterType, triggerSearch, setPatients, onSe
       skip: (page - 1) * rowsPerPage,
       limit: rowsPerPage,
     };
+
+  
 
     try {
       setIsLoading(true);
