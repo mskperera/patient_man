@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import LoadingSpinner from "../LoadingSpinner";
 import MessageModel from "../MessageModel";
@@ -10,8 +10,6 @@ import {
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import EditButton from "../EditButton";
-
-
 
 const printStyles = `
 
@@ -351,6 +349,9 @@ const TabBasicInformation = ({
             value: patientData.dateOfBirth
               ? moment(patientData.dateOfBirth).format("YYYY-MM-DD")
               : "",
+display: patientData.dateOfBirth
+    ? moment(patientData.dateOfBirth).format("DD-MM-YYYY")
+    : "",
             isTouched: false,
             isValid: true,
           },
@@ -448,6 +449,8 @@ const TabBasicInformation = ({
     setEditingSection(null);
   };
 
+
+  
   const handleSubmit = async (section) => {
     setIsSaving(true);
     const isValid = validateBasicInformation();
@@ -544,7 +547,7 @@ const TabBasicInformation = ({
     const required = basicInformation[name].required;
     const error = validateField(basicInformation[name].label, value, required);
 
-    //console.log('handleChangeBasicInfo:',{name,value})
+    console.log('handleChangeBasicInfo:',{name,value})
     const updatedInfo = {
       ...basicInformation,
       [name]: {
@@ -579,6 +582,134 @@ const TabBasicInformation = ({
       [name]: error,
     }));
   };
+const dobMaskRef = useRef(null);
+
+
+
+
+const handleMaskedDateChange = (e) => {
+  let input = e.target.value.replace(/\D/g, ""); // Remove non-digits
+  if (input.length > 8) input = input.slice(0, 8);
+
+  // Format as DD-MM-YYYY
+  let formatted = "";
+  if (input.length > 0) formatted += input.slice(0, 2);           // DD
+  if (input.length >= 3) formatted += "-" + input.slice(2, 4);    // -MM
+  if (input.length >= 5) formatted += "-" + input.slice(4, 8);    // -YYYY
+
+  // Parse to YYYY-MM-DD only if complete (8 digits)
+  let isoDate = "";
+  let isComplete = input.length === 8;
+  let isValid = false;
+
+  if (isComplete) {
+    const dd = parseInt(input.slice(0, 2), 10);
+    const mm = parseInt(input.slice(2, 4), 10);
+    const yyyy = parseInt(input.slice(4, 8), 10);
+
+    if (
+      dd >= 1 && dd <= 31 &&
+      mm >= 1 && mm <= 12 &&
+      yyyy >= 1900 && yyyy <= 2100
+    ) {
+      const date = new Date(yyyy, mm - 1, dd);
+      if (
+        date.getFullYear() === yyyy &&
+        date.getMonth() === mm - 1 &&
+        date.getDate() === dd
+      ) {
+        isoDate = `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+        isValid = true;
+      }
+    }
+  }
+
+  // Update state
+  const updatedInfo = {
+    ...basicInformation,
+    dateOfBirth: {
+      ...basicInformation.dateOfBirth,
+      value: isoDate,        // YYYY-MM-DD for backend
+      display: formatted,    // DD-MM-YYYY shown to user
+      isTouched: true,
+      isValid: isValid || input.length === 0 || !basicInformation.dateOfBirth.required,
+    },
+  };
+
+  // Calculate age if valid
+  if (isoDate) {
+    const birthDate = new Date(isoDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    updatedInfo.age = {
+      ...basicInformation.age,
+      value: age >= 0 ? age.toString() : "",
+      isTouched: true,
+      isValid: true,
+    };
+  } else if (input.length === 0) {
+    updatedInfo.age = {
+      ...basicInformation.age,
+      value: "",
+      isTouched: true,
+      isValid: true,
+    };
+  }
+
+  setBasicInformation(updatedInfo);
+
+  // Error handling
+  setBasicInformationErrors((prev) => ({
+    ...prev,
+    dateOfBirth:
+      isComplete && !isValid
+        ? "Invalid date"
+        : !isComplete && basicInformation.dateOfBirth.required && input.length > 0
+        ? "Incomplete date"
+        : "",
+  }));
+};
+
+
+const handleKeyDown = (e) => {
+  if (e.key === "Backspace") {
+    const input = e.target;
+    const cursorPos = input.selectionStart;
+
+    // Jump over dashes at positions 3 and 6 (after DD- and MM-)
+    if (cursorPos > 0 && [3, 6].includes(cursorPos)) {
+      input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+    }
+  }
+};
+
+const clearDateOfBirth = () => {
+  const updatedInfo = {
+    ...basicInformation,
+    dateOfBirth: {
+      ...basicInformation.dateOfBirth,
+      value: "",
+      display: "",
+      isTouched: true,
+      isValid: !basicInformation.dateOfBirth.required,
+    },
+    age: {
+      ...basicInformation.age,
+      value: "",
+      isTouched: true,
+      isValid: true,
+    },
+  };
+  setBasicInformation(updatedInfo);
+  setBasicInformationErrors((prev) => ({
+    ...prev,
+    dateOfBirth: basicInformation.dateOfBirth.required ? "Date of Birth is required." : "",
+  }));
+};
 
   const validateBasicInformation = () => {
     const errors = {};
@@ -835,7 +966,7 @@ const TabBasicInformation = ({
                     </div>
                
                  
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Date of Birth  {basicInformation.dateOfBirth.required && (
                   <span className="text-red-500">*</span>
@@ -855,7 +986,151 @@ const TabBasicInformation = ({
                           {basicInformationErrors.dateOfBirth}
                         </p>
                       )}
-                    </div>
+                    </div> */}
+
+
+
+{/* <div>
+  <label className="block text-sm font-medium text-gray-600">
+    Date of Birth
+    {basicInformation.dateOfBirth.required && (
+      <span className="text-red-500">*</span>
+    )}
+  </label>
+
+  <IMaskInput
+    mask="00-00-0000"
+    placeholder="dd-mm-yyyy"
+    lazy={false}
+    className="mt-1 w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+    
+    // Display current value in dd-mm-yyyy format
+    value={
+      basicInformation.dateOfBirth.value
+        ? moment(basicInformation.dateOfBirth.value, 'YYYY-MM-DD').format('DD-MM-YYYY')
+        : ''
+    }
+
+    // Update internal state ONLY when full and valid
+    onAccept={(formattedValue) => {
+      if (formattedValue && formattedValue.length === 10) {
+        const [day, month, year] = formattedValue.split('-');
+        const isoDate = `${year}-${month}-${day}`;
+
+        if (moment(isoDate, 'YYYY-MM-DD', true).isValid()) {
+          const fakeEvent = {
+            target: { name: 'dateOfBirth', value: isoDate },
+          };
+          handleChangeBasicInfo(fakeEvent);
+        }
+        // If invalid but full → do NOT update state yet (wait for blur)
+      }
+      // If incomplete → do nothing (keep current valid value)
+    }}
+
+    // Validate only when user leaves the field
+    onBlur={() => {
+      const currentDisplay = dobMaskRef.current?.value || ''; // get current text in input
+
+      //if (currentDisplay && currentDisplay.length === 10) {
+        const [day, month, year] = currentDisplay.split('-');
+        const isoDate = `${year}-${month}-${day}`;
+
+        if (moment(isoDate, 'YYYY-MM-DD', true).isValid()) {
+          // Valid → ensure state is updated
+          const fakeEvent = {
+            target: { name: 'dateOfBirth', value: isoDate },
+          };
+          handleChangeBasicInfo(fakeEvent);
+
+          // Clear any previous error
+          setBasicInformationErrors((prev) => {
+            const { dateOfBirth, ...rest } = prev;
+            return rest;
+          });
+        } else {
+          // Invalid → clear state and show error
+          const fakeEvent = {
+            target: { name: 'dateOfBirth', value: '' },
+          };
+          handleChangeBasicInfo(fakeEvent);
+
+          setBasicInformationErrors((prev) => ({
+            ...prev,
+            dateOfBirth: 'Invalid date.',
+          }));
+
+          
+       // }
+      //} else 
+     // if (currentDisplay && currentDisplay.length > 0 && currentDisplay.length < 10) {
+
+        // setBasicInformationErrors((prev) => {
+        //   const { dateOfBirth, ...rest } = prev;
+        //   return rest;
+       // });
+      //}
+    }}}
+
+    // Attach ref to access current value on blur
+    inputRef={(ref) => {
+      dobMaskRef.current = ref;
+    }}
+
+    aria-label="Date of Birth"
+  />
+
+  {basicInformationErrors.dateOfBirth && (
+    <p className="mt-1 text-sm text-red-600">
+      {basicInformationErrors.dateOfBirth}
+    </p>
+  )}
+</div> */}
+
+
+<div>
+  <label className="block text-sm font-medium text-gray-600">
+    Date of Birth
+    {basicInformation.dateOfBirth.required && (
+      <span className="text-red-500">*</span>
+    )}
+  </label>
+
+  <div className="mt-1 relative">
+    <input
+      type="text"
+      inputMode="numeric"
+      placeholder="DD-MM-YYYY"
+      value={basicInformation.dateOfBirth.display || ""}
+      onChange={handleMaskedDateChange}
+      onKeyDown={handleKeyDown}
+      className="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+      aria-label="Date of Birth (DD-MM-YYYY)"
+      maxLength="10"
+    />
+
+    {/* Clear button */}
+    {basicInformation.dateOfBirth.value && (
+      <button
+        type="button"
+        onClick={clearDateOfBirth}
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+        aria-label="Clear date"
+      >
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    )}
+  </div>
+
+  {basicInformationErrors.dateOfBirth && (
+    <p className="mt-1 text-sm text-red-600">
+      {basicInformationErrors.dateOfBirth}
+    </p>
+  )}
+</div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">
                         Age {basicInformation.dateOfBirth.required && (

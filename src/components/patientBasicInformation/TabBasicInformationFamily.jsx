@@ -529,6 +529,9 @@ const TabBasicInformationFamily = ({
             value: patientData.husbandDateOfBirth
               ? moment(patientData.husbandDateOfBirth).format("YYYY-MM-DD")
               : "",
+              display: patientData.husbandDateOfBirth
+    ? moment(patientData.husbandDateOfBirth).format("DD-MM-YYYY")
+    : "",
             isTouched: false,
             isValid: true,
           },
@@ -591,6 +594,9 @@ const TabBasicInformationFamily = ({
             value: patientData.wifeDateOfBirth
               ? moment(patientData.wifeDateOfBirth).format("YYYY-MM-DD")
               : "",
+              display: patientData.wifeDateOfBirth
+    ? moment(patientData.wifeDateOfBirth).format("DD-MM-YYYY")
+    : "",
             isTouched: false,
             isValid: true,
           },
@@ -979,6 +985,174 @@ const validateField = (name, value, required) => {
     }
   };
 
+
+//   const MaskedDateInput = ({ fieldKey, label, required }) => {
+//   const handleChange = (e) => handleMaskedDateChange(e, fieldKey);
+//   const clearDate = () => clearDateOfBirth(fieldKey);
+
+//   return (
+//     <div>
+//       <label className="block text-sm font-medium text-gray-700">
+//         {label}
+//         {required && <span className="text-red-500">*</span>}
+//       </label>
+
+//       <div className="mt-1 relative">
+//         <input
+//           type="text"
+//           inputMode="numeric"
+//           placeholder="DD-MM-YYYY"
+//           value={basicInformation[fieldKey]?.display || ""}
+//           onChange={handleChange}
+//           onKeyDown={handleKeyDown}
+//           className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+//           aria-label={`${label} (DD-MM-YYYY)`}
+//           maxLength="10"
+//         />
+
+//         {/* Clear button */}
+//         {basicInformation[fieldKey]?.value && (
+//           <button
+//             type="button"
+//             onClick={clearDate}
+//             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+//             aria-label="Clear date"
+//           >
+//             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+//             </svg>
+//           </button>
+//         )}
+//       </div>
+
+//       {basicInformationErrors[fieldKey] && (
+//         <p className="mt-1 text-sm text-red-600">
+//           {basicInformationErrors[fieldKey]}
+//         </p>
+//       )}
+//     </div>
+//   );
+// };
+
+
+const handleMaskedDateChange = (e, fieldKey) => {
+  let input = e.target.value.replace(/\D/g, "");
+  if (input.length > 8) input = input.slice(0, 8);
+
+  let formatted = "";
+  if (input.length > 0) formatted += input.slice(0, 2);
+  if (input.length >= 3) formatted += "-" + input.slice(2, 4);
+  if (input.length >= 5) formatted += "-" + input.slice(4, 8);
+
+  let isoDate = "";
+  let isValid = false;
+  let isComplete = input.length === 8;
+
+  if (isComplete) {
+    const dd = parseInt(input.slice(0, 2), 10);
+    const mm = parseInt(input.slice(2, 4), 10);
+    const yyyy = parseInt(input.slice(4, 8), 10);
+
+    if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12 && yyyy >= 1900 && yyyy <= 2100) {
+      const date = new Date(yyyy, mm - 1, dd);
+      if (
+        date.getFullYear() === yyyy &&
+        date.getMonth() === mm - 1 &&
+        date.getDate() === dd
+      ) {
+        isoDate = `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+        isValid = true;
+      }
+    }
+  }
+
+  const ageKey = fieldKey === "husbandDateOfBirth" ? "husbandAge" : "wifeAge";
+
+  const updatedInfo = {
+    ...basicInformation,
+    [fieldKey]: {
+      ...basicInformation[fieldKey],
+      value: isoDate,
+      display: formatted,
+      isTouched: true,
+      isValid: isValid || input.length === 0 || !basicInformation[fieldKey].required,
+    },
+  };
+
+  if (isoDate) {
+    const birthDate = new Date(isoDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+    updatedInfo[ageKey] = {
+      ...basicInformation[ageKey],
+      value: age >= 0 ? age.toString() : "",
+      isTouched: true,
+      isValid: true,
+    };
+  } else if (input.length === 0) {
+    updatedInfo[ageKey] = {
+      ...basicInformation[ageKey],
+      value: "",
+      isTouched: true,
+      isValid: true,
+    };
+  }
+
+  setBasicInformation(updatedInfo);
+
+  setBasicInformationErrors((prev) => ({
+    ...prev,
+    [fieldKey]:
+      isComplete && !isValid
+        ? "Invalid date"
+        : !isComplete && basicInformation[fieldKey].required && input.length > 0
+        ? "Incomplete date"
+        : "",
+  }));
+};
+
+const clearDateOfBirth = (fieldKey) => {
+  const ageKey = fieldKey === "husbandDateOfBirth" ? "husbandAge" : "wifeAge";
+
+  const updatedInfo = {
+    ...basicInformation,
+    [fieldKey]: {
+      ...basicInformation[fieldKey],
+      value: "",
+      display: "",
+      isTouched: true,
+      isValid: !basicInformation[fieldKey].required,
+    },
+    [ageKey]: {
+      ...basicInformation[ageKey],
+      value: "",
+      isTouched: true,
+      isValid: true,
+    },
+  };
+
+  setBasicInformation(updatedInfo);
+  setBasicInformationErrors((prev) => ({
+    ...prev,
+    [fieldKey]: basicInformation[fieldKey].required
+      ? `${basicInformation[fieldKey].label} is required.`
+      : "",
+  }));
+};
+
+const handleKeyDown = (e) => {
+  if (e.key === "Backspace") {
+    const input = e.target;
+    const cursorPos = input.selectionStart;
+    if (cursorPos > 0 && [3, 6].includes(cursorPos)) {
+      input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+    }
+  }
+};
+
   return (
     <>
       <MessageModel
@@ -1154,7 +1328,7 @@ const validateField = (name, value, required) => {
               </div>
             </div>
         
-            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+            {/* <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
               <label className="block text-sm font-medium text-gray-700">
                 Date of Birth{" "}
                 {basicInformation.husbandDateOfBirth.required && (
@@ -1191,7 +1365,91 @@ const validateField = (name, value, required) => {
                   </p>
                 )}
               </div>
-            </div>
+            </div> */}
+     <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
+  <label className="block text-sm font-medium text-gray-700 pt-3">
+    Date of Birth
+  </label>
+
+  {/* Husband Date of Birth */}
+  <div className="col-span-2">
+    <div>
+      <div className="mt-1 relative">
+        <input
+          type="text"
+          inputMode="numeric"
+          placeholder="DD-MM-YYYY"
+          value={basicInformation.husbandDateOfBirth.display || ""}
+          onChange={(e) => handleMaskedDateChange(e, "husbandDateOfBirth")}
+          onKeyDown={handleKeyDown}
+          className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+          aria-label="Husband Date of Birth (DD-MM-YYYY)"
+          maxLength="10"
+        />
+
+        {/* Clear button - Husband */}
+        {basicInformation.husbandDateOfBirth.value && (
+          <button
+            type="button"
+            onClick={() => clearDateOfBirth("husbandDateOfBirth")}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            aria-label="Clear husband date"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {basicInformationErrors.husbandDateOfBirth && (
+        <p className="mt-1 text-sm text-red-600">
+          {basicInformationErrors.husbandDateOfBirth}
+        </p>
+      )}
+    </div>
+  </div>
+
+  {/* Wife Date of Birth */}
+  <div className="col-span-2">
+    <div>
+      <div className="mt-1 relative">
+     
+        <input
+          type="text"
+          inputMode="numeric"
+          placeholder="DD-MM-YYYY"
+          value={basicInformation.wifeDateOfBirth.display || ""}
+          onChange={(e) => handleMaskedDateChange(e, "wifeDateOfBirth")}
+          onKeyDown={handleKeyDown}
+          className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+          aria-label="Wife Date of Birth (DD-MM-YYYY)"
+          maxLength="10"
+        />
+
+        {/* Clear button - Wife */}
+        {basicInformation.wifeDateOfBirth.value && (
+          <button
+            type="button"
+            onClick={() => clearDateOfBirth("wifeDateOfBirth")}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            aria-label="Clear wife date"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {basicInformationErrors.wifeDateOfBirth && (
+        <p className="mt-1 text-sm text-red-600">
+          {basicInformationErrors.wifeDateOfBirth}
+        </p>
+      )}
+    </div>
+  </div>
+</div>
             <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
               <label className="block text-sm font-medium text-gray-700">
                 Age
