@@ -284,6 +284,8 @@ function Notes({ patientId, userId,printPreviewMode }) {  // Assume passed as pr
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
+const [facingMode, setFacingMode] = useState('environment'); // 'environment' = back, 'user' = front
+
   const [deletedAttachments, setDeletedAttachments] = useState([]);
   
 
@@ -371,21 +373,76 @@ useEffect(() => {
     }
   };
 
-  const startCamera = () => {
-    setShowCamera(true);
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play();
-        }
-      })
-      .catch((err) => {
-        console.error('Camera access error:', err);
-        setShowCamera(false);
-      });
+  // const startCamera = () => {
+  //   setShowCamera(true);
+  //   navigator.mediaDevices.getUserMedia({ video: true })
+  //     .then((stream) => {
+  //       streamRef.current = stream;
+  //       if (videoRef.current) {
+  //         videoRef.current.srcObject = stream;
+  //         videoRef.current.play();
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error('Camera access error:', err);
+  //       setShowCamera(false);
+  //     });
+  // };
+
+  const startCamera = async () => {
+  // Stop any existing stream first
+  if (streamRef.current) {
+    streamRef.current.getTracks().forEach(track => track.stop());
+  }
+
+  const constraints = {
+    video: {
+      facingMode: facingMode, // 'environment' or 'user'
+      width: { ideal: 1280 },
+      height: { ideal: 720 }
+    }
   };
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    streamRef.current = stream;
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play();
+    }
+    setShowCamera(true);
+  } catch (err) {
+    console.error('Camera access error:', err);
+
+    // Fallback: try the other camera if one fails
+    const fallbackMode = facingMode === 'environment' ? 'user' : 'environment';
+    try {
+      const fallbackStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: fallbackMode }
+      });
+      streamRef.current = fallbackStream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = fallbackStream;
+        videoRef.current.play();
+      }
+      setFacingMode(fallbackMode);
+      setShowCamera(true);
+    } catch (fallbackErr) {
+      alert('Unable to access camera. Please check permissions.');
+      console.error(fallbackErr);
+    }
+  }
+
+
+};
+
+const toggleCamera = () => {
+  setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
+  // Restart camera with new mode
+  if (showCamera) {
+    startCamera();
+  }
+};
 
   const capturePhoto = () => {
     const canvas = document.createElement('canvas');
@@ -1213,7 +1270,7 @@ const confirmDelete = async () => {
    
 
       {/* Camera Modal */}
-      {showCamera && (
+      {/* {showCamera && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           role="dialog"
@@ -1241,7 +1298,65 @@ const confirmDelete = async () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
+
+      {showCamera && (
+  <div
+    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Capture Photo"
+  >
+    <div className="relative bg-black rounded-lg shadow-lg max-w-lg w-full mx-4">
+      {/* Video Feed */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline // Critical for iOS
+        muted
+        className="w-full h-auto rounded-t-lg"
+        style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)' }} // Mirror front camera
+      />
+
+      {/* Switch Camera Button */}
+      <button
+        onClick={toggleCamera}
+        className="absolute top-4 right-4 bg-white bg-opacity-80 text-gray-800 p-3 rounded-full shadow-lg hover:bg-opacity-100 transition z-10"
+        title="Switch Camera"
+        aria-label="Switch between front and back camera"
+      >
+        🔄
+      </button>
+
+      {/* Indicator: Current Camera */}
+      <div className="absolute top-4 left-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm">
+        {facingMode === 'environment' ? '🌍 Back' : '📱 Front'}
+      </div>
+
+      {/* Controls */}
+      <div className="p-6 bg-black rounded-b-lg">
+        <div className="flex gap-6 justify-center items-center">
+          <button
+            onClick={capturePhoto}
+            className="bg-white p-5 rounded-full shadow-2xl hover:scale-110 transition transform"
+            aria-label="Take photo"
+          >
+            <FaCircle size={36} className="text-red-600" />
+          </button>
+        </div>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={closeCamera}
+            className="text-white underline hover:no-underline"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Audio Recording Modal */}
       {showRecordModal && (
