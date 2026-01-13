@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner, FaUser, FaCalendarAlt, FaTimesCircle, FaHistory, FaClock, FaRegClock, FaSync, FaVideo, FaTimes } from 'react-icons/fa';
+import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaEdit, FaPause, FaPlay, FaSpinner, FaRegClock} from 'react-icons/fa';
 import { addNote, deleteNote, getNotes, updateNote } from '../functions/patient';
 import ConfirmDialog from './dialog/ConfirmDialog';
 import LoadingSpinner from './LoadingSpinner';
@@ -9,7 +9,6 @@ import { commitFile, markFileAsTobeDeleted, uploadFile } from '../functions/asse
 import MessageModel from './MessageModel';
 import moment from 'moment';
 import { getFileIcon } from '../utils/fileIconExtentions';
-
 import CameraCapture from './CameraCapture';
 
 const printStyles = `
