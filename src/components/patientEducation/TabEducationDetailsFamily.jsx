@@ -242,10 +242,22 @@ const PrintEducationDetailsFamilyA4 = ({
           <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
             University Qualifications
           </h3>
-
+    
+            
           {/* Husband */}
           <div className="mb-6">
             <h4 className="font-semibold text-sky-700 mb-2">Husband</h4>
+
+
+    {education.universityHusband.remark && (
+              <div className="my-4">
+                <span className="font-semibold text-gray-700">Remark:</span>
+                <div className="bg-gray-50 border border-gray-300 rounded-md p-2 mt-1 text-xs whitespace-pre-line text-gray-800">
+                  {education.universityHusband.remark}
+                </div>
+              </div>
+            )}
+
             {education.universityHusband.enabled && education.universityHusband.subjects.length > 0 ? (
               <table className="w-full border-collapse border border-gray-300 mt-1 text-xs">
                 <thead>
@@ -276,19 +288,22 @@ const PrintEducationDetailsFamilyA4 = ({
               </div>
             )}
 
-            {education.universityHusband.remark && (
-              <div className="mt-3">
-                <span className="font-semibold text-gray-700">Remark:</span>
-                <div className="bg-gray-50 border border-gray-300 rounded-md p-2 mt-1 text-xs whitespace-pre-line text-gray-800">
-                  {education.universityHusband.remark}
-                </div>
-              </div>
-            )}
+    
           </div>
 
           {/* Wife */}
           <div>
             <h4 className="font-semibold text-sky-700 mb-2">Wife</h4>
+
+                  {education.universityWife.remark && (
+              <div className="my-4">
+                <span className="font-semibold text-gray-700">Remark:</span>
+                <div className="bg-gray-50 border border-gray-300 rounded-md p-2 mt-1 text-xs whitespace-pre-line text-gray-800">
+                  {education.universityWife.remark}
+                </div>
+              </div>
+            )}
+
             {education.universityWife.enabled && education.universityWife.subjects.length > 0 ? (
               <table className="w-full border-collapse border border-gray-300 mt-1 text-xs">
                 <thead>
@@ -319,14 +334,7 @@ const PrintEducationDetailsFamilyA4 = ({
               </div>
             )}
 
-            {education.universityWife.remark && (
-              <div className="mt-3">
-                <span className="font-semibold text-gray-700">Remark:</span>
-                <div className="bg-gray-50 border border-gray-300 rounded-md p-2 mt-1 text-xs whitespace-pre-line text-gray-800">
-                  {education.universityWife.remark}
-                </div>
-              </div>
-            )}
+      
           </div>
         </div>
 
@@ -1302,6 +1310,41 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
             </div>
             {editingSection === "ol" || mode === "add" ? (
               <div className="space-y-6">
+                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+     <label className="block font-medium text-gray-700 mt-4">Remark</label>
+  
+   <div className="col-span-2">
+
+                    <VoiceToText
+                      name="olHusband.remark"
+                      value={education.olHusband.remark || ""}
+                      onChange={handleTextInputChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter any additional remarks"
+                      disabled={!education.olHusband.enabled}
+                      aria-label="Husband O/L Remark"
+                      rows="4"
+                    />
+               
+  </div>
+
+    <div className="col-span-2">
+ 
+      <VoiceToText
+                      name="olWife.remark"
+                      value={education.olWife.remark || ""}
+                      onChange={handleTextInputChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter any additional remarks"
+                      disabled={!education.olWife.enabled}
+                      aria-label="Wife O/L Remark"
+                      rows="4"
+                    />
+
+    </div>
+
+ </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                   <div></div>
                   <div className="col-span-2">
@@ -1428,40 +1471,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
                 </div>
 
 
- <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-     <label className="block font-medium text-gray-700 mt-4">Remark</label>
-  
-   <div className="col-span-2">
 
-                    <VoiceToText
-                      name="olHusband.remark"
-                      value={education.olHusband.remark || ""}
-                      onChange={handleTextInputChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter any additional remarks"
-                      disabled={!education.olHusband.enabled}
-                      aria-label="Husband O/L Remark"
-                      rows="4"
-                    />
-               
-  </div>
-
-    <div className="col-span-2">
- 
-      <VoiceToText
-                      name="olWife.remark"
-                      value={education.olWife.remark || ""}
-                      onChange={handleTextInputChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter any additional remarks"
-                      disabled={!education.olWife.enabled}
-                      aria-label="Wife O/L Remark"
-                      rows="4"
-                    />
-
-    </div>
-
- </div>
 
 
               </div>
@@ -1730,6 +1740,40 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
             </div>
             {editingSection === "al" || mode === "add" ? (
               <div className="space-y-6">
+
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                    <label className="block font-medium text-gray-700 mt-4">Remark</label>
+          
+                
+             <div className="col-span-2">
+                    <VoiceToText
+                      name="alHusband.remark"
+                      value={education.alHusband.remark || ""}
+                      onChange={handleTextInputChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter any additional remarks"
+                      disabled={!education.alHusband.enabled}
+                      aria-label="Husband A/L Remark"
+                      rows="4"
+                    />
+                  </div>
+
+                    <div className="col-span-2">
+                    <VoiceToText
+                      name="alWife.remark"
+                      value={education.alWife.remark || ""}
+                      onChange={handleTextInputChange}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter any additional remarks"
+                      disabled={!education.alWife.enabled}
+                      aria-label="Wife A/L Remark"
+                      rows="4"
+                    />
+                  </div>
+           
+
+</div>
+
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                   <div></div>
                  
@@ -1807,41 +1851,36 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
                 </div>
 
 
-                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                    <label className="block font-medium text-gray-700 mt-4">Remark</label>
-          
-                
-             <div className="col-span-2">
-                    <VoiceToText
-                      name="alHusband.remark"
-                      value={education.alHusband.remark || ""}
-                      onChange={handleTextInputChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter any additional remarks"
-                      disabled={!education.alHusband.enabled}
-                      aria-label="Husband A/L Remark"
-                      rows="4"
-                    />
-                  </div>
-
-                    <div className="col-span-2">
-                    <VoiceToText
-                      name="alWife.remark"
-                      value={education.alWife.remark || ""}
-                      onChange={handleTextInputChange}
-                      className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter any additional remarks"
-                      disabled={!education.alWife.enabled}
-                      aria-label="Wife A/L Remark"
-                      rows="4"
-                    />
-                  </div>
-           
-
-</div>
+         
               </div>
             ) : (
               <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                                     <label className="block font-medium text-gray-700">Remark</label>
+                
+                            <div className="col-span-2">
+                    {education.alHusband.remark && (
+                      <div className="mt-4">
+     
+                        <div className="bg-white border border-gray-200 rounded-lg p-3 mt-1 whitespace-pre-line">
+                          {education.alHusband.remark}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+              
+
+                   <div className="col-span-2">
+                    {education.alWife.remark && (
+                      <div className="mt-4">
+                        <div className="bg-white border border-gray-200 rounded-lg p-3 mt-1 whitespace-pre-line">
+                          {education.alWife.remark}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                   <div></div>
                      <div className="col-span-2">
@@ -1877,31 +1916,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
                   </div>
                 </div>
 
-                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                                     <label className="block font-medium text-gray-700">Remark</label>
-                
-                            <div className="col-span-2">
-                    {education.alHusband.remark && (
-                      <div className="mt-4">
-     
-                        <div className="bg-white border border-gray-200 rounded-lg p-3 mt-1 whitespace-pre-line">
-                          {education.alHusband.remark}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-              
-
-                   <div className="col-span-2">
-                    {education.alWife.remark && (
-                      <div className="mt-4">
-                        <div className="bg-white border border-gray-200 rounded-lg p-3 mt-1 whitespace-pre-line">
-                          {education.alWife.remark}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+             
 
 
               </div>
@@ -1979,6 +1994,20 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
                   <label className="block font-medium text-gray-700">Qualifications <span className="text-red-500">*</span></label>
                     <div className="col-span-2">
+                        <div className="mt-4">
+                        <label className="block font-medium text-gray-700">Remark</label>
+                        <VoiceToText
+                          name="universityHusband.remark"
+                          value={education.universityHusband.remark || ""}
+                          onChange={handleTextInputChange}
+                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                          placeholder="Enter any additional remarks"
+                          disabled={!education.universityHusband.enabled}
+                          aria-label="Husband University Remark"
+                          rows="4"
+                        />
+                      </div>
+
                     {education.universityHusband.subjects.map((qualification, index) => (
                       <div key={index} className="flex items-center space-x-4 mb-4">
                         <div className="grid grid-cols-1 gap-4 flex-1">
@@ -2087,22 +2116,23 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
                       Add Qualification
                     </button>
                   
-                      <div className="mt-4">
-                        <label className="block font-medium text-gray-700">Remark</label>
-                        <VoiceToText
-                          name="universityHusband.remark"
-                          value={education.universityHusband.remark || ""}
-                          onChange={handleTextInputChange}
-                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                          placeholder="Enter any additional remarks"
-                          disabled={!education.universityHusband.enabled}
-                          aria-label="Husband University Remark"
-                          rows="4"
-                        />
-                      </div>
+                    
                  
                   </div>
                       <div className="col-span-2">
+                               <div className="mt-4">
+                        <label className="block font-medium text-gray-700">Remark</label>
+                        <VoiceToText
+                          name="universityWife.remark"
+                          value={education.universityWife.remark || ""}
+                          onChange={handleTextInputChange}
+                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                          placeholder="Enter any additional remarks"
+                          disabled={!education.universityWife.enabled}
+                          aria-label="Wife University Remark"
+                          rows="4"
+                        />
+                      </div>
                     {education.universityWife.subjects.map((qualification, index) => (
                       <div key={index} className="flex items-center space-x-4 mb-4">
                         <div className="grid grid-cols-1 gap-4 flex-1">
@@ -2160,19 +2190,7 @@ const TabEducationDetailsFamily = ({ id, refreshTabDetails,printPreviewMode }) =
                       Add Qualification
                     </button>
                    
-                      <div className="mt-4">
-                        <label className="block font-medium text-gray-700">Remark</label>
-                        <VoiceToText
-                          name="universityWife.remark"
-                          value={education.universityWife.remark || ""}
-                          onChange={handleTextInputChange}
-                          className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                          placeholder="Enter any additional remarks"
-                          disabled={!education.universityWife.enabled}
-                          aria-label="Wife University Remark"
-                          rows="4"
-                        />
-                      </div>
+               
                  
                   </div>
                 </div>

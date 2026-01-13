@@ -201,7 +201,7 @@ const PrintPersonalInformationFamilyA4 = ({ personalInformation, maritalStatusOp
 
 
             {/* Life Goals */}
-          <div className="grid grid-cols-5 gap-4 mb-4">
+          {/* <div className="grid grid-cols-5 gap-4 mb-4">
             <span className="font-semibold text-gray-700">
                  Main Life Goals
             </span>
@@ -215,14 +215,14 @@ const PrintPersonalInformationFamilyA4 = ({ personalInformation, maritalStatusOp
                  {renderValue(personalInformation.lifeGoalsWife.value)}
               </div>
             </div>
-          </div>
+          </div> */}
 
 
 
           
 
             {/* Things to Change */}
-                 <div className="grid grid-cols-5 gap-4 mb-4">
+                 {/* <div className="grid grid-cols-5 gap-4 mb-4">
             <span className="font-semibold text-gray-700">
                  Things Most Like to Change About Yourself
             </span>
@@ -236,7 +236,7 @@ const PrintPersonalInformationFamilyA4 = ({ personalInformation, maritalStatusOp
              {renderValue(personalInformation.thingsToChangeWife.value)}
               </div>
             </div>
-          </div>
+          </div> */}
 
 
           </div>
@@ -1473,7 +1473,7 @@ const NewOccupationPanel = () => {
       
 
 
-
+{/* 
          <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
         <label className="block text-sm font-medium text-gray-700">
                 List your main life goals
@@ -1519,12 +1519,12 @@ const NewOccupationPanel = () => {
               </div>
 
 
-          </div>
+          </div> */}
 
       
 
 
-
+{/* 
    <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
           <label className="block text-sm font-medium text-gray-700">
                 Things Most Like to Change
@@ -1568,7 +1568,7 @@ const NewOccupationPanel = () => {
                 </p>
               )}
               </div>
-          </div>
+          </div> */}
 
             <div>  
         
@@ -1606,7 +1606,7 @@ const NewOccupationPanel = () => {
             </div>
 
 
-      <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+      {/* <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <strong className="text-sm">Main Life Goals:</strong>
               <div className="col-span-2">
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -1626,10 +1626,10 @@ const NewOccupationPanel = () => {
               </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
    
-              <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              {/* <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
                   <strong className="text-sm">Things Most Like to Change:</strong>
               <div className="col-span-2">
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -1649,7 +1649,7 @@ const NewOccupationPanel = () => {
               </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
        
           </div>

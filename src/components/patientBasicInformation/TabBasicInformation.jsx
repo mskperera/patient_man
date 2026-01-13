@@ -10,6 +10,9 @@ import {
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import EditButton from "../EditButton";
+import DatePicker from "react-datepicker";
+
+import { format } from "date-fns";
 
 const printStyles = `
 
@@ -79,19 +82,21 @@ const printStyles = `
               <span className="text-gray-900">{basicInformation.lastName.value}</span>
             </div>
 
-            {/* Date of Birth */}
-    <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
-              <span className="font-medium text-gray-700">Date of Birth:</span>
-              <span className="text-gray-900">{formatDate(basicInformation.dateOfBirth.value)}</span>
-            </div>
-
-            {/* Age */}
+        {/* Age */}
              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
               <span className="font-medium text-gray-700">Age:</span>
               <span className="text-gray-900">
                 {basicInformation.age.value} {basicInformation.age.value ? "Years" : ""}
               </span>
             </div>
+
+            {/* Date of Birth */}
+    <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="font-medium text-gray-700">Date of Birth:</span>
+              <span className="text-gray-900">{formatDate(basicInformation.dateOfBirth.value)}</span>
+            </div>
+
+    
 
             {/* Gender */}
              <div className="flex justify-between py-1.5 border-b border-dashed border-gray-300">
@@ -543,11 +548,13 @@ display: patientData.dateOfBirth
   };
 
   const handleChangeBasicInfo = (e) => {
+       console.log('handleChangeBasicInfo:',e)
     const { name, value } = e.target;
+
     const required = basicInformation[name].required;
     const error = validateField(basicInformation[name].label, value, required);
 
-    console.log('handleChangeBasicInfo:',{name,value})
+ 
     const updatedInfo = {
       ...basicInformation,
       [name]: {
@@ -559,6 +566,20 @@ display: patientData.dateOfBirth
     };
 
     if (name === "dateOfBirth") {
+
+
+    setBasicInformation(prev => ({
+      ...prev,
+      dateOfBirth: {
+        ...prev.dateOfBirth,
+        value: value ? format(value, "yyyy-MM-dd") : "",
+        isTouched: true,
+        isValid: !!value
+      }
+    }));
+  
+
+
       const birthDate = new Date(value);
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -582,97 +603,66 @@ display: patientData.dateOfBirth
       [name]: error,
     }));
   };
-const dobMaskRef = useRef(null);
 
 
 
+  const handleChangeDob = (name,value) => {
 
-const handleMaskedDateChange = (e) => {
-  let input = e.target.value.replace(/\D/g, ""); // Remove non-digits
-  if (input.length > 8) input = input.slice(0, 8);
+const dobValFormated=moment(value).format("yyyy-MM-DD");
 
-  // Format as DD-MM-YYYY
-  let formatted = "";
-  if (input.length > 0) formatted += input.slice(0, 2);           // DD
-  if (input.length >= 3) formatted += "-" + input.slice(2, 4);    // -MM
-  if (input.length >= 5) formatted += "-" + input.slice(4, 8);    // -YYYY
+console.log('dobVal',dobValFormated)
+    const required = basicInformation[name].required;
+    const error = validateField(basicInformation[name].label, dobValFormated, required);
 
-  // Parse to YYYY-MM-DD only if complete (8 digits)
-  let isoDate = "";
-  let isComplete = input.length === 8;
-  let isValid = false;
+ 
+    const updatedInfo = {
+      ...basicInformation,
+      [name]: {
+        ...basicInformation[name],
+        value:dobValFormated,
+        isTouched: true,
+        isValid: error === "",
+      },
+    };
 
-  if (isComplete) {
-    const dd = parseInt(input.slice(0, 2), 10);
-    const mm = parseInt(input.slice(2, 4), 10);
-    const yyyy = parseInt(input.slice(4, 8), 10);
 
-    if (
-      dd >= 1 && dd <= 31 &&
-      mm >= 1 && mm <= 12 &&
-      yyyy >= 1900 && yyyy <= 2100
-    ) {
-      const date = new Date(yyyy, mm - 1, dd);
-      if (
-        date.getFullYear() === yyyy &&
-        date.getMonth() === mm - 1 &&
-        date.getDate() === dd
-      ) {
-        isoDate = `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
-        isValid = true;
+
+    setBasicInformation(prev => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        value: dobValFormated,
+        isTouched: true,
+        isValid: !!value
       }
-    }
-  }
+    }));
+  
 
-  // Update state
-  const updatedInfo = {
-    ...basicInformation,
-    dateOfBirth: {
-      ...basicInformation.dateOfBirth,
-      value: isoDate,        // YYYY-MM-DD for backend
-      display: formatted,    // DD-MM-YYYY shown to user
-      isTouched: true,
-      isValid: isValid || input.length === 0 || !basicInformation.dateOfBirth.required,
-    },
+
+      const birthDate = new Date(value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      console.log('age:',age)
+      updatedInfo["age"] = {
+        ...basicInformation["age"],
+        value: age.toString()=="NaN" ? '' : age.toString(),
+        isTouched: true,
+        isValid: true,
+      };
+    
+
+    setBasicInformation(updatedInfo);
+    setBasicInformationErrors((prev) => ({
+      ...prev,
+      dateOfBirth: error,
+    }));
   };
 
-  // Calculate age if valid
-  if (isoDate) {
-    const birthDate = new Date(isoDate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    updatedInfo.age = {
-      ...basicInformation.age,
-      value: age >= 0 ? age.toString() : "",
-      isTouched: true,
-      isValid: true,
-    };
-  } else if (input.length === 0) {
-    updatedInfo.age = {
-      ...basicInformation.age,
-      value: "",
-      isTouched: true,
-      isValid: true,
-    };
-  }
-
-  setBasicInformation(updatedInfo);
-
-  // Error handling
-  setBasicInformationErrors((prev) => ({
-    ...prev,
-    dateOfBirth:
-      isComplete && !isValid
-        ? "Invalid date"
-        : !isComplete && basicInformation.dateOfBirth.required && input.length > 0
-        ? "Incomplete date"
-        : "",
-  }));
-};
 
 
 const handleKeyDown = (e) => {
@@ -1086,6 +1076,21 @@ const clearDateOfBirth = () => {
     </p>
   )}
 </div> */}
+         <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Age {basicInformation.dateOfBirth.required && (
+                  <span className="text-red-500">*</span>
+                )}
+                      </label>
+                      {basicInformation.dateOfBirth.value && (
+                        <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-lg bg-gray-50">
+                          <span className="text-gray-800 font-medium">
+                            {basicInformation.age.value}
+                          </span>
+                          <span className="text-gray-600">{"Years"}</span>
+                        </div>
+                      )}
+                    </div>
 
 
 <div>
@@ -1097,17 +1102,23 @@ const clearDateOfBirth = () => {
   </label>
 
   <div className="mt-1 relative">
-    <input
-      type="text"
-      inputMode="numeric"
-      placeholder="DD-MM-YYYY"
-      value={basicInformation.dateOfBirth.display || ""}
-      onChange={handleMaskedDateChange}
-      onKeyDown={handleKeyDown}
-      className="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-      aria-label="Date of Birth (DD-MM-YYYY)"
-      maxLength="10"
-    />
+
+<DatePicker
+  selected={
+    basicInformation.dateOfBirth.value
+      ? new Date(basicInformation.dateOfBirth.value)
+      : null
+  }
+  onChange={(date)=>{
+    handleChangeDob('dateOfBirth',date)
+  }}
+  dateFormat="yyyy-MM-dd"
+  placeholderText="YYYY-MM-DD"
+  className="w-full p-3 text-sm border border-gray-300 rounded-lg"
+/>
+
+
+
 
     {/* Clear button */}
     {basicInformation.dateOfBirth.value && (
@@ -1131,21 +1142,7 @@ const clearDateOfBirth = () => {
   )}
 </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">
-                        Age {basicInformation.dateOfBirth.required && (
-                  <span className="text-red-500">*</span>
-                )}
-                      </label>
-                      {basicInformation.dateOfBirth.value && (
-                        <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-lg bg-gray-50">
-                          <span className="text-gray-800 font-medium">
-                            {basicInformation.age.value}
-                          </span>
-                          <span className="text-gray-600">{"Years"}</span>
-                        </div>
-                      )}
-                    </div>
+           
                     <div>
                       <label className="block text-sm font-medium text-gray-600">
                         Gender <span className="text-red-500">*</span>
@@ -1423,6 +1420,15 @@ const clearDateOfBirth = () => {
                       </span>
                     </div>
                
+                      <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                      <span className="text-gray-600 font-semibold">
+                        Age:
+                      </span>
+                      <span className="text-gray-800 text-right">
+                        {basicInformation.age.value} {basicInformation.age.value ? 'Years':''} 
+                      </span>
+                    </div>
+                    
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                       <span className="text-gray-600 font-semibold">
                         Date of Birth:
@@ -1435,14 +1441,7 @@ const clearDateOfBirth = () => {
                           : ""}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <span className="text-gray-600 font-semibold">
-                        Age:
-                      </span>
-                      <span className="text-gray-800 text-right">
-                        {basicInformation.age.value} {basicInformation.age.value ? 'Years':''} 
-                      </span>
-                    </div>
+             
                     <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
                       <span className="text-gray-600 font-semibold">
                         Gender:

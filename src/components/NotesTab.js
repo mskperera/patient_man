@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner, FaUser, FaCalendarAlt, FaTimesCircle, FaHistory, FaClock, FaRegClock } from 'react-icons/fa';
+import { FaMicrophone, FaTrash, FaCamera, FaFile, FaFileAudio, FaImage, FaNotesMedical, FaEdit, FaCircle, FaPause, FaPlay, FaSpinner, FaUser, FaCalendarAlt, FaTimesCircle, FaHistory, FaClock, FaRegClock, FaSync, FaVideo, FaTimes } from 'react-icons/fa';
 import { addNote, deleteNote, getNotes, updateNote } from '../functions/patient';
 import ConfirmDialog from './dialog/ConfirmDialog';
 import LoadingSpinner from './LoadingSpinner';
@@ -10,6 +10,7 @@ import MessageModel from './MessageModel';
 import moment from 'moment';
 import { getFileIcon } from '../utils/fileIconExtentions';
 
+import CameraCapture from './CameraCapture';
 
 const printStyles = `
    @media print {
@@ -261,7 +262,13 @@ const VoiceToText = ({
   );
 };
 
-function Notes({ patientId, userId,printPreviewMode }) {  // Assume passed as props
+
+
+
+
+
+
+function Notes({ patientId, userId, printPreviewMode }) {  // Assume passed as props
   const [notes, setNotes] = useState('');
   const [savedNotes, setSavedNotes] = useState([]);
   const [attachments, setAttachments] = useState([]);
@@ -278,13 +285,9 @@ function Notes({ patientId, userId,printPreviewMode }) {  // Assume passed as pr
   const [noteToDelete, setNoteToDelete] = useState(null);
   const [showEditor, setShowEditor] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState(null);
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
   const audioStreamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
-const [facingMode, setFacingMode] = useState('environment'); // 'environment' = back, 'user' = front
 
   const [deletedAttachments, setDeletedAttachments] = useState([]);
   
@@ -341,12 +344,9 @@ useEffect(() => {
     return () => clearInterval(timer);
   }, [recording, isPaused]);
 
-  // Cleanup streams on component unmount
+  // Cleanup audio streams on component unmount
   useEffect(() => {
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
       if (audioStreamRef.current) {
         audioStreamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -373,101 +373,42 @@ useEffect(() => {
     }
   };
 
-  // const startCamera = () => {
-  //   setShowCamera(true);
-  //   navigator.mediaDevices.getUserMedia({ video: true })
-  //     .then((stream) => {
-  //       streamRef.current = stream;
-  //       if (videoRef.current) {
-  //         videoRef.current.srcObject = stream;
-  //         videoRef.current.play();
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.error('Camera access error:', err);
-  //       setShowCamera(false);
-  //     });
+  // const handleCapturePhoto = (blob) => {
+  //   const url = URL.createObjectURL(blob);
+  //   setPendingAttachment({
+  //     id: Math.random().toString(),
+  //     name: `Photo-${new Date().toISOString()}.jpg`,
+  //     type: 'image',
+  //     file: blob,
+  //     url,
+  //   });
+  //   setShowDescriptionModal(true);
   // };
 
-  const startCamera = async () => {
-  // Stop any existing stream first
-  if (streamRef.current) {
-    streamRef.current.getTracks().forEach(track => track.stop());
-  }
+  const handleCapturePhoto = (blob) => {
+  // Create a proper File object with .jpg extension
+  const fileName = `Photo-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`;
+  
+  // Convert Blob → File (File is basically Blob + name + lastModified)
+  const photoFile = new File([blob], fileName, {
+    type: 'image/jpeg',
+    lastModified: Date.now(),
+  });
 
-  const constraints = {
-    video: {
-      facingMode: facingMode, // 'environment' or 'user'
-      width: { ideal: 1280 },
-      height: { ideal: 720 }
-    }
-  };
+  const previewUrl = URL.createObjectURL(blob);
 
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    streamRef.current = stream;
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
-      videoRef.current.play();
-    }
-    setShowCamera(true);
-  } catch (err) {
-    console.error('Camera access error:', err);
+  setPendingAttachment({
+    id: Math.random().toString(),
+    name: fileName,              // This is what will be shown & sent
+    type: 'image',
+    file: photoFile,             // ← Now it's a real File with proper name
+    url: previewUrl,
+  });
 
-    // Fallback: try the other camera if one fails
-    const fallbackMode = facingMode === 'environment' ? 'user' : 'environment';
-    try {
-      const fallbackStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: fallbackMode }
-      });
-      streamRef.current = fallbackStream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = fallbackStream;
-        videoRef.current.play();
-      }
-      setFacingMode(fallbackMode);
-      setShowCamera(true);
-    } catch (fallbackErr) {
-      alert('Unable to access camera. Please check permissions.');
-      console.error(fallbackErr);
-    }
-  }
-
-
+  setShowDescriptionModal(true);
 };
-
-const toggleCamera = () => {
-  setFacingMode(prev => prev === 'environment' ? 'user' : 'environment');
-  // Restart camera with new mode
-  if (showCamera) {
-    startCamera();
-  }
-};
-
-  const capturePhoto = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      setPendingAttachment({
-        id: Math.random().toString(),
-        name: `Photo-${new Date().toISOString()}.jpg`,
-        type: 'image',
-        file: blob,
-        url,
-      });
-      setShowDescriptionModal(true);
-      streamRef.current.getTracks().forEach(track => track.stop());
-      setShowCamera(false);
-    }, 'image/jpeg');
-  };
 
   const closeCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
     setShowCamera(false);
   };
 
@@ -604,6 +545,7 @@ const toggleCamera = () => {
     setShowDescriptionModal(false);
     setPendingAttachment(null);
     setAttachmentDescription('');
+    setIsUploadingAttachement(false);
     if (pendingAttachment?.url) {
       URL.revokeObjectURL(pendingAttachment.url);
     }
@@ -967,7 +909,7 @@ const confirmDelete = async () => {
                   </span>
                 </label>
                 <button
-                  onClick={startCamera}
+                  onClick={() => setShowCamera(true)}
                   className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
                   title="Camera Shot"
                 >
@@ -1267,96 +1209,12 @@ const confirmDelete = async () => {
 
       </div>
 
-   
-
-      {/* Camera Modal */}
-      {/* {showCamera && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Capture Photo"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h3 className="text-lg font-semibold mb-4">Capture Photo</h3>
-            <video ref={videoRef} className="w-full h-auto mb-4 rounded-md" autoPlay />
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={capturePhoto}
-                className="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition transform hover:scale-105"
-                title="Capture Photo"
-                aria-label="Capture Photo"
-              >
-                <FaCircle size={24} />
-              </button>
-              <button
-                onClick={closeCamera}
-                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
-
-      {showCamera && (
-  <div
-    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Capture Photo"
-  >
-    <div className="relative bg-black rounded-lg shadow-lg max-w-lg w-full mx-4">
-      {/* Video Feed */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline // Critical for iOS
-        muted
-        className="w-full h-auto rounded-t-lg"
-        style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)' }} // Mirror front camera
+      {/* Camera Modal - Now using the reusable component */}
+      <CameraCapture
+        isOpen={showCamera}
+        onClose={closeCamera}
+        onCapture={handleCapturePhoto}
       />
-
-      {/* Switch Camera Button */}
-      <button
-        onClick={toggleCamera}
-        className="absolute top-4 right-4 bg-white bg-opacity-80 text-gray-800 p-3 rounded-full shadow-lg hover:bg-opacity-100 transition z-10"
-        title="Switch Camera"
-        aria-label="Switch between front and back camera"
-      >
-        🔄
-      </button>
-
-      {/* Indicator: Current Camera */}
-      <div className="absolute top-4 left-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm">
-        {facingMode === 'environment' ? '🌍 Back' : '📱 Front'}
-      </div>
-
-      {/* Controls */}
-      <div className="p-6 bg-black rounded-b-lg">
-        <div className="flex gap-6 justify-center items-center">
-          <button
-            onClick={capturePhoto}
-            className="bg-white p-5 rounded-full shadow-2xl hover:scale-110 transition transform"
-            aria-label="Take photo"
-          >
-            <FaCircle size={36} className="text-red-600" />
-          </button>
-        </div>
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={closeCamera}
-            className="text-white underline hover:no-underline"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
 
       {/* Audio Recording Modal */}
       {showRecordModal && (
@@ -1548,7 +1406,7 @@ const confirmDelete = async () => {
 
           {/* Camera */}
           <button
-            onClick={startCamera}
+            onClick={() => setShowCamera(true)}
             className="flex items-center justify-center w-8 h-8 bg-sky-600 text-white rounded-full hover:bg-sky-700 transition transform hover:scale-105"
             title="Camera Shot"
           >

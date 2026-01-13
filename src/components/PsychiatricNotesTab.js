@@ -9,6 +9,7 @@ import { commitFile, markFileAsTobeDeleted, uploadPsyNoteAttachments } from '../
 import MessageModel from './MessageModel';
 import moment from 'moment';
 import { getFileIcon } from '../utils/fileIconExtentions';
+import CameraCapture from './CameraCapture';
 
 
 const printStyles = `
@@ -275,6 +276,11 @@ const VoiceToText = ({
   );
 };
 
+
+
+
+
+
 function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
   const [notes, setNotes] = useState('');
   const [summaryNote, setSummaryNote] = useState('');
@@ -441,26 +447,6 @@ function PsychiatricNotesTab({ patientId, userId,printPreviewMode }) {
         console.error('Camera access error:', err);
         setShowCamera(false);
       });
-  };
-
-  const capturePhoto = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      setPendingAttachment({
-        id: Math.random().toString(),
-        name: `Photo-${new Date().toISOString()}.jpg`,
-        type: 'image',
-        file: blob,
-        url,
-      });
-      setShowDescriptionModal(true);
-      streamRef.current.getTracks().forEach(track => track.stop());
-      setShowCamera(false);
-    }, 'image/jpeg');
   };
 
   const closeCamera = () => {
@@ -906,6 +892,17 @@ const confirmDelete = async () => {
   };
 
 
+  const handleCapturePhoto = (blob) => {
+    const url = URL.createObjectURL(blob);
+    setPendingAttachment({
+      id: Math.random().toString(),
+      name: `Photo-${new Date().toISOString()}.jpg`,
+      type: 'image',
+      file: blob,
+      url,
+    });
+    setShowDescriptionModal(true);
+  };
 
   return (
    !printPreviewMode ?  <>
@@ -1320,35 +1317,13 @@ const confirmDelete = async () => {
       </div>}
 
       {/* Camera Modal */}
-      {showCamera && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Capture Photo"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h3 className="text-lg font-semibold mb-4">Capture Photo</h3>
-            <video ref={videoRef} className="w-full h-auto mb-4 rounded-md" autoPlay />
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={capturePhoto}
-                className="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition transform hover:scale-105"
-                title="Capture Photo"
-                aria-label="Capture Photo"
-              >
-                <FaCircle size={24} />
-              </button>
-              <button
-                onClick={closeCamera}
-                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          <CameraCapture
+              isOpen={showCamera}
+              onClose={closeCamera}
+              onCapture={handleCapturePhoto}
+            />
+
+
 
       {/* Audio Recording Modal */}
       {showRecordModal && (

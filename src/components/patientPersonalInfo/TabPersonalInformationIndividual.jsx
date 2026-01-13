@@ -18,14 +18,14 @@ import EditButton from "../EditButton";
 import DialogModel from "../model/DialogModel";
 
 const maritalStatusOptions = [
-  { value: "never_married", text: "Never Married" },
+  { value: "never_married", text: "Single" },
   {
     value: "married_first_time",
-    text: "Married (Living Together) Now for First Time",
+    text: "Living Together",
   },
   {
     value: "married_second_time",
-    text: "Married (Living Together) Now for Second (or More) Time",
+    text: "Married",
   },
   { value: "separated", text: "Separated" },
   { value: "divorced_not_remarried", text: "Divorced and Not Remarried" },
@@ -202,26 +202,26 @@ function PersonalInsightsPrint({ personalInformation }) {
         <section className="print-section space-y-5">
 
           {/* Things Liked */}
-          <div className="print-field">
+          {/* <div className="print-field">
             <span className="font-medium text-gray-700">Things you like to do most</span>
             <p className="mt-1 text-gray-900 whitespace-pre-line">
               {personalInformation.thingsLiked.value || (
                 <span className="italic text-gray-500">N/A</span>
               )}
             </p>
-          </div>
+          </div> */}
 
           {/* Assets / Good points */}
-          <div className="print-field">
+          {/* <div className="print-field">
             <span className="font-medium text-gray-700">Main assets and good points</span>
             <div className="mt-1">{renderList("assets")}</div>
-          </div>
+          </div> */}
 
           {/* Bad points */}
-          <div className="print-field">
+          {/* <div className="print-field">
             <span className="font-medium text-gray-700">Main bad points</span>
             <div className="mt-1">{renderList("badPoints")}</div>
-          </div>
+          </div> */}
 
           {/* Social difficulties */}
           <div className="print-field">
@@ -250,24 +250,24 @@ function PersonalInsightsPrint({ personalInformation }) {
           </div>
 
           {/* Life goals */}
-          <div className="print-field">
+          {/* <div className="print-field">
             <span className="font-medium text-gray-700">Main life goals</span>
             <p className="mt-1 text-gray-900 whitespace-pre-line">
               {personalInformation.lifeGoals.value || (
                 <span className="italic text-gray-500">N/A</span>
               )}
             </p>
-          </div>
+          </div> */}
 
           {/* Things to change */}
-          <div className="print-field">
+          {/* <div className="print-field">
             <span className="font-medium text-gray-700">Things you would most like to change about yourself</span>
             <p className="mt-1 text-gray-900 whitespace-pre-line">
               {personalInformation.thingsToChange.value || (
                 <span className="italic text-gray-500">N/A</span>
               )}
             </p>
-          </div>
+          </div> */}
 
         </section>
       </div>
@@ -1638,7 +1638,7 @@ if(value===0) // adding custom occupation
             </div>
             {editingSection === "insights" || mode === "add" ? (
               <div className="space-y-6">
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     List the things you like to do most, kinds of things and
                     persons that give you pleasure{" "}
@@ -1660,9 +1660,9 @@ if(value===0) // adding custom occupation
                       {personalInformationErrors.thingsLiked}
                     </p>
                   )}
-                </div>
+                </div> */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+                  {/* <div>
                     <DescriptionInput
                       patient={personalInformation}
                       setValue={(value) => {
@@ -1685,8 +1685,8 @@ if(value===0) // adding custom occupation
                         {personalInformationErrors.assets}
                       </p>
                     )}
-                  </div>
-                  <div>
+                  </div> */}
+                  {/* <div>
                     <DescriptionInput
                       patient={personalInformation}
                       setValue={(value) => {
@@ -1709,7 +1709,7 @@ if(value===0) // adding custom occupation
                         {personalInformationErrors.badPoints}
                       </p>
                     )}
-                  </div>
+                  </div> */}
                 </div>
                     <div>
                 
@@ -1778,7 +1778,7 @@ if(value===0) // adding custom occupation
                     </p>
                   )}
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     List your main life goals
                     {personalInformation.lifeGoals.required && (
@@ -1799,8 +1799,8 @@ if(value===0) // adding custom occupation
                       {personalInformationErrors.lifeGoals}
                     </p>
                   )}
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Things Most Like to Change
                     {personalInformation.thingsToChange.required && (
@@ -1821,11 +1821,11 @@ if(value===0) // adding custom occupation
                       {personalInformationErrors.thingsToChange}
                     </p>
                   )}
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className="space-y-4">
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                {/* <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Things Liked:</strong>
                   <div className="mt-2">
                     <p className="text-gray-700 mt-1 whitespace-pre-line">
@@ -1847,7 +1847,7 @@ if(value===0) // adding custom occupation
                   <div className="mt-2">
                     {renderListItems(personalInformation.badPoints.value)}
                   </div>
-                </div>
+                </div> */}
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Social Difficulties:</strong>
                   <div className="mt-2">
@@ -1877,7 +1877,7 @@ if(value===0) // adding custom occupation
                     </p>
                   </div>
                 </div>
-                <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                {/* <div className=" bg-white border border-gray-200 rounded-lg p-4">
                   <strong className="text-sm">Main Life Goals:</strong>
                   <div className="mt-2">
                     <p className="text-gray-700 mt-1 whitespace-pre-line">
@@ -1894,7 +1894,7 @@ if(value===0) // adding custom occupation
                       {personalInformation.thingsToChange.value}
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
           </section>

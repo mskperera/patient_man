@@ -1812,6 +1812,111 @@ const NewOccupationPanel = () => {
                     </p>
                   )}
                 </div>
+
+
+
+
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+   <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      If your mother and father separated, how old were you at
+                      the time?
+                      {familyInformation.parentalSeparationAge.required && (
+                        <span className="text-red-500">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      name="parentalSeparationAge"
+                      value={familyInformation.parentalSeparationAge.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter age"
+                      aria-label="Parental separation age"
+                    />
+                    {familyInformationErrors.parentalSeparationAge && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {familyInformationErrors.parentalSeparationAge}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      If your mother and father divorced, how old were you at
+                      the time?
+                      {familyInformation.parentalDivorceAge.required && (
+                        <span className="text-red-500">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      name="parentalDivorceAge"
+                      value={familyInformation.parentalDivorceAge.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter age"
+                      aria-label="Parental divorce age"
+                    />
+                    {familyInformationErrors.parentalDivorceAge && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {familyInformationErrors.parentalDivorceAge}
+                      </p>
+                    )}
+                  </div>
+</div>      
+
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Total number of times mother divorced
+                      {familyInformation.motherDivorceCount.required && (
+                        <span className="text-red-500">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      name="motherDivorceCount"
+                      value={familyInformation.motherDivorceCount.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter number"
+                      aria-label="Mother divorce count"
+                    />
+                    {familyInformationErrors.motherDivorceCount && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {familyInformationErrors.motherDivorceCount}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Total number of times father divorced
+                      {familyInformation.fatherDivorceCount.required && (
+                        <span className="text-red-500">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      name="fatherDivorceCount"
+                      value={familyInformation.fatherDivorceCount.value}
+                      onChange={handleChange}
+                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                      placeholder="Enter number"
+                      aria-label="Father divorce count"
+                    />
+                    {familyInformationErrors.fatherDivorceCount && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {familyInformationErrors.fatherDivorceCount}
+                      </p>
+                    )}
+                  </div>
+</div>
+
+
               </div>
             ) : (
               <div className="space-y-4">
@@ -1926,6 +2031,62 @@ const NewOccupationPanel = () => {
                     </div>
                   </div>
                 </div>
+
+
+
+
+
+
+ <div className="mt-6">
+                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                          <strong className="text-sm">
+                        If your mother and father separated, how old were you at
+                        the time?
+                      </strong>
+                       <div className=" mt-2">
+                        {familyInformation.parentalSeparationAge.value}
+                      </div>
+                    </div>  
+                    </div>
+
+                <div className="mt-6">
+                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                        <strong className="text-sm">
+                        If your mother and father divorced, how old were you at
+                        the time?
+                      </strong>
+                       <div className=" mt-2">
+                        {familyInformation.parentalDivorceAge.value}
+                      </div>
+                    </div>
+                    </div>
+
+
+                  <div className="mt-6">
+                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                       <strong className="text-sm">
+                        Total number of times mother divorced
+                      </strong>
+              <div className=" mt-2">
+                        {familyInformation.motherDivorceCount.value}
+                      </div>
+                    </div>
+                    </div>
+
+                    
+ <div className="mt-6">
+                  <div className=" bg-white border border-gray-200 rounded-lg p-4">
+                     <strong className="text-sm">
+                        Total number of times father divorced
+                      </strong>
+                      <div className=" mt-2">
+                        {familyInformation.fatherDivorceCount.value}
+                      </div>
+                    </div>
+                    </div>
+
+
+
               </div>
             )}
           </section>
@@ -1987,100 +2148,7 @@ const NewOccupationPanel = () => {
             {editingSection === "sibling" || mode === "add" ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      If your mother and father separated, how old were you at
-                      the time?
-                      {familyInformation.parentalSeparationAge.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      name="parentalSeparationAge"
-                      value={familyInformation.parentalSeparationAge.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter age"
-                      aria-label="Parental separation age"
-                    />
-                    {familyInformationErrors.parentalSeparationAge && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {familyInformationErrors.parentalSeparationAge}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      If your mother and father divorced, how old were you at
-                      the time?
-                      {familyInformation.parentalDivorceAge.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      name="parentalDivorceAge"
-                      value={familyInformation.parentalDivorceAge.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter age"
-                      aria-label="Parental divorce age"
-                    />
-                    {familyInformationErrors.parentalDivorceAge && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {familyInformationErrors.parentalDivorceAge}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Total number of times mother divorced
-                      {familyInformation.motherDivorceCount.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      name="motherDivorceCount"
-                      value={familyInformation.motherDivorceCount.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter number"
-                      aria-label="Mother divorce count"
-                    />
-                    {familyInformationErrors.motherDivorceCount && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {familyInformationErrors.motherDivorceCount}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Total number of times father divorced
-                      {familyInformation.fatherDivorceCount.required && (
-                        <span className="text-red-500">*</span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      name="fatherDivorceCount"
-                      value={familyInformation.fatherDivorceCount.value}
-                      onChange={handleChange}
-                      className="mt-1 w-full p-3 border text-sm border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                      placeholder="Enter number"
-                      aria-label="Father divorce count"
-                    />
-                    {familyInformationErrors.fatherDivorceCount && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {familyInformationErrors.fatherDivorceCount}
-                      </p>
-                    )}
-                  </div>
+               
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Number of living brothers
@@ -2325,41 +2393,7 @@ const NewOccupationPanel = () => {
             ) : (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white border-gray-200 rounded-lg p-4 border-2">
-                  <div className="mr-5">
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                      <span className="font-bold text-sm w-2/3">
-                        If your mother and father separated, how old were you at
-                        the time?
-                      </span>
-                      <span className="text-gray-700 text-sm w-1/3 text-right">
-                        {familyInformation.parentalSeparationAge.value}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                      <span className="font-bold text-sm w-2/3">
-                        If your mother and father divorced, how old were you at
-                        the time?
-                      </span>
-                      <span className="text-gray-700 text-sm w-1/3 text-right">
-                        {familyInformation.parentalDivorceAge.value}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                      <span className="font-bold text-sm w-2/3">
-                        Total number of times mother divorced
-                      </span>
-                      <span className="text-gray-700 text-sm w-1/3 text-right">
-                        {familyInformation.motherDivorceCount.value}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
-                      <span className="font-bold text-sm w-2/3">
-                        Total number of times father divorced
-                      </span>
-                      <span className="text-gray-700 text-sm w-1/3 text-right">
-                        {familyInformation.fatherDivorceCount.value}
-                      </span>
-                    </div>
+              
                     <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
                       <span className="font-bold text-sm w-2/3">
                         Number of living brothers
@@ -2368,9 +2402,7 @@ const NewOccupationPanel = () => {
                         {familyInformation.livingBrothers.value}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="ml-5">
+                  
                     <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
                       <span className="font-bold text-sm w-2/3">
                         Number of living sisters
@@ -2379,6 +2411,7 @@ const NewOccupationPanel = () => {
                         {familyInformation.livingSisters.value}
                       </span>
                     </div>
+
                     <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
                       <span className="font-bold text-sm w-2/3">
                         Ages of living brothers
@@ -2396,9 +2429,10 @@ const NewOccupationPanel = () => {
                                   <FaMale className="mr-1" /> {age.trim()}
                                 </span>
                               ))
-                          : "N/A"}
+                          : ""}
                       </span>
                     </div>
+
                     <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
                       <span className="font-bold text-sm w-2/3">
                         Ages of living sisters
@@ -2416,9 +2450,10 @@ const NewOccupationPanel = () => {
                                   <FaFemale className="mr-1" /> {age.trim()}
                                 </span>
                               ))
-                          : "N/A"}
+                          : ""}
                       </span>
                     </div>
+
                     <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
                       <span className="font-bold text-sm w-2/3">
                         I was child number
@@ -2427,6 +2462,7 @@ const NewOccupationPanel = () => {
                         {familyInformation.childNumber.value}
                       </span>
                     </div>
+                    
                     <div className="flex justify-between items-center py-2.5 border-b border-gray-200 last:border-b-0">
                       <span className="font-bold text-sm w-2/3">
                         In a family of children
@@ -2435,7 +2471,7 @@ const NewOccupationPanel = () => {
                         {familyInformation.familyChildren.value}
                       </span>
                     </div>
-                  </div>
+                 
                 </div>
 
                 <div className=" bg-white border border-gray-200 rounded-lg p-4">

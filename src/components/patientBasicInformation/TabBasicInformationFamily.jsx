@@ -12,6 +12,8 @@ import {
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import EditButton from "../EditButton";
+import DatePicker from "react-datepicker";
+import { format } from "date-fns";
 
 /* --------------------------------------------------------------
    Print-Only CSS: Page breaks, A4 size, color accuracy
@@ -105,18 +107,7 @@ const FamilyInfoPrint = ({ basicInformation }) => {
             </div>
           </div>
 
-          {/* Date of Birth */}
-          <div className="grid grid-cols-5 gap-4 mb-2">
-            <span className="font-medium text-gray-700">Date of Birth:</span>
-            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
-              <span className="text-gray-900">{formatDate(basicInformation.husbandDateOfBirth.value)}</span>
-            </div>
-            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
-              <span className="text-gray-900">{formatDate(basicInformation.wifeDateOfBirth.value)}</span>
-            </div>
-          </div>
-
-          {/* Age */}
+     {/* Age */}
           <div className="grid grid-cols-5 gap-4 mb-2">
             <span className="font-medium text-gray-700">Age:</span>
             <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
@@ -130,6 +121,19 @@ const FamilyInfoPrint = ({ basicInformation }) => {
               </span>
             </div>
           </div>
+
+          {/* Date of Birth */}
+          <div className="grid grid-cols-5 gap-4 mb-2">
+            <span className="font-medium text-gray-700">Date of Birth:</span>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{formatDate(basicInformation.husbandDateOfBirth.value)}</span>
+            </div>
+            <div className="col-span-2 flex justify-between py-1.5 border-b border-dashed border-gray-300">
+              <span className="text-gray-900">{formatDate(basicInformation.wifeDateOfBirth.value)}</span>
+            </div>
+          </div>
+
+     
 
           {/* Gender */}
           <div className="grid grid-cols-5 gap-4 mb-2">
@@ -1035,6 +1039,67 @@ const validateField = (name, value, required) => {
 // };
 
 
+
+  const handleChangeDob = (name,value) => {
+
+const dobValFormated=moment(value).format("yyyy-MM-DD");
+
+console.log('dobVal',dobValFormated)
+    const required = basicInformation[name].required;
+    const error = validateField(basicInformation[name].label, dobValFormated, required);
+
+ 
+    const updatedInfo = {
+      ...basicInformation,
+      [name]: {
+        ...basicInformation[name],
+        value:dobValFormated,
+        isTouched: true,
+        isValid: error === "",
+      },
+    };
+
+
+
+    setBasicInformation(prev => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        value: dobValFormated,
+        isTouched: true,
+        isValid: !!value
+      }
+    }));
+  
+
+
+      const birthDate = new Date(value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      console.log('age:',age)
+      updatedInfo["age"] = {
+        ...basicInformation["age"],
+        value: age.toString()=="NaN" ? '' : age.toString(),
+        isTouched: true,
+        isValid: true,
+      };
+    
+
+    setBasicInformation(updatedInfo);
+    setBasicInformationErrors((prev) => ({
+      ...prev,
+      dateOfBirth: error,
+    }));
+  };
+
+
+
+
 const handleMaskedDateChange = (e, fieldKey) => {
   let input = e.target.value.replace(/\D/g, "");
   if (input.length > 8) input = input.slice(0, 8);
@@ -1366,6 +1431,33 @@ const handleKeyDown = (e) => {
                 )}
               </div>
             </div> */}
+
+             <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+              <label className="block text-sm font-medium text-gray-700">
+                Age
+              </label>
+              <div className="col-span-2">
+                {basicInformation.husbandDateOfBirth.value && (
+                  <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    <span className="text-gray-800 font-medium">
+                      {basicInformation.husbandAge.value}
+                    </span>
+                   {basicInformation.husbandAge.value ? <span className="text-gray-600">Years</span>:''} 
+                  </div>
+                )}
+              </div>
+              <div className="col-span-2">
+                {basicInformation.wifeDateOfBirth.value && (
+                  <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    <span className="text-gray-800 font-medium">
+                      {basicInformation.wifeAge.value}
+                    </span>
+                  {basicInformation.wifeAge.value ? <span className="text-gray-600">Years</span>:''}
+                  </div>
+                )}
+              </div>
+            </div>
+            
      <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
   <label className="block text-sm font-medium text-gray-700 pt-3">
     Date of Birth
@@ -1375,17 +1467,19 @@ const handleKeyDown = (e) => {
   <div className="col-span-2">
     <div>
       <div className="mt-1 relative">
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="DD-MM-YYYY"
-          value={basicInformation.husbandDateOfBirth.display || ""}
-          onChange={(e) => handleMaskedDateChange(e, "husbandDateOfBirth")}
-          onKeyDown={handleKeyDown}
-          className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-          aria-label="Husband Date of Birth (DD-MM-YYYY)"
-          maxLength="10"
-        />
+    <DatePicker
+      selected={
+        basicInformation.husbandDateOfBirth.value
+          ? new Date(basicInformation.husbandDateOfBirth.value)
+          : null
+      }
+       onChange={(date)=>{
+          handleChangeDob('husbandDateOfBirth',date)
+    }}
+      dateFormat="yyyy-MM-dd"
+      placeholderText="YYYY-MM-DD"
+      className="w-full p-3 text-sm border border-gray-300 rounded-lg"
+    />
 
         {/* Clear button - Husband */}
         {basicInformation.husbandDateOfBirth.value && (
@@ -1415,17 +1509,19 @@ const handleKeyDown = (e) => {
     <div>
       <div className="mt-1 relative">
      
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="DD-MM-YYYY"
-          value={basicInformation.wifeDateOfBirth.display || ""}
-          onChange={(e) => handleMaskedDateChange(e, "wifeDateOfBirth")}
-          onKeyDown={handleKeyDown}
-          className="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-          aria-label="Wife Date of Birth (DD-MM-YYYY)"
-          maxLength="10"
-        />
+   <DatePicker
+     selected={
+       basicInformation.wifeDateOfBirth.value
+         ? new Date(basicInformation.wifeDateOfBirth.value)
+         : null
+     }
+       onChange={(date)=>{
+          handleChangeDob('wifeDateOfBirth',date)
+    }}
+     dateFormat="yyyy-MM-dd"
+     placeholderText="YYYY-MM-DD"
+     className="w-full p-3 text-sm border border-gray-300 rounded-lg"
+   />
 
         {/* Clear button - Wife */}
         {basicInformation.wifeDateOfBirth.value && (
@@ -1450,31 +1546,7 @@ const handleKeyDown = (e) => {
     </div>
   </div>
 </div>
-            <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-              <label className="block text-sm font-medium text-gray-700">
-                Age
-              </label>
-              <div className="col-span-2">
-                {basicInformation.husbandDateOfBirth.value && (
-                  <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-md bg-gray-50">
-                    <span className="text-gray-800 font-medium">
-                      {basicInformation.husbandAge.value}
-                    </span>
-                   {basicInformation.husbandAge.value ? <span className="text-gray-600">Years</span>:''} 
-                  </div>
-                )}
-              </div>
-              <div className="col-span-2">
-                {basicInformation.wifeDateOfBirth.value && (
-                  <div className="flex items-center gap-2 p-3 text-sm border border-gray-300 rounded-md bg-gray-50">
-                    <span className="text-gray-800 font-medium">
-                      {basicInformation.wifeAge.value}
-                    </span>
-                  {basicInformation.wifeAge.value ? <span className="text-gray-600">Years</span>:''}
-                  </div>
-                )}
-              </div>
-            </div>
+           
             <div className="mb-5 grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
               <label className="block text-sm font-medium text-gray-700">
                 Gender{" "}

@@ -116,6 +116,14 @@ const PrintEducationDetailsA4 = ({
           <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
             G.C.E Ordinary Level (O/L) Qualifications
           </h3>
+      {education.ol.remark && (
+                <div className="mt-4">
+                  <span className="font-semibold text-gray-700">Remark:</span>
+                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                    {education.ol.remark}
+                  </div>
+                </div>
+              )}
 
           {!education.ol.enabled ? (
             <div className="flex items-center gap-2 text-gray-600 italic">
@@ -143,14 +151,7 @@ const PrintEducationDetailsA4 = ({
                 </tbody>
               </table>
 
-              {education.ol.remark && (
-                <div className="mt-4">
-                  <span className="font-semibold text-gray-700">Remark:</span>
-                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
-                    {education.ol.remark}
-                  </div>
-                </div>
-              )}
+        
             </>
           ) : (
             <div className="flex items-center gap-2 text-gray-600 italic">
@@ -203,6 +204,14 @@ const PrintEducationDetailsA4 = ({
           <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
             G.C.E Advanced Level (A/L) Qualifications
           </h3>
+    {education.al.remark && (
+                    <div className="mt-4">
+                      <span className="font-semibold text-gray-700">Remark:</span>
+                      <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                        {education.al.remark}
+                      </div>
+                    </div>
+                  )}
 
           {!education.al.enabled ? (
             <div className="flex items-center gap-2 text-gray-600 italic">
@@ -237,14 +246,7 @@ const PrintEducationDetailsA4 = ({
                     </tbody>
                   </table>
 
-                  {education.al.remark && (
-                    <div className="mt-4">
-                      <span className="font-semibold text-gray-700">Remark:</span>
-                      <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
-                        {education.al.remark}
-                      </div>
-                    </div>
-                  )}
+              
                 </>
               ) : (
                 <div className="flex items-center gap-2 text-gray-600 italic">
@@ -263,7 +265,15 @@ const PrintEducationDetailsA4 = ({
           <h3 className="text-lg font-bold text-sky-700 border-b-2 border-sky-700 pb-1 mb-4">
             University Qualifications
           </h3>
-
+       {education.university.remark && (
+                <div className="mt-4">
+                  <span className="font-semibold text-gray-700">Remark:</span>
+                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
+                    {education.university.remark}
+                  </div>
+                </div>
+              )}
+              
           {!education.university.enabled ? (
             <div className="flex items-center gap-2 text-gray-600 italic">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,14 +304,7 @@ const PrintEducationDetailsA4 = ({
                 </tbody>
               </table>
 
-              {education.university.remark && (
-                <div className="mt-4">
-                  <span className="font-semibold text-gray-700">Remark:</span>
-                  <div className="bg-gray-50 border border-gray-300 rounded-md p-3 mt-1 text-xs whitespace-pre-line text-gray-800">
-                    {education.university.remark}
-                  </div>
-                </div>
-              )}
+       
             </>
           ) : (
             <div className="flex items-center gap-2 text-gray-600 italic">
@@ -1722,6 +1725,21 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                     {olSubjectListError}
                   </p>
                 )}
+                        <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
+                  <VoiceToText
+                    name="ol.remark"
+                    value={education.ol.remark || ""}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Enter any additional remarks"
+                    disabled={education.ol.enabled === false}
+                    aria-label="O/L Remark"
+                    rows="4"
+                  />
+                </div>
                 {education.ol.subjects.map((subject, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <div className="w-1/3">
@@ -1821,25 +1839,19 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                 >
                   Add O/L Subject
                 </button>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Remark
-                  </label>
-                  <VoiceToText
-                    name="ol.remark"
-                    value={education.ol.remark || ""}
-                    onChange={handleTextInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter any additional remarks"
-                    disabled={education.ol.enabled === false}
-                    aria-label="O/L Remark"
-                    rows="4"
-                  />
-                </div>
+        
               </div>
             ) : (
               <div className="space-y-4">
-                
+                   <div className="mt-5">
+                       {education.ol.remark ?    <div className="">
+                            <strong>Remark:</strong>{" "}
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
+                              {education.ol.remark}
+                            </div>
+                          </div>:''}
+                    </div>
+
                 {!education.ol.enabled ? 
                  <div className="flex items-center space-x-2 text-gray-500 font-semibold">
                                         <FaInfoCircle className="text-xl" /><span>No O/L qualifications</span>
@@ -1880,14 +1892,7 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                         ))}
                       </tbody>
                     </table>
-                    <div className="mt-5">
-                       {education.ol.remark ?    <div className="">
-                            <strong>Remark:</strong>{" "}
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                              {education.ol.remark}
-                            </div>
-                          </div>:''}
-                    </div>
+                 
                   </div>
                 ) :  null}
               </div>
@@ -2043,6 +2048,23 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
             </div>
             {editingSection === "al" || mode === "add" ? (
               <div className="space-y-4">
+              
+                        <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
+                  <VoiceToText
+                    name="al.remark"
+                    value={education.al.remark || ""}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Enter any additional remarks"
+                    disabled={education.al.enabled === false}
+                    aria-label="A/L Remark"
+                    rows="4"
+                  />
+                </div>
+              
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Stream{<span className="text-red-500">*</span>}
@@ -2172,25 +2194,18 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                 >
                   Add A/L Subject
                 </button>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Remark
-                  </label>
-                  <VoiceToText
-                    name="al.remark"
-                    value={education.al.remark || ""}
-                    onChange={handleTextInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter any additional remarks"
-                    disabled={education.al.enabled === false}
-                    aria-label="A/L Remark"
-                    rows="4"
-                  />
-                </div>
+      
               </div>
             ) : (
               <div className="space-y-4">
-               
+                   <div className="mt-5">
+                               {education.al.remark ?    <div className="">
+                            <strong>Remark:</strong>{" "}
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
+                              {education.al.remark}
+                            </div>
+                          </div>:''}
+                        </div>
                
                 {! education.al.enabled ? <div className="flex items-center space-x-2 text-gray-500 font-semibold">
                                        <FaInfoCircle className="text-xl" /><span>No A/L qualifications</span>
@@ -2235,14 +2250,7 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                             ))}
                           </tbody>
                         </table>
-                        <div className="mt-5">
-                               {education.al.remark ?    <div className="">
-                            <strong>Remark:</strong>{" "}
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                              {education.al.remark}
-                            </div>
-                          </div>:''}
-                        </div>
+                    
                       </div>
                     ) : (
                       null
@@ -2307,6 +2315,22 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
             </div>
             {editingSection === "university" || mode === "add" ? (
               <div className="space-y-4">
+                    <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Remark
+                  </label>
+                  <VoiceToText
+                    name="university.remark"
+                    value={education.university.remark || ""}
+                    onChange={handleTextInputChange}
+                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
+                    placeholder="Enter any additional remarks"
+                    disabled={education.university.enabled === false}
+                    aria-label="University Remark"
+                    rows="4"
+                  />
+                </div>
+
                 {universitySubjectListError && (
                   <p className="mt-1 text-sm text-white w-full bg-red-600 p-3 rounded-lg">
                     {universitySubjectListError}
@@ -2456,24 +2480,16 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                 >
                   Add University Qualification
                 </button>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Remark
-                  </label>
-                  <VoiceToText
-                    name="university.remark"
-                    value={education.university.remark || ""}
-                    onChange={handleTextInputChange}
-                    className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200"
-                    placeholder="Enter any additional remarks"
-                    disabled={education.university.enabled === false}
-                    aria-label="University Remark"
-                    rows="4"
-                  />
-                </div>
+            
               </div>
             ) : (
               <div className="space-y-4">
+                    {education.university.remark ? <div className="mt-5">
+                      <strong>Remark:</strong>
+                      <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
+                        {education.university.remark}
+                      </div>
+                    </div>:''}
                 <div>
                
                  {!education.university.enabled ?  <div className="flex items-center space-x-2 text-gray-500 font-semibold">
@@ -2524,12 +2540,7 @@ const TabEducationDetailsIndividual = ({ id, refreshTabDetails,printPreviewMode 
                         )}
                       </tbody>
                     </table>
-                 {education.university.remark ? <div className="mt-5">
-                      <strong>Remark:</strong>
-                      <div className="bg-white border border-gray-200 rounded-lg p-4 mt-1 whitespace-pre-line">
-                        {education.university.remark}
-                      </div>
-                    </div>:''}
+             
                   </div>
                 )   
                 :null}
