@@ -1051,13 +1051,13 @@ const confirmDelete = async () => {
                   {/* Image preview */}
                   {att.type === "image" && (
                     <a
-                      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                      href={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex justify-center"
                     >
                       <img
-                        src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                        src={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
                         alt={att.name}
                         className="mt-2 w-20 h-20 object-cover rounded-md"
                       />
@@ -1069,7 +1069,7 @@ const confirmDelete = async () => {
                     <div className="mt-2 w-40">
                       <audio controls className="w-full">
                         <source
-                          src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                          src={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
                           type="audio/webm"
                         />
                       </audio>
@@ -1079,7 +1079,7 @@ const confirmDelete = async () => {
                   {/* File link */}
                   {att.type === "file" && (
                     <a
-                      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                      href={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
@@ -1196,13 +1196,13 @@ const confirmDelete = async () => {
   {/* Image preview */}
   {att.type === "image" && (
     <a
-      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+      href={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
       target="_blank"
       rel="noopener noreferrer"
       className="flex justify-center"
     >
       <img
-        src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+        src={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
         alt={att.name}
         className="mt-2 w-20 h-20 object-cover rounded-md"
       />
@@ -1214,7 +1214,7 @@ const confirmDelete = async () => {
     <div className="mt-2 w-40">
       <audio controls className="w-full">
         <source
-          src={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+          src={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
           type="audio/webm"
         />
       </audio>
@@ -1224,7 +1224,7 @@ const confirmDelete = async () => {
   {/* File link */}
   {att.type === "file" && (
     <a
-      href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+      href={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
       download
       target="_blank"
       rel="noopener noreferrer"
@@ -1577,13 +1577,13 @@ const confirmDelete = async () => {
        
                        {att.type === 'image' && (
                              <a
-             href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+             href={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
              target="_blank"
              rel="noopener noreferrer"
              className="flex justify-center"
            >
                          <img
-                           src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`}
+                           src={`${process.env.REACT_APP_API_CDN}/${att.hash}`}
                            alt={att.name}
                            className="max-h-20 mx-auto rounded"
                          />
@@ -1592,13 +1592,13 @@ const confirmDelete = async () => {
                        {att.type === 'audio' && (
                             <div className="mt-2 w-40">
                          <audio controls className="w-full">
-                           <source src={`https://clpos.legendbyte.com/api/v1/asset/${att.hash}`} />
+                           <source src={`${process.env.REACT_APP_API_CDN}/${att.hash}`} />
                          </audio>
                          </div>
                        )}
                        {att.type === 'file' && (
                          <a
-                 href={`https://clpos.legendbyte.com/api/v1/asset/${att?.hash}`}
+                 href={`${process.env.REACT_APP_API_CDN}/${att?.hash}`}
              download
              target="_blank"
              rel="noopener noreferrer"
