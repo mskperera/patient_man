@@ -20,7 +20,8 @@
     "react-router-dom": "^7.5.0",
     "react-scripts": "5.0.1",
     "react-select": "^5.10.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.20.0"
   },
   "scripts": {
     "start": "react-scripts start",

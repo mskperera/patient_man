@@ -5,6 +5,7 @@ import LogoForLogin from '../assets/logo.png';
 import loginBack from '../assets/loginback.png';
 import { userLogin } from '../functions/patient';
 import { parseJwt } from '../utils/jwt';
+import VoiceApp from './voiceApp/VoiceApp';
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -80,6 +81,7 @@ function LoginPage() {
 >
 
 <div></div>
+{/* <VoiceApp /> */}
       
       <div className="max-w-md w-full bg-white border border-gray-200 rounded-xl p-8 shadow-xl">
         {/* Avatar Image */}
